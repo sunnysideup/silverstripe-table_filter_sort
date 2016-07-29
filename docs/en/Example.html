@@ -1,0 +1,214 @@
+-<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Example Filter Table</title>
+        <style>
+            * {font-family: sans-serif; font-size: 13px!important;}
+            .tableFilterSortHolder {background-color: pink; border-radius: 5px; padding: 1em 5em 5em 5em;}
+            table {width: 100%; margin-left: auto; margin-right: auto;}
+            table th, table td {width: 12.5%; border: 5px solid #fff; background-color: #ddd; text-align: center; padding: 1em;}
+            table th {background-color: crimson;}
+            table th a, table th {color: white; border-bottom: 1px solid #fff;}
+            table td ul {margin: 0; padding: 0;}
+            table td ul li {padding: 0; margin: 0; display: inline;}
+            table td ul li:after {content: ";";}
+
+            .tableFilterSortFilterFormHolder { }
+            .tableFilterSortFilterFormHolder .filterColumn{ width: calc(33% - 2em); float: left; oveflow: auto; margin: 1em;}
+            .tableFilterSortFilterFormHolder .filterColumn:nth-child(3n+1){clear:left;}
+            .tableFilterSortFilterFormHolder .filterColumn ul,
+            .tableFilterSortFilterFormHolder .filterColumn ul li{list-style: none; padding: 0; margin: 0;}
+
+            .tableFilterSortCommonContentHolder {clear: both; }
+            .tableFilterSortCommonContentHolder ul {margin-top: 0; padding-top: 0; }
+
+            .sort-asc:after {content: " △";}
+            .sort-desc:after {content: " ▽";}
+            .sortable {text-decoration: none;}
+        </style>
+    </head>
+    <body>
+
+        <h1>Example of a Filter and Sort Table ... </h1>
+
+        <div class="tableFilterSortHolder">
+            <div class="tableFilterSortFilterFormHolder" data-title="My Filter Title"></div>
+            <div class="tableFilterSortCommonContentHolder" data-title="Common Info"></div>
+            <table class="tableFilterSortTable">
+                <thead>
+                    <tr>
+                        <th scope="col">Type</th>
+                        <th scope="col">Producer</th>
+                        <th scope="col">Colour</th>
+                        <th scope="col">
+                            <a href="#" class="sortable" data-filter="Size" data-sort-direction="asc" data-sort-type="text">Size</a>
+                        </th>
+                        <th scope="col">
+                            <a href="#" class="sortable" data-filter="Weight" data-sort-direction="asc" data-sort-type="number">Weight</a>
+                        </th>
+                        <th scope="col">
+                            <a href="#" class="sortable" data-filter="Price" data-sort-direction="asc" data-sort-type="number" data-sort-default="true">Price</a>
+                        </th>
+                        <th scope="col">
+                            <a href="#" class="sortable" data-filter="Rating" data-sort-direction="desc" data-sort-type="number">Rating</a>
+                        </th>
+                        <th scope="col">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="tableFilterSortFilterRow">
+                        <td><span data-filter="Type">Test Product</span></td>
+                        <td><span data-filter="Original Producer">Sunny Side Up</span></td>
+                        <td><span data-filter="Colour">Green</span></td>
+                        <td><span data-filter="Size">S</span></td>
+                        <td><span data-filter="Weight">1kg.</span></td>
+                        <td><span data-filter="Price">$12.12</span></td>
+                        <td><span data-filter="Rating">5 Stars</span></td>
+                        <td>
+                            <a href="#" class="tableFilterSortMoreDetails" data-rel="Row_1_Details">more</a>
+                            <div style="display: none;" id="Row_1_Details">
+                                <h6>Tags</h6>
+                                <ul>
+                                    <li><span data-filter="Tags">Cabbage</span></li>
+                                    <li><span data-filter="Tags">Carrot</span></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="tableFilterSortFilterRow">
+                        <td><span data-filter="Type">Test Product</span></td>
+                        <td><span data-filter="Original Producer">Sunny Side Up</span></td>
+                        <td><span data-filter="Colour">Red</span></td>
+                        <td><span data-filter="Size">M</span></td>
+                        <td><span data-filter="Weight">11kg.</span></td>
+                        <td><span data-filter="Price">$443.12</span></td>
+                        <td><span data-filter="Rating">2 Stars</span></td>
+                        <td>
+                            <a href="#" class="tableFilterSortMoreDetails" data-rel="Row_2_Details">more</a>
+                            <div style="display: none;" id="Row_2_Details">
+                                <h6>Tags</h6>
+                                <ul>
+                                    <li><span data-filter="Tags">Onion</span></li>
+                                    <li><span data-filter="Tags">Tomato</span></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="tableFilterSortFilterRow">
+                        <td><span data-filter="Type">Test Product</span></td>
+                        <td><span data-filter="Original Producer">Sunny Side Up</span></td>
+                        <td><span data-filter="Colour">Orange</span></td>
+                        <td><span data-filter="Size">X</span></td>
+                        <td><span data-filter="Weight">3kg.</span></td>
+                        <td><span data-filter="Price">$428.36</span></td>
+                        <td><span data-filter="Rating">4 Stars</span></td>
+                        <td>
+                            <a href="#" class="tableFilterSortMoreDetails" data-rel="Row_3_Details">more</a>
+                            <div style="display: none;" id="Row_3_Details">
+                                <h6>Tags</h6>
+                                <ul>
+                                    <li><span data-filter="Tags">Eggplant</span></li>
+                                    <li><span data-filter="Tags">Celery</span></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="tableFilterSortFilterRow">
+                        <td><span data-filter="Type">Test Product</span></td>
+                        <td><span data-filter="Original Producer">Sunny Side Up</span></td>
+                        <td><span data-filter="Colour">Blue</span></td>
+                        <td><span data-filter="Size">XL</span></td>
+                        <td><span data-filter="Weight">4kg.</span></td>
+                        <td><span data-filter="Price">$65.36</span></td>
+                        <td><span data-filter="Rating">3 Stars</span></td>
+                        <td>
+                            <a href="#" class="tableFilterSortMoreDetails" data-rel="Row_4_Details">more</a>
+                            <div style="display: none;" id="Row_4_Details">
+                                <h6>Tags</h6>
+                                <ul>
+                                    <li><span data-filter="Tags">Beetroot</span></li>
+                                    <li><span data-filter="Tags">Celery</span></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="tableFilterSortFilterRow">
+                        <td><span data-filter="Type">Test Product</span></td>
+                        <td><span data-filter="Original Producer">Sunny Side Up</span></td>
+                        <td><span data-filter="Colour">Pink</span></td>
+                        <td><span data-filter="Size">XXL</span></td>
+                        <td><span data-filter="Weight">7kg.</span></td>
+                        <td><span data-filter="Price">$78.23</span></td>
+                        <td><span data-filter="Rating">5 Stars</span></td>
+                        <td>
+                            <a href="#" class="tableFilterSortMoreDetails" data-rel="Row_5_Details">more</a>
+                            <div style="display: none;" id="Row_5_Details">
+                                <h6>Tags</h6>
+                                <ul>
+                                    <li><span data-filter="Tags">Ginger</span></li>
+                                    <li><span data-filter="Tags">Red Cabbage</span></li>
+                                    <li><span data-filter="Tags">Onion</span></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="tableFilterSortFilterRow">
+                        <td><span data-filter="Type">Test Product</span></td>
+                        <td><span data-filter="Original Producer">Sunny Side Up</span></td>
+                        <td><span data-filter="Colour">Orange</span></td>
+                        <td><span data-filter="Size">XXL</span></td>
+                        <td><span data-filter="Weight">9kg.</span></td>
+                        <td><span data-filter="Price">$91.74</span></td>
+                        <td><span data-filter="Rating">3 Stars</span></td>
+                        <td>
+                            <a href="#" class="tableFilterSortMoreDetails" data-rel="Row_6_Details">more</a>
+                            <div style="display: none;" id="Row_6_Details">
+                                <h6>Tags</h6>
+                                <ul>
+                                    <li><span data-filter="Tags">Spinach</span></li>
+                                    <li><span data-filter="Tags">fennel</span></li>
+                                    <li><span data-filter="Tags">Onion</span></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="tableFilterSortFilterRow">
+                        <td><span data-filter="Type">Test Product</span></td>
+                        <td><span data-filter="Original Producer">Sunny Side Up</span></td>
+                        <td><span data-filter="Colour">Red</span></td>
+                        <td><span data-filter="Size">S</span></td>
+                        <td><span data-filter="Weight">6kg.</span></td>
+                        <td><span data-filter="Price">$1.74</span></td>
+                        <td><span data-filter="Rating">5 Stars</span></td>
+                        <td>
+                            <a href="#" class="tableFilterSortMoreDetails" data-rel="Row_7_Details">more</a>
+                            <div style="display: none;" id="Row_7_Details">
+                                <h6>Tags</h6>
+                                <ul>
+                                    <li><span data-filter="Tags">Taro</span></li>
+                                    <li><span data-filter="Tags">Swedes</span></li>
+                                    <li><span data-filter="Tags">Pumpkin</span></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+
+
+        <script src="https://code.jquery.com/jquery-git.min.js"></script>
+        <script src="../../javascript/TableFilterSort.js"></script>
+        <script type="text/javascript">
+            var myFilterSortTable = new TableFilterSortFx(".tableFilterSortHolder");
+        </script>
+</html>
