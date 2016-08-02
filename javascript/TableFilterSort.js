@@ -82,6 +82,7 @@ function TableFilterSortFx(selector){
                     jQuery('#' + id).slideToggle("fast");
                     jQuery(this).toggleClass("opened");
                     jQuery(TableFilterSort.myTableHolder).toggleClass("filterIsOpen");
+                    jQuery('body').toggleClass("tableFilterSortfilterIsOpen");
                 }
             );
         },
