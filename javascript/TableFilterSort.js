@@ -72,102 +72,6 @@ jQuery(document).ready(function() {
                     }
                 },
 
-<<<<<<< HEAD
-function TableFilterSortFx(selector){
-
-
-    var TableFilterSort = {
-
-
-        /**
-         * turn on to see what is going on in console
-         * @var boolean
-         */
-        debug: false,
-
-        /**
-         * selector for holder
-         * @var jQuery Object
-         */
-        myTableHolder: null,
-
-        /**
-         *
-         * @var jQuery Object
-         */
-        myTable: null,
-
-        /**
-         * turn on to see what is going on in console
-         * @var string
-         */
-        filterTitle: "Filter Table",
-
-        /**
-         * "Colour" => [Red, Blue, Green]
-         * "Size" => [X]
-         * @var array
-         */
-        optionsForFilter:[],
-
-        /**
-         * "Colour" => [Red]
-         * "Size" => []
-         * show TRS where at least one of the values for EVERY category is matched
-         * @var array
-         */
-        currentFilter:[],
-
-        /**
-         * startup
-         *
-         */
-        init: function(){
-            this.toggleSlideSetup();
-            if(jQuery(this.myTable).find("tr.tableFilterSortFilterRow").length > 1){
-                this.tableFilterSetup();
-                this.tableHideColsWhichAreAllTheSame();
-                this.createFilterForm();
-                this.setupFilterListeners();
-                this.setupSortListeners();
-            }
-        },
-
-        /**
-         * set up toggle slides ...
-         * we do this last
-         */
-        toggleSlideSetup: function(){
-            //add toggle
-            jQuery(this.myTableHolder).on(
-                'click',
-                'a.tableFilterSortMoreDetails',
-                function(event) {
-                    event.preventDefault();
-                    id = jQuery(this).attr("data-rel");
-                    jQuery('#' + id).slideToggle("fast");
-                    jQuery(this).toggleClass("opened");
-                    jQuery(TableFilterSort.myTableHolder).toggleClass("filterIsOpen");
-                    jQuery('body').toggleClass("tableFilterSortfilterIsOpen");
-                }
-            );
-        },
-
-
-        /**
-         * find the filters ...
-         */
-        tableFilterSetup: function() {
-            var myObject = this;
-            //for each table with specific class ...
-            jQuery(this.myTable).find("span[data-filter]").each(
-                function(i, el) {
-                    var value = jQuery(el).text();
-                    var category = jQuery(el).attr("data-filter");
-                    if(value.trim().length > 0 && category.trim().length) {
-                        if(typeof myObject.optionsForFilter[category] === "undefined") {
-                            myObject.optionsForFilter[category] = [];
-=======
                 /**
                  * set up toggle slides ...
                  * we do this last
@@ -184,7 +88,6 @@ function TableFilterSortFx(selector){
                             jQuery(this).toggleClass("opened");
                             jQuery(TableFilterSort.myTableHolder).toggleClass("filterIsOpen");
                             jQuery('body').toggleClass("tableFilterSortFilterIsOpen");
->>>>>>> 10abbfd9e0b76346840f71f4070b139d7701efc6
                         }
                     );
                 },
