@@ -3,10 +3,7 @@
 
 class TableFilterSortAPI extends Object
 {
-
     /**
-     *
-     *
      *
      * @param  string $tableSelector e.g. #MyTableHolder
      */
