@@ -112,7 +112,6 @@ jQuery(document).ready(function() {
                             }
                         }
                     );
-                    console.debug(myObject);
                 },
 
                 /**
