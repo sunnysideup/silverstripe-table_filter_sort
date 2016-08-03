@@ -1,0 +1,22 @@
+ * {font-family: sans-serif; font-size: 13px!important;}
+ .tableFilterSortHolder {background-color: pink; border-radius: 5px; padding: 1em 5em 5em 5em;}
+ table {width: 100%; margin-left: auto; margin-right: auto;}
+ table th, table td {width: 12.5%; border: 5px solid #fff; background-color: #ddd; text-align: center; padding: 1em;}
+ table th {background-color: crimson;}
+ table th a, table th {color: white; border-bottom: 1px solid #fff;}
+ table td ul {margin: 0; padding: 0;}
+ table td ul li {padding: 0; margin: 0; display: inline;}
+ table td ul li:after {content: ";";}
+
+ .tableFilterSortFilterFormHolder { }
+ .tableFilterSortFilterFormHolder .filterColumn{ width: calc(33% - 2em); float: left; oveflow: auto; margin: 1em;}
+ .tableFilterSortFilterFormHolder .filterColumn:nth-child(3n+1){clear:left;}
+ .tableFilterSortFilterFormHolder .filterColumn ul,
+ .tableFilterSortFilterFormHolder .filterColumn ul li{list-style: none; padding: 0; margin: 0;}
+
+ .tableFilterSortCommonContentHolder {clear: both; }
+ .tableFilterSortCommonContentHolder ul {margin-top: 0; padding-top: 0; }
+
+ .sort-asc:after {content: " △";}
+ .sort-desc:after {content: " ▽";}
+ .sortable {text-decoration: none;}
