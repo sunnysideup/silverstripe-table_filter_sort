@@ -88,7 +88,7 @@ function TableFilterSortFx(selector){
                 'a.tableFilterSortMoreDetails',
                 function(event) {
                     event.preventDefault();
-                    var id = jQuery(this).attr("href");
+                    var id = jQuery(this).attr("data-rel");
                     jQuery(id).slideToggle("fast");
                     jQuery(this).toggleClass("opened");
                     jQuery(TableFilterSort.myTableHolder).toggleClass("filterIsOpen");
