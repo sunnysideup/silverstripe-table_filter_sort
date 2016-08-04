@@ -89,11 +89,21 @@ function TableFilterSortFx(selector){
                 function(event) {
                     event.preventDefault();
                     var id = jQuery(this).attr("data-rel");
-                    jQuery(id).slideToggle("fast");
+                    jQuery("#"+id).slideToggle("fast");
+                    jQuery(this).toggleClass("opened");
+                }
+            );
+            jQuery(this.myTableHolder).on(
+                'click',
+                'a.tableFilterSortOpenFilterForm',
+                function(event) {
+                    event.preventDefault();
+                    var id = jQuery(this).attr("data-rel");
+                    jQuery("#"+id).slideToggle("fast");
                     jQuery(this).toggleClass("opened");
                     jQuery(TableFilterSort.myTableHolder).toggleClass("filterIsOpen");
                     TableFilterSort.displayCurrentSearchParameters();
-                    jQuery('body').toggleClass("tableFilterSortFilterIsOpen");
+                    jQuery('body').toggleClass("tableFilterSortFilterIsOpen");                    
                 }
             );
         },
@@ -228,7 +238,7 @@ function TableFilterSortFx(selector){
                 filterFormTitle = this.filterTitle;
             }
             var content = '<form class="tableFilterSortFilterFormInner">'
-                                    + '<h3><a href="#'+id+'" class="tableFilterSortMoreDetails button" data-rel="'+id+'" class="closed">'+filterFormTitle+'</a></h3>'
+                                    + '<h3><a href="#'+id+'" class="tableFilterSortOpenFilterForm button" data-rel="'+id+'" class="closed">'+filterFormTitle+'</a></h3>'
                                     + '<div id="'+id+'" style="display: none;" class="tableFilterSortFilterFormOptions">';
             var numberOfRows = jQuery('tr.tableFilterSortFilterRow').length;
             Object.keys(myObject.optionsForFilter).forEach(
