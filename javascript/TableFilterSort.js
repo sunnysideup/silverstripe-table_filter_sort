@@ -91,16 +91,52 @@ function TableFilterSortFx(selector){
                     var id = jQuery(this).attr("href");
                     jQuery(id).slideToggle("fast");
                     jQuery(this).toggleClass("opened");
-                    this.displayCurrentSearchParameters();
                     jQuery(TableFilterSort.myTableHolder).toggleClass("filterIsOpen");
+                    TableFilterSort.displayCurrentSearchParameters();
                     jQuery('body').toggleClass("tableFilterSortFilterIsOpen");
                 }
             );
         },
 
         displayCurrentSearchParameters: function(){
-            jQuery('tableFilterSortCurrentSearchHolder').html("dkjfjkshdfkjhd");
-            jQuery('tableFilterSortCurrentSearchHolder').slideToggle();
+            var html = "";
+            jQuery(".tableFilterSortFilterFormOptions .filterColumn").each(
+                function(i, el){
+                    var leftLabel = jQuery(el).find('label.left').text();
+                    if(jQuery(el).hasClass('textFilter')){
+                        var inputVal = jQuery(el).find('input').val();
+                        if(inputVal.length > 0){
+                            html += "<strong>" + leftLabel + ":</strong> " + inputVal + "; ";
+                        }
+                    }
+                    else if(jQuery(el).hasClass('checkboxFilter')){
+                        var inputsChecked = "";
+                        var list = jQuery(el).find("ul li");
+                        jQuery(list).each(
+                            function(i, el){
+                                var input = jQuery(el).find('input');
+                                if(input.is(":checked")){
+                                    inputsChecked += input.val() + ";";
+                                }
+                            }
+                        );
+                        if(inputsChecked.length > 0){
+                            html += "<strong>" + leftLabel + ":</strong> " + inputsChecked + "; ";
+                        }
+                    }
+                }
+            );
+            if(html.length > 0){
+                html = "<p>You current search parameters are: " + html + "<p>";
+                jQuery('.tableFilterSortCurrentSearchHolder').html(html);
+                if(jQuery(TableFilterSort.myTableHolder).hasClass("filterIsOpen")){
+                    jQuery('.tableFilterSortCurrentSearchHolder').hide();
+                }
+                else {
+                    jQuery('.tableFilterSortCurrentSearchHolder').show();
+                }
+
+            }
         },
 
         /**
@@ -192,7 +228,7 @@ function TableFilterSortFx(selector){
                 filterFormTitle = this.filterTitle;
             }
             var content = '<form class="tableFilterSortFilterFormInner">'
-                                    + '<h3><a href="#'+id+'" class="tableFilterSortMoreDetails" data-rel="'+id+'" class="closed">'+filterFormTitle+'</a></h3>'
+                                    + '<h3><a href="#'+id+'" class="tableFilterSortMoreDetails button" data-rel="'+id+'" class="closed">'+filterFormTitle+'</a></h3>'
                                     + '<div id="'+id+'" style="display: none;" class="tableFilterSortFilterFormOptions">';
             var numberOfRows = jQuery('tr.tableFilterSortFilterRow').length;
             Object.keys(myObject.optionsForFilter).forEach(
@@ -201,7 +237,7 @@ function TableFilterSortFx(selector){
                     if(optionCount > 1 && optionCount < 25) {
                         var cleanCategory = category.replace(/\W/g, '');
                         var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
-                        content += '<div id="' + categoryID + '" class="filterColumn">'
+                        content += '<div id="' + categoryID + '" class="filterColumn checkboxFilter">'
                                         +  '<label class="left">' + category.split('-').join(' ') + '</label>'
                                         +  '<ul>';
                         var sortedObject = myObject.objectSort(myObject.optionsForFilter[category]);
@@ -222,7 +258,7 @@ function TableFilterSortFx(selector){
                     else if (optionCount > 25) {
                         var cleanCategory = category.replace(/\W/g, '');
                         var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
-                        content += '<div id="' + categoryID + '" class="filterColumn">'
+                        content += '<div id="' + categoryID + '" class="filterColumn textFilter">'
                                         +  '<label class="left">' + category.split('-').join(' ') + '</label>'
                                         +  '<ul>';
                         var cleanValue = category.replace(/\W/g, '');
@@ -266,10 +302,10 @@ function TableFilterSortFx(selector){
                 }
             );
 
+
             //add listeners to any change in the checkboxes/inputs
             var myObject = this;
-            jQuery(this.myTableHolder).find(".tableFilterSortFilterFormInner input").on(
-                'change',
+            jQuery(this.myTableHolder).find(".tableFilterSortFilterFormInner input").change(
                 function(event){
                     if(myObject.debug) {console.debug("==============");console.debug(myObject.currentFilter);}
                     var inputChanged = jQuery(this);
