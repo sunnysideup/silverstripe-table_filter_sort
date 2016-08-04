@@ -548,8 +548,15 @@ function TableFilterSortFx(selector){
          * array sorter function ...
          */
         sortMultiDimensionalArray: function(a, b) {
-            var testA = a[0].toLowerCase();
-            var testB = b[0].toLowerCase();
+
+            var testA = a[0];
+            if(typeof testA === 'string'){
+                testA = testA.toLowerCase();
+            }
+            var testB = b[0];
+            if(typeof testB === 'string'){
+                testB = testB.toLowerCase();
+            }
             if (testA === testB) {
                 return 0;
             }
@@ -700,4 +707,3 @@ jQuery.fn.isOnScreen = function(){
 
 
 }
-
