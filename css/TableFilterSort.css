@@ -20,3 +20,5 @@
  .sort-asc:after {content: " △";}
  .sort-desc:after {content: " ▽";}
  .sortable {text-decoration: none;}
+
+.no-matches-message { display: none; }

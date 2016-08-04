@@ -4,17 +4,16 @@
  *
  *
  */
-jQuery(document).ready(
-    function() {
-        if(typeof TableFilterSortTableList !== 'undefined') {
-            var i = 0;
-            for(i = 0; i < TableFilterSortTableList.length; i++) {
-                new TableFilterSortFx(TableFilterSortTableList[i]);
-            }
+jQuery(document).ready(function() {
+    if(typeof TableFilterSortTableList !== 'undefined') {
+        var i = 0;
+        for(i = 0; i < TableFilterSortTableList.length; i++) {
+            new TableFilterSortFx(TableFilterSortTableList[i]);
         }
 
-});
 
+    }    
+});
 
 
 function TableFilterSortFx(selector){
@@ -91,17 +90,12 @@ function TableFilterSortFx(selector){
                     var id = jQuery(this).attr("href");
                     jQuery(id).slideToggle("fast");
                     jQuery(this).toggleClass("opened");
-                    this.displayCurrentSearchParameters();
                     jQuery(TableFilterSort.myTableHolder).toggleClass("filterIsOpen");
                     jQuery('body').toggleClass("tableFilterSortFilterIsOpen");
                 }
             );
         },
 
-        displayCurrentSearchParameters: function(){
-            jQuery('tableFilterSortCurrentSearchHolder').html("dkjfjkshdfkjhd");
-            jQuery('tableFilterSortCurrentSearchHolder').slideToggle();
-        },
 
         /**
          * find the filters ...
@@ -122,6 +116,7 @@ function TableFilterSortFx(selector){
                     }
                 }
             );
+            console.debug(myObject);
         },
 
         /**
@@ -150,8 +145,17 @@ function TableFilterSortFx(selector){
                                 if(i == 0) {
                                     commonContent += "<li>"+category + ":<strong> " + jQuery(el).html() + "</strong></li>";
                                 }
+<<<<<<< HEAD
+                                if(myObject.debug) { console.debug("adding "+value+" to "+category);}
+                                myObject.optionsForFilter[category][value] = value;
+                            }
+                        }
+                    );
+                },
+=======
                                 var spanParent = jQuery(el).parent();
                                 jQuery(el).remove();
+>>>>>>> 8d04171a75a76673e2436296bbf8d9a6633ac356
 
                                 if(spanParent.is("li")){
                                     jQuery(spanParent).hide();
@@ -198,11 +202,11 @@ function TableFilterSortFx(selector){
             Object.keys(myObject.optionsForFilter).forEach(
                 function(category, categoryIndex) {
                     var optionCount = myObject.objectSize(myObject.optionsForFilter, category);
-                    if(optionCount > 1 && optionCount < 25) {
+                    if(optionCount > 1 && optionCount < (0.8 * numberOfRows)) {
                         var cleanCategory = category.replace(/\W/g, '');
                         var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
                         content += '<div id="' + categoryID + '" class="filterColumn">'
-                                        +  '<label class="left">' + category.split('-').join(' ') + '</label>'
+                                        +  '<label class="left">' + category + '</label>'
                                         +  '<ul>';
                         var sortedObject = myObject.objectSort(myObject.optionsForFilter[category]);
                         var count = 0;
@@ -211,7 +215,7 @@ function TableFilterSortFx(selector){
                                 count++;
                                 var cleanValue = category.replace(/\W/g, '');
                                 var valueID = cleanValue + "_IDandNameForvalueInFilterForm" + count;
-                                content += '<li class="checkbox">'
+                                content += '<li>'
                                                 + '<input type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + value.raw2attr() + '" data-to-filter="' + category.raw2attr() + '" />'
                                                 + '<label for="' + valueID + '">' + value + '</label>'
                                                 + '</li>';
@@ -219,19 +223,8 @@ function TableFilterSortFx(selector){
                         content += '</ul>'
                                         +  '</div>';
                     }
-                    else if (optionCount > 25) {
-                        var cleanCategory = category.replace(/\W/g, '');
-                        var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
-                        content += '<div id="' + categoryID + '" class="filterColumn">'
-                                        +  '<label class="left">' + category.split('-').join(' ') + '</label>'
-                                        +  '<ul>';
-                        var cleanValue = category.replace(/\W/g, '');
-                        var valueID = cleanValue + "_IDandNameForvalueInFilterForm" + count;
-                        content += '<li>'
-                                        + '<input type="text" name="' + valueID + '" id="' + valueID + '" data-to-filter="' + category.raw2attr() + '" />'
-                                        + '</li>'
-                                        + '</ul>'
-                                        +  '</div>';
+                    else {
+                        //remove it, it is useless now ...
                     }
                 }
             );
@@ -259,68 +252,39 @@ function TableFilterSortFx(selector){
          * set up filter listeners ...
          */
         setupFilterListeners: function() {
-            jQuery(this.myTableHolder).find(".tableFilterSortFilterFormInner input").on(
-                'keyup',
-                function(){
-                    jQuery(this).trigger("change");
-                }
-            );
-
-            //add listeners to any change in the checkboxes/inputs
+            //add listeners to any change in the checkboxes
             var myObject = this;
-            jQuery(this.myTableHolder).find(".tableFilterSortFilterFormInner input").on(
-                'change',
+            jQuery(this.myTableHolder).find(".tableFilterSortFilterFormInner input").change(
                 function(event){
                     if(myObject.debug) {console.debug("==============");console.debug(myObject.currentFilter);}
                     var inputChanged = jQuery(this);
-                    if(jQuery(inputChanged).attr('type') === 'text') {
-                        var categoryToMatch = inputChanged.attr("data-to-filter");
-                        var valueToMatch = inputChanged.val().toLowerCase().trim();
-                        delete myObject.currentFilter[categoryToMatch];
-                        if(valueToMatch.length > 1) {
-                            if(typeof myObject.currentFilter[categoryToMatch] === "undefined") {
-                                if(myObject.debug) {console.log("adding "+categoryToMatch);}
-                                myObject.currentFilter[categoryToMatch] = [];
+                    var categoryToMatch = inputChanged.attr("data-to-filter");
+                    var valueToMatch = inputChanged.val();
+                    if(inputChanged.is(":checked")){
+                        if(typeof myObject.currentFilter[categoryToMatch] === "undefined") {
+                            if(myObject.debug) {console.log("adding "+categoryToMatch);}
+                            myObject.currentFilter[categoryToMatch] = [];
+                        }
+                        myObject.currentFilter[categoryToMatch][valueToMatch] = valueToMatch;
+                        if(myObject.debug) {console.log("... adding '"+categoryToMatch+"' to '"+valueToMatch+"'");}
+                    }
+                    else {
+                        if(typeof myObject.currentFilter[categoryToMatch] !== "undefined") {
+                            if(typeof myObject.currentFilter[categoryToMatch][valueToMatch] !== "undefined") {
+                                if(myObject.debug) {console.log("remove "+valueToMatch+" from "+categoryToMatch);}
+                                delete myObject.currentFilter[categoryToMatch][valueToMatch];
                             }
-                            var filterValueArray = valueToMatch.split(" ");
-                            for(var i = 0, len = filterValueArray.length; i < len; i++) {
-                                var tempVal = filterValueArray[i].trim();
-                                if(tempVal.length > 1) {
-                                    myObject.currentFilter[categoryToMatch][tempVal] = tempVal;
-                                    if(myObject.debug) {console.log("... adding '"+categoryToMatch+"' to '"+valueToMatch+"'");}
-                                }
+                            if(myObject.objectSize(myObject.currentFilter, categoryToMatch) == 0) {
+                                if(myObject.debug) {console.log("removing category: "+categoryToMatch);}
+                                delete myObject.currentFilter[categoryToMatch];
                             }
                         }
                     }
-                    else {
-                        var categoryToMatch = inputChanged.attr("data-to-filter");
-                        var valueToMatch = inputChanged.val().toLowerCase();
-                        if(inputChanged.is(":checked")){
-                            if(typeof myObject.currentFilter[categoryToMatch] === "undefined") {
-                                if(myObject.debug) {console.log("adding "+categoryToMatch);}
-                                myObject.currentFilter[categoryToMatch] = [];
-                            }
-                            myObject.currentFilter[categoryToMatch][valueToMatch] = valueToMatch;
-                            if(myObject.debug) {console.log("... adding '"+categoryToMatch+"' to '"+valueToMatch+"'");}
-                        }
-                        else {
-                            if(typeof myObject.currentFilter[categoryToMatch] !== "undefined") {
-                                if(typeof myObject.currentFilter[categoryToMatch][valueToMatch] !== "undefined") {
-                                    if(myObject.debug) {console.log("remove "+valueToMatch+" from "+categoryToMatch);}
-                                    delete myObject.currentFilter[categoryToMatch][valueToMatch];
-                                }
-                                if(myObject.objectSize(myObject.currentFilter, categoryToMatch) == 0) {
-                                    if(myObject.debug) {console.log("removing category: "+categoryToMatch);}
-                                    delete myObject.currentFilter[categoryToMatch];
-                                }
-                            }
-                        }
-                        //no check boxes selected
-                        if(jQuery(".tableFilterSortFilterFormInner input").is(":checked").length == 0) {
-                            if(typeof myObject.currentFilter[categoryToMatch] !== "undefined") {
-                                if(myObject.debug) {console.log("removing altogether"+categoryToMatch);}
-                                delete myObject.currentFilter[categoryToMatch];
-                            }
+                    //no check boxes selected
+                    if(jQuery(".tableFilterSortFilterFormInner input").is(":checked").length == 0) {
+                        if(typeof myObject.currentFilter[categoryToMatch] !== "undefined") {
+                            if(myObject.debug) {console.log("removing altogether"+categoryToMatch);}
+                            delete myObject.currentFilter[categoryToMatch];
                         }
                     }
                     jQuery('tr.tableFilterSortFilterRow').each(
@@ -330,7 +294,6 @@ function TableFilterSortFx(selector){
                             var rowMatches = true;
 
                             var stillLookingForCategory = true;
-
                             //check for each category
                             Object.keys(myObject.currentFilter).forEach(
                                 function(categoryToMatch, categoryToMatchIndex) {
@@ -348,8 +311,8 @@ function TableFilterSortFx(selector){
                                                 if(stillLookingForValue) {
                                                     jQuery(el).find('span[data-filter="' + categoryToMatch + '"]').each(
                                                         function(i, el) {
-                                                            var value = jQuery(el).text().toLowerCase();
-                                                            if(value.indexOf(valueToMatch) != -1){
+                                                            var value = jQuery(el).text();
+                                                            if(value == valueToMatch){
                                                                 if(myObject.debug) {console.log("FILTER - MATCH: '"+valueToMatch+"' in '"+categoryToMatch+"'");}
                                                                 rowMatchesForFilterGroup = true;
                                                                 //break out of each loop
@@ -384,12 +347,6 @@ function TableFilterSortFx(selector){
                             }
                         }
                     );
-                    if(jQuery('tr.tableFilterSortFilterRow').is(":visible")){
-                        jQuery('.no-matches-message').hide();
-                    }
-                    else {
-                        jQuery('.no-matches-message').show();
-                    }
                     if(myObject.debug) {console.debug(myObject.currentFilter);console.debug("==============");}
                     jQuery('html, body').animate({
                         scrollTop: jQuery(myObject.myTableHolder).offset().top
@@ -432,7 +389,6 @@ function TableFilterSortFx(selector){
                         }
                     );
                     arr.sort(myObject.sortMultiDimensionalArray);
-
                     if(sortOrder == "desc"){
                         arr.reverse();
                         jQuery(this)
@@ -512,46 +468,40 @@ function TableFilterSortFx(selector){
          * array sorter function ...
          */
         sortMultiDimensionalArray: function(a, b) {
-            var testA = a[0].toLowerCase();
-            var testB = b[0].toLowerCase();
-            if (testA === testB) {
+            if (a[0] === b[0]) {
                 return 0;
             }
             else {
-                return (testA < testB) ? -1 : 1;
+                return (a[0] < b[0]) ? -1 : 1;
             }
         }
 
     }
 
+    /**
+     * source: http://stackoverflow.com/questions/7753448/how-do-i-escape-quotes-in-html-attribute-values
+     * the methods below make sure that the values are safe for html attribute values ...
+     */
 
+    String.prototype.raw2attr = function(){
+        return ('' + this) /* Forces the conversion to string. */
+                .replace(/&/g, '&amp;') /* This MUST be the 1st replacement. */
+                .replace(/'/g, '&apos;') /* The 4 other predefined entities, required. */
+                .replace(/"/g, '&quot;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                /*
+                You may add other replacements here for HTML only
+                (but it's not necessary).
+                Or for XML, only if the named entities are defined in its DTD.
+                */
+                .replace(/\r\n/g, '&#13;') /* Must be before the next replacement. */
+                .replace(/[\r\n]/g, '&#13;');
+                ;
+    };
 
-
-
-/**
- * source: http://stackoverflow.com/questions/7753448/how-do-i-escape-quotes-in-html-attribute-values
- * the methods below make sure that the values are safe for html attribute values ...
- */
-
-String.prototype.raw2attr = function(){
-    return ('' + this) /* Forces the conversion to string. */
-            .replace(/&/g, '&amp;') /* This MUST be the 1st replacement. */
-            .replace(/'/g, '&apos;') /* The 4 other predefined entities, required. */
-            .replace(/"/g, '&quot;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            /*
-            You may add other replacements here for HTML only
-            (but it's not necessary).
-            Or for XML, only if the named entities are defined in its DTD.
-            */
-            .replace(/\r\n/g, '&#13;') /* Must be before the next replacement. */
-            .replace(/[\r\n]/g, '&#13;');
-            ;
-};
-
-String.prototype.attr2raw = function(){
-    /*
+    String.prototype.attr2raw = function(){
+/*
     Note: this can be implemented more efficiently by a loop searching for
     ampersands, from start to end of ssource string, and parsing the
     character(s) found immediately after after the ampersand.
@@ -571,8 +521,8 @@ String.prototype.attr2raw = function(){
 
     The following code is only for the alternate sections that are
     not within the detected CDATA sections.
-    Decode by reversing the initial order of replacements.
     */
+    /* Decode by reversing the initial order of replacements. */
     s = s
             .replace(/\r\n/g, '\n') /* To do before the next replacement. */
             .replace(/[\r\n]/, '\n')
@@ -607,7 +557,8 @@ String.prototype.attr2raw = function(){
     CR+LF, or NL) *must* be decoded only as if they were '\n' (U+000A).
 
     See the XML/HTML reference specifications !
-    Required check for security! */
+    */
+    /* Required check for security! */
     var found = /&[^;]*;?/.match(s);
     if (found.length >0 && found[0] != '&amp;')
             throw 'unsafe entity found in the attribute literal content';
@@ -630,6 +581,7 @@ String.prototype.attr2raw = function(){
 };
 
 
+
 jQuery.fn.isOnScreen = function(){
     var viewport = {};
     viewport.top = jQuery(window).scrollTop();
@@ -645,8 +597,6 @@ jQuery.fn.isOnScreen = function(){
         TableFilterSort.myTable = jQuery(TableFilterSort.myTableHolder).find("table.tableFilterSortTable").first();
         TableFilterSort.init();
     }
-
-
     // Expose public API
     return {
         getVar: function( variableName ) {
@@ -660,8 +610,4 @@ jQuery.fn.isOnScreen = function(){
         }
     }
 
-
-
-
 }
-
