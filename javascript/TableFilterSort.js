@@ -103,7 +103,7 @@ function TableFilterSortFx(selector){
                     jQuery(this).toggleClass("opened");
                     jQuery(TableFilterSort.myTableHolder).toggleClass("filterIsOpen");
                     TableFilterSort.displayCurrentSearchParameters();
-                    jQuery('body').toggleClass("tableFilterSortFilterIsOpen");                    
+                    jQuery('body').toggleClass("tableFilterSortFilterIsOpen");
                 }
             );
         },
@@ -438,7 +438,7 @@ function TableFilterSortFx(selector){
                     }
                     if(myObject.debug) {console.debug(myObject.currentFilter);console.debug("==============");}
                     jQuery('html, body').animate({
-                        scrollTop: jQuery(myObject.myTableHolder).offset().top
+                        scrollTop: (jQuery(myObject.myTableHolder).offset().top - 550)
                     }, 200);
                 }
             );
