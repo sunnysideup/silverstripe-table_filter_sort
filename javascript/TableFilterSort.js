@@ -126,18 +126,18 @@ function TableFilterSortFx(selector){
                             function(i, el){
                                 var input = jQuery(el).find('input');
                                 if(input.is(":checked")){
-                                    inputsChecked += input.val() + ";";
+                                    inputsChecked += '<span>'+input.val() + "</span> ";
                                 }
                             }
                         );
                         if(inputsChecked.length > 0){
-                            html += "<strong>" + leftLabel + ":</strong> " + inputsChecked + "; ";
+                            html += "<li><strong>" + leftLabel + ":</strong> " + inputsChecked + "</li>";
                         }
                     }
                 }
             );
             if(html.length > 0){
-                html = "<p>You current search parameters are: " + html + "<p>";
+                html = "<p>Current Filter</p><ul>" + html + "</ul>";
                 jQuery('.tableFilterSortCurrentSearchHolder').html(html);
                 if(jQuery(TableFilterSort.myTableHolder).hasClass("filterIsOpen")){
                     jQuery('.tableFilterSortCurrentSearchHolder').hide();
@@ -159,7 +159,7 @@ function TableFilterSortFx(selector){
                 function(i, el) {
                     var value = jQuery(el).text();
                     var category = jQuery(el).attr("data-filter");
-                    if(value.trim().length > 0 && category.trim().length) {
+                    if(value.trim().length > 0) {
                         if(typeof myObject.optionsForFilter[category] === "undefined") {
                             myObject.optionsForFilter[category] = [];
                         }
@@ -254,6 +254,7 @@ function TableFilterSortFx(selector){
                         var count = 0;
 
                         for(var value in sortedObject) {
+                            if(sortedObject.hasOwnProperty(value)) {
                                 count++;
                                 var cleanValue = category.replace(/\W/g, '');
                                 var valueID = cleanValue + "_IDandNameForvalueInFilterForm" + count;
@@ -261,6 +262,7 @@ function TableFilterSortFx(selector){
                                                 + '<input type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + value.raw2attr() + '" data-to-filter="' + category.raw2attr() + '" />'
                                                 + '<label for="' + valueID + '">' + value + '</label>'
                                                 + '</li>';
+                            }
                         }
                         content += '</ul>'
                                         +  '</div>';
@@ -514,7 +516,9 @@ function TableFilterSortFx(selector){
             }
             var obj = object[category];
             for (key in obj) {
-                if (obj.hasOwnProperty(key)) size++;
+                if (obj.hasOwnProperty(key)) {
+                    size++;
+                }
             }
             return size;
         },
@@ -536,7 +540,9 @@ function TableFilterSortFx(selector){
             });
             var newObject = {};
             for(var i =0; i < sortedObject.length; i++) {
-                newObject[sortedObject[i][0]] = sortedObject[i][1];
+                if((typeof sortedObject[i][1]) === 'string') {
+                    newObject[sortedObject[i][0]] = sortedObject[i][1];
+                }
             }
             return newObject;
         },
