@@ -1,21 +1,26 @@
-
 {
     "name": "sunnysideup/table_filter_sort",
     "type": "silverstripe-module",
     "description": "A javascript module that allows you to filter and sort complex tables.  Primarily written for the Silverstripe CMS",
-    "keywords": ["javascript", "silverstripe", "table", "filter", "sort"],
+    "keywords": [
+        "javascript",
+        "silverstripe",
+        "table",
+        "filter",
+        "sort"
+    ],
     "license": "Sunny Side Up (BSD-3-Clause and CUSTOM)",
-    "authors":[
+    "authors": [
         {
             "name": "Nicolaas Francken",
-            "homepage": "https://github.com/sunnysideup",
-            "email" : "modules@sunnysideup.co.nz",
-            "role" : "lead developer"
+            "email": "modules@sunnysideup.co.nz",
+            "role": "lead developer"
         }
     ],
-    "require":{},
+    "require": {
+
+    },
     "extra": {
         "installer-name": "table_filter_sort"
     }
-
 }
