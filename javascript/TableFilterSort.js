@@ -426,13 +426,9 @@ function TableFilterSortFx(selector){
                             //hide or show
                             if(rowMatches){
                                 jQuery(el).show();
-                                jQuery(el).addClass('isVisible');
-                                jQuery(el).removeClass('isHidden');
                             }
                             else {
                                 jQuery(el).hide();
-                                jQuery(el).addClass('isHidden');
-                                jQuery(el).removeClass('isVisible');
                             }
                         }
                     );
