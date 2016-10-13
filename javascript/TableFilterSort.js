@@ -61,6 +61,12 @@ function TableFilterSortFx(selector){
          * @var array
          */
         currentFilter:[],
+        
+        /**
+         * Max Number of Filter Items to be shown as check boxes, before
+         * collapssing in text fields.
+         */
+        NumFilterItemsThreshold : 25,
 
         /**
          * startup
@@ -233,6 +239,7 @@ function TableFilterSortFx(selector){
             //create html content and add to top of page
             var myObject = this;
             var id = this.makeID();
+            
             var filterFormTitle = jQuery(this.myTableHolder).find(".tableFilterSortFilterFormHolder").attr("data-title");
             if(typeof filterFormTitle == "undefined") {
                 filterFormTitle = this.filterTitle;
@@ -244,7 +251,7 @@ function TableFilterSortFx(selector){
             Object.keys(myObject.optionsForFilter).forEach(
                 function(category, categoryIndex) {
                     var optionCount = myObject.objectSize(myObject.optionsForFilter, category);
-                    if(optionCount > 1 && optionCount < 25) {
+                    if(optionCount > 1 && optionCount < TableFilterSort.NumFilterItemsThreshold) {
                         var cleanCategory = category.replace(/\W/g, '');
                         var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
                         content += '<div id="' + categoryID + '" class="filterColumn checkboxFilter">'
@@ -267,7 +274,7 @@ function TableFilterSortFx(selector){
                         content += '</ul>'
                                 +  '</div>';
                     }
-                    else if (optionCount > 25) {
+                    else if (optionCount > TableFilterSort.NumFilterItemsThreshold) {
                         var cleanCategory = category.replace(/\W/g, '');
                         var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
                         content += '<div id="' + categoryID + '" class="filterColumn textFilter">'
