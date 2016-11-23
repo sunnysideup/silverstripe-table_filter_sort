@@ -61,12 +61,6 @@ function TableFilterSortFx(selector){
          * @var array
          */
         currentFilter:[],
-        
-        /**
-         * Max Number of Filter Items to be shown as check boxes, before
-         * collapssing in text fields.
-         */
-        NumFilterItemsThreshold : 25,
 
         /**
          * startup
@@ -79,6 +73,7 @@ function TableFilterSortFx(selector){
                 this.tableHideColsWhichAreAllTheSame();
                 this.createFilterForm();
                 this.setupFilterListeners();
+                this.directFilterLinkListener();
                 this.setupSortListeners();
             }
         },
@@ -164,6 +159,7 @@ function TableFilterSortFx(selector){
             jQuery(this.myTable).find("span[data-filter]").each(
                 function(i, el) {
                     var value = jQuery(el).text();
+                    jQuery(el).addClass("direct-filter-link");
                     var category = jQuery(el).attr("data-filter");
                     if(value.trim().length > 0) {
                         if(typeof myObject.optionsForFilter[category] === "undefined") {
@@ -239,7 +235,6 @@ function TableFilterSortFx(selector){
             //create html content and add to top of page
             var myObject = this;
             var id = this.makeID();
-            
             var filterFormTitle = jQuery(this.myTableHolder).find(".tableFilterSortFilterFormHolder").attr("data-title");
             if(typeof filterFormTitle == "undefined") {
                 filterFormTitle = this.filterTitle;
@@ -251,7 +246,7 @@ function TableFilterSortFx(selector){
             Object.keys(myObject.optionsForFilter).forEach(
                 function(category, categoryIndex) {
                     var optionCount = myObject.objectSize(myObject.optionsForFilter, category);
-                    if(optionCount > 1 && optionCount < TableFilterSort.NumFilterItemsThreshold) {
+                    if(optionCount > 1 && optionCount < 25) {
                         var cleanCategory = category.replace(/\W/g, '');
                         var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
                         content += '<div id="' + categoryID + '" class="filterColumn checkboxFilter">'
@@ -274,7 +269,7 @@ function TableFilterSortFx(selector){
                         content += '</ul>'
                                 +  '</div>';
                     }
-                    else if (optionCount > TableFilterSort.NumFilterItemsThreshold) {
+                    else if (optionCount > 25) {
                         var cleanCategory = category.replace(/\W/g, '');
                         var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
                         content += '<div id="' + categoryID + '" class="filterColumn textFilter">'
@@ -453,15 +448,30 @@ function TableFilterSortFx(selector){
             );
         },
 
+        directFilterLinkListener: function() {
+            jQuery(document).on(
+                'click',
+                '.direct-filter-link',
+                function(e){
+                    var dataFilter = jQuery(this).attr('data-filter');
+                    var filterValue = jQuery.trim(jQuery(this).text());
+                    var filterToTriger = jQuery('input[data-to-filter="'+ dataFilter + '"][value="'+ filterValue + '"]');
+                    if(jQuery(filterToTriger).prop('checked') == true){
+                        jQuery(filterToTriger).prop('checked', false).trigger('change');
+                    }
+                    else {
+                        jQuery(filterToTriger).prop('checked', true).trigger('change');
+                    }
+                }
+            )
+        },
+
         /**
          * set up sorting mechanism
          */
         setupSortListeners: function() {
-            //set up the holders
             var myObject = this;
             var table = jQuery(this.myTable).find(" > tbody");
-            
-            //set up a listener for a.sortable (the "sort by button")
             jQuery(this.myTableHolder).on(
                 "click",
                 "a.sortable",
@@ -470,15 +480,11 @@ function TableFilterSortFx(selector){
                     jQuery(myObject.myTableHolder).find("a.sortable")
                         .removeClass("sort-asc")
                         .removeClass("sort-desc");
-                    // get the key data elements
                     var dataFilter = jQuery(this).attr("data-filter");
                     var sortOrder = jQuery(this).attr("data-sort-direction");
                     var sortType = jQuery(this).attr("data-sort-type");
                     var arr = [];
                     var rows = jQuery(table).find('tr.tableFilterSortFilterRow');
-                    // go through each table row
-                    // get the value and the index of the row
-                    // and add to array (arr)
                     rows.each(
                         function(i, el) {
                             var dataValue = jQuery(el).find('[data-filter="' + dataFilter + '"]').text();
@@ -487,18 +493,14 @@ function TableFilterSortFx(selector){
                                 dataValue = parseFloat(dataValue);
                             }
                             else {
-                                dataValue = dataValue.trim();
+                                //do nothing ...
                             }
                             var row = new Array(dataValue, i);
                             arr.push(row);
                         }
                     );
-            
-                    //sort the array using the sortMultiDimensionalArray method
-                    //see JS manual for details
                     arr.sort(myObject.sortMultiDimensionalArray);
 
-                    //reverse?
                     if(sortOrder == "desc"){
                         arr.reverse();
                         jQuery(this)
@@ -510,20 +512,14 @@ function TableFilterSortFx(selector){
                         .attr("data-sort-direction", "desc")
                         .addClass("sort-asc");
                     }
-                    //clear the table
                     table.empty();
-                    
-                    //loop through ARR and add the row to the clean table
                     arr.forEach(
-                        function(arrayWithDataValueAndIndex) {
-                            // index 1 is the original i.
-                            table.append(rows[arrayWithDataValueAndIndex[1]]);
+                        function(entry) {
+                            table.append(rows[entry[1]]);
                         }
                     );
                 }
             );
-    
-            //sort by the default column when we first start
             jQuery(this.myTable).find("a.sortable[data-sort-default=true]").click();
         },
 
@@ -611,116 +607,117 @@ function TableFilterSortFx(selector){
 
 
 
-        /**
-         * source: http://stackoverflow.com/questions/7753448/how-do-i-escape-quotes-in-html-attribute-values
-         * the methods below make sure that the values are safe for html attribute values ...
-         */
-        String.prototype.raw2attr = function(){
-            return ('' + this) /* Forces the conversion to string. */
-                    .replace(/&/g, '&amp;') /* This MUST be the 1st replacement. */
-                    .replace(/'/g, '&apos;') /* The 4 other predefined entities, required. */
-                    .replace(/"/g, '&quot;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    /*
-                    You may add other replacements here for HTML only
-                    (but it's not necessary).
-                    Or for XML, only if the named entities are defined in its DTD.
-                    */
-                    .replace(/\r\n/g, '&#13;') /* Must be before the next replacement. */
-                    .replace(/[\r\n]/g, '&#13;');
-                    ;
-        };
+/**
+ * source: http://stackoverflow.com/questions/7753448/how-do-i-escape-quotes-in-html-attribute-values
+ * the methods below make sure that the values are safe for html attribute values ...
+ */
 
-        String.prototype.attr2raw = function(){
+String.prototype.raw2attr = function(){
+    return ('' + this) /* Forces the conversion to string. */
+            .replace(/&/g, '&amp;') /* This MUST be the 1st replacement. */
+            .replace(/'/g, '&apos;') /* The 4 other predefined entities, required. */
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
             /*
-            Note: this can be implemented more efficiently by a loop searching for
-            ampersands, from start to end of ssource string, and parsing the
-            character(s) found immediately after after the ampersand.
+            You may add other replacements here for HTML only
+            (but it's not necessary).
+            Or for XML, only if the named entities are defined in its DTD.
             */
-            s = ('' + this); /* Forces the conversion to string type. */
-            /*
-            You may optionally start by detecting CDATA sections (like
-            `<![CDATA[` ... `]]>`), whose contents must not be reparsed by the
-            following replacements, but separated, filtered out of the CDATA
-            delimiters, and then concatenated into an output buffer.
-            The following replacements are only for sections of source text
-            found *outside* such CDATA sections, that will be concatenated
-            in the output buffer only after all the following replacements and
-            security checkings.
+            .replace(/\r\n/g, '&#13;') /* Must be before the next replacement. */
+            .replace(/[\r\n]/g, '&#13;');
+            ;
+};
 
-            This will require a loop starting here.
+String.prototype.attr2raw = function(){
+    /*
+    Note: this can be implemented more efficiently by a loop searching for
+    ampersands, from start to end of ssource string, and parsing the
+    character(s) found immediately after after the ampersand.
+    */
+    s = ('' + this); /* Forces the conversion to string type. */
+    /*
+    You may optionally start by detecting CDATA sections (like
+    `<![CDATA[` ... `]]>`), whose contents must not be reparsed by the
+    following replacements, but separated, filtered out of the CDATA
+    delimiters, and then concatenated into an output buffer.
+    The following replacements are only for sections of source text
+    found *outside* such CDATA sections, that will be concatenated
+    in the output buffer only after all the following replacements and
+    security checkings.
 
-            The following code is only for the alternate sections that are
-            not within the detected CDATA sections.
-            Decode by reversing the initial order of replacements.
-            */
-            s = s
-                    .replace(/\r\n/g, '\n') /* To do before the next replacement. */
-                    .replace(/[\r\n]/, '\n')
-                    .replace(/&#13;&#10;/g, '\n') /* These 3 replacements keep whitespaces. */
-                    .replace(/&#1[03];/g, '\n')
-                    .replace(/&#9;/g, '\t')
-                    .replace(/&gt;/g, '>') /* The 4 other predefined entities required. */
-                    .replace(/&lt;/g, '<')
-                    .replace(/&quot;/g, '"')
-                    .replace(/&apos;/g, "'")
-                    ;
-            /*
-            You may add other replacements here for predefined HTML entities only
-            (but it's not necessary). Or for XML, only if the named entities are
-            defined in *your* assumed DTD.
-            But you can add these replacements only if these entities will *not*
-            be replaced by a string value containing *any* ampersand character.
-            Do not decode the '&amp;' sequence here !
+    This will require a loop starting here.
 
-            If you choose to support more numeric character entities, their
-            decoded numeric value *must* be assigned characters or unassigned
-            Unicode code points, but *not* surrogates or assigned non-characters,
-            and *not* most C0 and C1 controls (except a few ones that are valid
-            in HTML/XML text elements and attribute values: TAB, LF, CR, and
-            NL='\x85').
+    The following code is only for the alternate sections that are
+    not within the detected CDATA sections.
+    Decode by reversing the initial order of replacements.
+    */
+    s = s
+            .replace(/\r\n/g, '\n') /* To do before the next replacement. */
+            .replace(/[\r\n]/, '\n')
+            .replace(/&#13;&#10;/g, '\n') /* These 3 replacements keep whitespaces. */
+            .replace(/&#1[03];/g, '\n')
+            .replace(/&#9;/g, '\t')
+            .replace(/&gt;/g, '>') /* The 4 other predefined entities required. */
+            .replace(/&lt;/g, '<')
+            .replace(/&quot;/g, '"')
+            .replace(/&apos;/g, "'")
+            ;
+    /*
+    You may add other replacements here for predefined HTML entities only
+    (but it's not necessary). Or for XML, only if the named entities are
+    defined in *your* assumed DTD.
+    But you can add these replacements only if these entities will *not*
+    be replaced by a string value containing *any* ampersand character.
+    Do not decode the '&amp;' sequence here !
 
-            If you find valid Unicode code points that are invalid characters
-            for XML/HTML, this function *must* reject the source string as
-            invalid and throw an exception.
+    If you choose to support more numeric character entities, their
+    decoded numeric value *must* be assigned characters or unassigned
+    Unicode code points, but *not* surrogates or assigned non-characters,
+    and *not* most C0 and C1 controls (except a few ones that are valid
+    in HTML/XML text elements and attribute values: TAB, LF, CR, and
+    NL='\x85').
 
-            In addition, the four possible representations of newlines (CR, LF,
-            CR+LF, or NL) *must* be decoded only as if they were '\n' (U+000A).
+    If you find valid Unicode code points that are invalid characters
+    for XML/HTML, this function *must* reject the source string as
+    invalid and throw an exception.
 
-            See the XML/HTML reference specifications !
-            Required check for security! */
-            var found = /&[^;]*;?/.match(s);
-            if (found.length >0 && found[0] != '&amp;')
-                    throw 'unsafe entity found in the attribute literal content';
-             /* This MUST be the last replacement. */
-            s = s.replace(/&amp;/g, '&');
-            /*
-            The loop needed to support CDATA sections will end here.
-            This is where you'll concatenate the replaced sections (CDATA or
-            not), if you have splitted the source string to detect and support
-            these CDATA sections.
+    In addition, the four possible representations of newlines (CR, LF,
+    CR+LF, or NL) *must* be decoded only as if they were '\n' (U+000A).
 
-            Note that all backslashes found in CDATA sections do NOT have the
-            semantic of escapes, and are *safe*.
+    See the XML/HTML reference specifications !
+    Required check for security! */
+    var found = /&[^;]*;?/.match(s);
+    if (found.length >0 && found[0] != '&amp;')
+            throw 'unsafe entity found in the attribute literal content';
+     /* This MUST be the last replacement. */
+    s = s.replace(/&amp;/g, '&');
+    /*
+    The loop needed to support CDATA sections will end here.
+    This is where you'll concatenate the replaced sections (CDATA or
+    not), if you have splitted the source string to detect and support
+    these CDATA sections.
 
-            On the opposite, CDATA sections not properly terminated by a
-            matching `]]>` section terminator are *unsafe*, and must be rejected
-            before reaching this final point.
-            */
-            return s;
-        };
+    Note that all backslashes found in CDATA sections do NOT have the
+    semantic of escapes, and are *safe*.
+
+    On the opposite, CDATA sections not properly terminated by a
+    matching `]]>` section terminator are *unsafe*, and must be rejected
+    before reaching this final point.
+    */
+    return s;
+};
 
 
-        jQuery.fn.isOnScreen = function(){
-            var viewport = {};
-            viewport.top = jQuery(window).scrollTop();
-            viewport.bottom = viewport.top + jQuery(window).height();
-            var bounds = {};
-            bounds.top = this.offset().top;
-            bounds.bottom = bounds.top + this.outerHeight();
-            return ((bounds.top <= viewport.bottom) && (bounds.bottom >= viewport.top));
-        };
+jQuery.fn.isOnScreen = function(){
+    var viewport = {};
+    viewport.top = jQuery(window).scrollTop();
+    viewport.bottom = viewport.top + jQuery(window).height();
+    var bounds = {};
+    bounds.top = this.offset().top;
+    bounds.bottom = bounds.top + this.outerHeight();
+    return ((bounds.top <= viewport.bottom) && (bounds.bottom >= viewport.top));
+};
 
     if(jQuery(selector).length > 0) {
         TableFilterSort.myTableHolder = jQuery(selector);
