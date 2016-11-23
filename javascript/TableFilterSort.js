@@ -73,6 +73,7 @@ function TableFilterSortFx(selector){
                 this.tableHideColsWhichAreAllTheSame();
                 this.createFilterForm();
                 this.setupFilterListeners();
+                this.directFilterLinkListener();
                 this.setupSortListeners();
             }
         },
@@ -158,6 +159,7 @@ function TableFilterSortFx(selector){
             jQuery(this.myTable).find("span[data-filter]").each(
                 function(i, el) {
                     var value = jQuery(el).text();
+                    jQuery(el).addClass("direct-filter-link");
                     var category = jQuery(el).attr("data-filter");
                     if(value.trim().length > 0) {
                         if(typeof myObject.optionsForFilter[category] === "undefined") {
@@ -444,6 +446,24 @@ function TableFilterSortFx(selector){
                     }, 200);
                 }
             );
+        },
+
+        directFilterLinkListener: function() {
+            jQuery(document).on(
+                'click',
+                '.direct-filter-link',
+                function(e){
+                    var dataFilter = jQuery(this).attr('data-filter');
+                    var filterValue = jQuery.trim(jQuery(this).text());
+                    var filterToTriger = jQuery('input[data-to-filter="'+ dataFilter + '"][value="'+ filterValue + '"]');
+                    if(jQuery(filterToTriger).prop('checked') == true){
+                        jQuery(filterToTriger).prop('checked', false).trigger('change');
+                    }
+                    else {
+                        jQuery(filterToTriger).prop('checked', true).trigger('change');
+                    }
+                }
+            )
         },
 
         /**

@@ -22,3 +22,8 @@
  .sortable {text-decoration: none;}
 
 .no-matches-message { display: none; }
+
+.direct-filter-link {
+    cursor: pointer;
+    color: #39F;
+}
