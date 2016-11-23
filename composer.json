@@ -3,8 +3,10 @@
     "type": "silverstripe-module",
     "description": "A javascript module that allows you to filter and sort complex tables.  Primarily written for the Silverstripe CMS",
     "keywords": [
+        "Silverstripe-CMS",
+        "CMS",
+        "Silverstripe",
         "javascript",
-        "silverstripe",
         "table",
         "filter",
         "sort"
@@ -18,7 +20,8 @@
         }
     ],
     "require": {
-
+        "silverstripe/framework": "~3.1",
+        "silverstripe/cms": "~3.1"
     },
     "extra": {
         "installer-name": "table_filter_sort"
