@@ -462,8 +462,9 @@ function TableFilterSortFx(selector){
                     else {
                         jQuery(filterToTriger).prop('checked', true).trigger('change');
                     }
+                    return false;
                 }
-            )
+            );
         },
 
         /**
