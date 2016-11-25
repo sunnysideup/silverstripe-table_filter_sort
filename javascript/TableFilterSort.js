@@ -118,11 +118,16 @@ function TableFilterSortFx(selector){
                 function(event) {
                     jQuery('input[data-to-filter]').each(
                         function(i, el){
-                            if(jQuery(el).prop('checked') == true){
+                            if(jQuery(el).is(":checkbox") && jQuery(el).prop('checked') == true){
                                 jQuery(el).prop('checked', false).trigger('change');
+                            }
+                            else {
+                                jQuery(el).val('').trigger('change');
                             }
                         }
                     );
+                    jQuery('.direct-filter-link').parent().removeClass('filter-selected');
+                    jQuery('.tableFilterSortCurrentSearchHolder').html('');
                     return false;
                 }
             );
@@ -259,8 +264,8 @@ function TableFilterSortFx(selector){
                 filterFormTitle = this.filterTitle;
             }
             var content = '<form class="tableFilterSortFilterFormInner">'
-                        + '<h3><a href="#'+id+'" class="tableFilterSortOpenFilterForm button" data-rel="'+id+'" class="closed">'+filterFormTitle+'</a></h3>'
-                        + '<h2><a href="#'+id+'" class="tableFilterSortClearFilterForm button" data-rel="'+id+'" class="clear">Clear Filter</a></h2>'
+                        + '<h3><a href="#'+id+'" class="tableFilterSortOpenFilterForm button closed" data-rel="'+id+'">'+filterFormTitle+'</a></h3>'
+                        + '<h4><a href="#'+id+'" class="tableFilterSortClearFilterForm button" data-rel="'+id+'">Clear Filter</a></h4>'
                         + '<div id="'+id+'" style="display: none;" class="tableFilterSortFilterFormOptions">';
             var numberOfRows = jQuery('tr.tableFilterSortFilterRow').length;
             Object.keys(myObject.optionsForFilter).forEach(
@@ -305,7 +310,8 @@ function TableFilterSortFx(selector){
                     }
                 }
             );
-            content += '</div>'
+            content += '<h3 class="applyFilter"><a href="#'+id+'" class="tableFilterSortOpenFilterForm button" data-rel="'+id+'">Close Filter</a></h3>';
+                    +  '</div>'
                     +  '</form>';
             jQuery(this.myTableHolder)
                 .find(".tableFilterSortFilterFormHolder")
@@ -476,23 +482,36 @@ function TableFilterSortFx(selector){
                     var dataFilter = jQuery(this).attr('data-filter');
                     var filterValue = jQuery.trim(jQuery(this).text());
                     var filterToTriger = jQuery('input[data-to-filter="'+ dataFilter + '"][value="'+ filterValue + '"]');
-                    if(jQuery(filterToTriger).prop('checked') == true){
-                        jQuery(filterToTriger).prop('checked', false).trigger('change');
-                        jQuery('.direct-filter-link[data-filter="' + dataFilter + '"]').filter(
-                            function(){
-                                return $(this).text() == filterValue;
-                            }
-                        ).removeClass('filter-selected')
+                    if(jQuery(filterToTriger).is(':checkbox')){
+                        if(jQuery(filterToTriger).prop('checked') == true){
+                            jQuery(filterToTriger).prop('checked', false).trigger('change');
+                            jQuery('.direct-filter-link[data-filter="' + dataFilter + '"]').filter(
+                                function(){
+                                    return jQuery(this).text() == filterValue;
+                                }
+                            ).parent().removeClass('filter-selected');
+                        }
+                        else {
+                            jQuery(filterToTriger).prop('checked', true).trigger('change');
+                            jQuery('.direct-filter-link[data-filter="' + dataFilter + '"]').filter(
+                                function(){
+                                    return jQuery(this).text() == filterValue;
+                                }
+                            ).parent().addClass('filter-selected');
+                        }
+                        TableFilterSort.displayCurrentSearchParameters();
                     }
                     else {
-                        jQuery(filterToTriger).prop('checked', true).trigger('change');
-                        jQuery('.direct-filter-link[data-filter="' + dataFilter + '"]').filter(
-                            function(){
-                                return $(this).text() == filterValue;
-                            }
-                        ).addClass('filter-selected')
+                        var filterToTriger = jQuery('input[data-to-filter="'+ dataFilter + '"]');
+                        if(jQuery('.direct-filter-link[data-filter="' + dataFilter + '"]').parent().hasClass('filter-selected')){
+                            filterToTriger.val('').trigger('change');
+                            jQuery('.direct-filter-link[data-filter="' + dataFilter + '"]').parent().removeClass('filter-selected');
+                        }
+                        else {
+                            filterToTriger.val(filterValue).trigger('change');
+                            jQuery('.direct-filter-link[data-filter="' + dataFilter + '"]').parent().addClass('filter-selected');
+                        }
                     }
-                    TableFilterSort.displayCurrentSearchParameters();
                     return false;
                 }
             );
