@@ -27,3 +27,5 @@
     cursor: pointer;
     color: #39F;
 }
+
+.filter-selected { background-color: yellow; }

@@ -68,6 +68,7 @@ function TableFilterSortFx(selector){
          */
         init: function(){
             this.toggleSlideSetup();
+            this.clearFilterListener();
             if(jQuery(this.myTable).find("tr.tableFilterSortFilterRow").length > 1){
                 this.tableFilterSetup();
                 this.tableHideColsWhichAreAllTheSame();
@@ -105,6 +106,24 @@ function TableFilterSortFx(selector){
                     jQuery(TableFilterSort.myTableHolder).toggleClass("filterIsOpen");
                     TableFilterSort.displayCurrentSearchParameters();
                     jQuery('body').toggleClass("tableFilterSortFilterIsOpen");
+                }
+            );
+        },
+
+        clearFilterListener: function(){
+            //add toggle
+            jQuery(this.myTableHolder).on(
+                'click',
+                'a.tableFilterSortClearFilterForm',
+                function(event) {
+                    jQuery('input[data-to-filter]').each(
+                        function(i, el){
+                            if(jQuery(el).prop('checked') == true){
+                                jQuery(el).prop('checked', false).trigger('change');
+                            }
+                        }
+                    );
+                    return false;
                 }
             );
         },
@@ -241,6 +260,7 @@ function TableFilterSortFx(selector){
             }
             var content = '<form class="tableFilterSortFilterFormInner">'
                         + '<h3><a href="#'+id+'" class="tableFilterSortOpenFilterForm button" data-rel="'+id+'" class="closed">'+filterFormTitle+'</a></h3>'
+                        + '<h2><a href="#'+id+'" class="tableFilterSortClearFilterForm button" data-rel="'+id+'" class="clear">Clear Filter</a></h2>'
                         + '<div id="'+id+'" style="display: none;" class="tableFilterSortFilterFormOptions">';
             var numberOfRows = jQuery('tr.tableFilterSortFilterRow').length;
             Object.keys(myObject.optionsForFilter).forEach(
@@ -458,10 +478,21 @@ function TableFilterSortFx(selector){
                     var filterToTriger = jQuery('input[data-to-filter="'+ dataFilter + '"][value="'+ filterValue + '"]');
                     if(jQuery(filterToTriger).prop('checked') == true){
                         jQuery(filterToTriger).prop('checked', false).trigger('change');
+                        jQuery('.direct-filter-link[data-filter="' + dataFilter + '"]').filter(
+                            function(){
+                                return $(this).text() == filterValue;
+                            }
+                        ).removeClass('filter-selected')
                     }
                     else {
                         jQuery(filterToTriger).prop('checked', true).trigger('change');
+                        jQuery('.direct-filter-link[data-filter="' + dataFilter + '"]').filter(
+                            function(){
+                                return $(this).text() == filterValue;
+                            }
+                        ).addClass('filter-selected')
                     }
+                    TableFilterSort.displayCurrentSearchParameters();
                     return false;
                 }
             );
