@@ -258,64 +258,68 @@ function TableFilterSortFx(selector){
         createFilterForm: function() {
             //create html content and add to top of page
             var myObject = this;
-            var id = this.makeID();
-            var filterFormTitle = jQuery(this.myTableHolder).find(".tableFilterSortFilterFormHolder").attr("data-title");
-            if(typeof filterFormTitle == "undefined") {
-                filterFormTitle = this.filterTitle;
-            }
-            var content = '<form class="tableFilterSortFilterFormInner">'
-                        + '<h3><a href="#'+id+'" class="tableFilterSortOpenFilterForm button closed" data-rel="'+id+'">'+filterFormTitle+'</a></h3>'
-                        + '<h4><a href="#'+id+'" class="tableFilterSortClearFilterForm button" data-rel="'+id+'">Clear Filter</a></h4>'
-                        + '<div id="'+id+'" style="display: none;" class="tableFilterSortFilterFormOptions">';
-            var numberOfRows = jQuery('tr.tableFilterSortFilterRow').length;
-            Object.keys(myObject.optionsForFilter).forEach(
-                function(category, categoryIndex) {
-                    var optionCount = myObject.objectSize(myObject.optionsForFilter, category);
-                    if(optionCount > 1 && optionCount < 25) {
-                        var cleanCategory = category.replace(/\W/g, '');
-                        var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
-                        content += '<div id="' + categoryID + '" class="filterColumn checkboxFilter">'
-                                +  '<label class="left">' + category.split('-').join(' ') + '</label>'
-                                +  '<ul class="listOfCheckboxes">';
-                        var sortedObject = myObject.objectSort(myObject.optionsForFilter[category]);
-                        var count = 0;
+            jQuery('.tableFilterSortFilterFormHolder').each(
+                function(i, el){
+                    var id = TableFilterSort.makeID();
+                    var filterFormTitle = jQuery(el).attr("data-title");
+                    var formType = jQuery(el).attr("data-form");
+                    if(typeof filterFormTitle == "undefined") {
+                        filterFormTitle = this.filterTitle;
+                    }
+                    var content = '<form class="tableFilterSortFilterFormInner">'
+                                + '<h3><a href="#'+id+'" class="tableFilterSortOpenFilterForm button closed" data-rel="'+id+'">'+filterFormTitle+'</a></h3>'
+                                + '<h4><a href="#'+id+'" class="tableFilterSortClearFilterForm button" data-rel="'+id+'">Clear Filter</a></h4>'
+                                + '<div id="'+id+'" style="display: none;" class="tableFilterSortFilterFormOptions">';
+                    var numberOfRows = jQuery('tr.tableFilterSortFilterRow').length;
+                    Object.keys(myObject.optionsForFilter).forEach(
+                        function(category, categoryIndex) {
+                            var optionCount = myObject.objectSize(myObject.optionsForFilter, category);
+                            if(optionCount > 1 && optionCount < 25) {
+                                var cleanCategory = category.replace(/\W/g, '');
+                                var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
+                                content += '<div id="' + categoryID + '" class="filterColumn checkboxFilter">'
+                                        +  '<label class="left">' + category.split('-').join(' ') + '</label>'
+                                        +  '<ul class="listOfCheckboxes">';
+                                var sortedObject = myObject.objectSort(myObject.optionsForFilter[category]);
+                                var count = 0;
 
-                        for(var value in sortedObject) {
-                            if(sortedObject.hasOwnProperty(value)) {
-                                count++;
+                                for(var value in sortedObject) {
+                                    if(sortedObject.hasOwnProperty(value)) {
+                                        count++;
+                                        var cleanValue = category.replace(/\W/g, '');
+                                        var valueID = cleanValue + "_IDandNameForvalueInFilterForm" + count;
+                                        content += '<li class="checkbox">'
+                                                + '<input type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + value.raw2attr() + '" data-to-filter="' + category.raw2attr() + '" />'
+                                                + '<label for="' + valueID + '">' + value + '</label>'
+                                                + '</li>';
+                                    }
+                                }
+                                content += '</ul>'
+                                        +  '</div>';
+                            }
+                            else if (optionCount > 25) {
+                                var cleanCategory = category.replace(/\W/g, '');
+                                var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
+                                content += '<div id="' + categoryID + '" class="filterColumn textFilter">'
+                                        +  '<label class="left">' + category.split('-').join(' ') + '</label>'
+                                        +  '<ul class="listOfTextFields">';
                                 var cleanValue = category.replace(/\W/g, '');
                                 var valueID = cleanValue + "_IDandNameForvalueInFilterForm" + count;
-                                content += '<li class="checkbox">'
-                                        + '<input type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + value.raw2attr() + '" data-to-filter="' + category.raw2attr() + '" />'
-                                        + '<label for="' + valueID + '">' + value + '</label>'
-                                        + '</li>';
+                                content += '<li>'
+                                        + '<input type="text" name="' + valueID + '" id="' + valueID + '" data-to-filter="' + category.raw2attr() + '" />'
+                                        + '</li>'
+                                        + '</ul>'
+                                        +  '</div>';
                             }
                         }
-                        content += '</ul>'
-                                +  '</div>';
-                    }
-                    else if (optionCount > 25) {
-                        var cleanCategory = category.replace(/\W/g, '');
-                        var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
-                        content += '<div id="' + categoryID + '" class="filterColumn textFilter">'
-                                +  '<label class="left">' + category.split('-').join(' ') + '</label>'
-                                +  '<ul class="listOfTextFields">';
-                        var cleanValue = category.replace(/\W/g, '');
-                        var valueID = cleanValue + "_IDandNameForvalueInFilterForm" + count;
-                        content += '<li>'
-                                + '<input type="text" name="' + valueID + '" id="' + valueID + '" data-to-filter="' + category.raw2attr() + '" />'
-                                + '</li>'
-                                + '</ul>'
-                                +  '</div>';
-                    }
+                    );
+                    content += '<h3 class="applyFilter"><a href="#'+id+'" class="tableFilterSortOpenFilterForm button" data-rel="'+id+'">Close Filter</a></h3>';
+                            +  '</div>'
+                            +  '</form>';
+                    jQuery(el)
+                        .html(content);
                 }
             );
-            content += '<h3 class="applyFilter"><a href="#'+id+'" class="tableFilterSortOpenFilterForm button" data-rel="'+id+'">Close Filter</a></h3>';
-                    +  '</div>'
-                    +  '</form>';
-            jQuery(this.myTableHolder)
-                .find(".tableFilterSortFilterFormHolder")
-                .html(content);
             window.setInterval(
                 function() {
                     if(jQuery(TableFilterSort.myTableHolder).isOnScreen() || jQuery(TableFilterSort.myTableHolder).hasClass('filterIsOpen')) {
