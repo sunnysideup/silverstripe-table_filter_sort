@@ -118,7 +118,7 @@ function TableFilterSortFx(selector){
                 function(event) {
                     jQuery('input[data-to-filter]').each(
                         function(i, el){
-                            if(jQuery(el).is(":checkbox") && jQuery(el).prop('checked') == true){
+                            if(jQuery(el).is(":checkbox")){
                                 jQuery(el).prop('checked', false).trigger('change');
                             }
                             else {
@@ -264,7 +264,7 @@ function TableFilterSortFx(selector){
                     var filterFormTitle = jQuery(el).attr("data-title");
                     var formType = jQuery(el).attr("data-form");
                     if(typeof filterFormTitle == "undefined") {
-                        filterFormTitle = this.filterTitle;
+                        filterFormTitle = TableFilterSort.filterTitle;
                     }
                     var content = '<form class="tableFilterSortFilterFormInner">'
                                 + '<h3><a href="#'+id+'" class="tableFilterSortOpenFilterForm button closed" data-rel="'+id+'">'+filterFormTitle+'</a></h3>'
@@ -273,43 +273,46 @@ function TableFilterSortFx(selector){
                     var numberOfRows = jQuery('tr.tableFilterSortFilterRow').length;
                     Object.keys(myObject.optionsForFilter).forEach(
                         function(category, categoryIndex) {
-                            var optionCount = myObject.objectSize(myObject.optionsForFilter, category);
-                            if(optionCount > 1 && optionCount < 25) {
-                                var cleanCategory = category.replace(/\W/g, '');
-                                var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
-                                content += '<div id="' + categoryID + '" class="filterColumn checkboxFilter">'
-                                        +  '<label class="left">' + category.split('-').join(' ') + '</label>'
-                                        +  '<ul class="listOfCheckboxes">';
-                                var sortedObject = myObject.objectSort(myObject.optionsForFilter[category]);
-                                var count = 0;
+                            var formTypeFieldSet = jQuery('[data-filter="'+ category +'"]').first().attr('data-form-fieldset');
+                            if(formType == formTypeFieldSet){
+                                var optionCount = myObject.objectSize(myObject.optionsForFilter, category);
+                                if(optionCount > 1 && optionCount < 25) {
+                                    var cleanCategory = category.replace(/\W/g, '');
+                                    var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
+                                    content += '<div id="' + categoryID + '" class="filterColumn checkboxFilter">'
+                                            +  '<label class="left">' + category.split('-').join(' ') + '</label>'
+                                            +  '<ul class="listOfCheckboxes">';
+                                    var sortedObject = myObject.objectSort(myObject.optionsForFilter[category]);
+                                    var count = 0;
 
-                                for(var value in sortedObject) {
-                                    if(sortedObject.hasOwnProperty(value)) {
-                                        count++;
-                                        var cleanValue = category.replace(/\W/g, '');
-                                        var valueID = cleanValue + "_IDandNameForvalueInFilterForm" + count;
-                                        content += '<li class="checkbox">'
-                                                + '<input type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + value.raw2attr() + '" data-to-filter="' + category.raw2attr() + '" />'
-                                                + '<label for="' + valueID + '">' + value + '</label>'
-                                                + '</li>';
+                                    for(var value in sortedObject) {
+                                        if(sortedObject.hasOwnProperty(value)) {
+                                            count++;
+                                            var cleanValue = category.replace(/\W/g, '');
+                                            var valueID = cleanValue + "_IDandNameForvalueInFilterForm" + count;
+                                            content += '<li class="checkbox">'
+                                                    + '<input type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + value.raw2attr() + '" data-to-filter="' + category.raw2attr() + '" />'
+                                                    + '<label for="' + valueID + '">' + value + '</label>'
+                                                    + '</li>';
+                                        }
                                     }
+                                    content += '</ul>'
+                                            +  '</div>';
                                 }
-                                content += '</ul>'
-                                        +  '</div>';
-                            }
-                            else if (optionCount > 25) {
-                                var cleanCategory = category.replace(/\W/g, '');
-                                var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
-                                content += '<div id="' + categoryID + '" class="filterColumn textFilter">'
-                                        +  '<label class="left">' + category.split('-').join(' ') + '</label>'
-                                        +  '<ul class="listOfTextFields">';
-                                var cleanValue = category.replace(/\W/g, '');
-                                var valueID = cleanValue + "_IDandNameForvalueInFilterForm" + count;
-                                content += '<li>'
-                                        + '<input type="text" name="' + valueID + '" id="' + valueID + '" data-to-filter="' + category.raw2attr() + '" />'
-                                        + '</li>'
-                                        + '</ul>'
-                                        +  '</div>';
+                                else if (optionCount > 25) {
+                                    var cleanCategory = category.replace(/\W/g, '');
+                                    var categoryID = cleanCategory+"_IDandNameForLabelInFilterForm";
+                                    content += '<div id="' + categoryID + '" class="filterColumn textFilter">'
+                                            +  '<label class="left">' + category.split('-').join(' ') + '</label>'
+                                            +  '<ul class="listOfTextFields">';
+                                    var cleanValue = category.replace(/\W/g, '');
+                                    var valueID = cleanValue + "_IDandNameForvalueInFilterForm" + count;
+                                    content += '<li>'
+                                            + '<input type="text" name="' + valueID + '" id="' + valueID + '" data-to-filter="' + category.raw2attr() + '" />'
+                                            + '</li>'
+                                            + '</ul>'
+                                            +  '</div>';
+                                }
                             }
                         }
                     );
