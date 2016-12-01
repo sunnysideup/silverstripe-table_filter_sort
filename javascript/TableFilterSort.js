@@ -216,11 +216,15 @@ function TableFilterSortFx(selector){
                     if(myObject.objectSize(myObject.optionsForFilter, category) == 1) {
                         if(myObject.debug) {console.debug("tableHideColsWhichAreAllTheSame: checking category: "+category);}
                         commonContentExists = true;
+                        var commonContentAdded = false;
                         //remove text from span
                         jQuery('span[data-filter="' + category + '"]').each(
                             function(i, el) {
-                                if(i == 0) {
-                                    commonContent += "<li>"+category + ":<strong> " + jQuery(el).html() + "</strong></li>";
+                                if(!commonContentAdded) {
+                                    if(jQuery(el).html() != ""){
+                                        commonContent += "<li>"+category + ":<strong> " + jQuery(el).html() + "</strong></li>";
+                                        commonContentAdded = true;
+                                    }
                                 }
                                 var spanParent = jQuery(el).parent();
                                 jQuery(el).remove();
