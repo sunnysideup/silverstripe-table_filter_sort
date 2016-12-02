@@ -320,7 +320,7 @@ function TableFilterSortFx(selector){
                             }
                         }
                     );
-                    content += '<h3 class="applyFilter"><a href="#'+id+'" class="tableFilterSortOpenFilterForm button" data-rel="'+id+'">Close Filter</a></h3>';
+                    content += '<h4 class="applyFilter"><a href="#'+id+'" class="tableFilterSortOpenFilterForm button" data-rel="'+id+'">Close Filter</a></h4>';
                             +  '</div>'
                             +  '</form>';
                     jQuery(el)
