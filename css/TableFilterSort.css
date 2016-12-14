@@ -33,3 +33,7 @@
 .applyFilter {
     float: right;
 }
+
+tr.match {}
+tr.topRow{}
+tr.restRow, tr.noMatch {display: none;}

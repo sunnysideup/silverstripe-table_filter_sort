@@ -63,13 +63,43 @@ function TableFilterSortFx(selector){
         currentFilter:[],
 
         /**
+         * rows to show
+         * @type Int
+         */
+        visibleRowCount: 3,
+
+        /**
+         * class for rows that should show
+         * @type string
+         */
+        showClass: 'topRow',
+
+        /**
+         * class for rows that should not show
+         * @type string
+         */
+        hideClass: 'restRow',
+
+        /**
+         * class for matching rows
+         * @type string
+         */
+        matchClass: 'match',
+
+        /**
+         * class for non-matching rows
+         * @type string
+         */
+        notMatchClass: 'noMatch',
+
+        /**
          * startup
          *
          */
         init: function(){
             this.toggleSlideSetup();
             this.clearFilterListener();
-            if(jQuery(this.myTable).find("tr.tableFilterSortFilterRow").length > 1){
+            if(jQuery(this.myTable).find("tr.tfsRow").length > 1){
                 this.tableFilterSetup();
                 this.tableHideColsWhichAreAllTheSame();
                 this.createFilterForm();
@@ -81,7 +111,6 @@ function TableFilterSortFx(selector){
 
         /**
          * set up toggle slides ...
-         * we do this last
          */
         toggleSlideSetup: function(){
             //add toggle
@@ -274,7 +303,7 @@ function TableFilterSortFx(selector){
                                 + '<h3><a href="#'+id+'" class="tableFilterSortOpenFilterForm button closed" data-rel="'+id+'">'+filterFormTitle+'</a></h3>'
                                 + '<h4><a href="#'+id+'" class="tableFilterSortClearFilterForm button" data-rel="'+id+'">Clear Filter</a></h4>'
                                 + '<div id="'+id+'" style="display: none;" class="tableFilterSortFilterFormOptions">';
-                    var numberOfRows = jQuery('tr.tableFilterSortFilterRow').length;
+                    var numberOfRows = jQuery('tr.tfsRow').length;
                     Object.keys(myObject.optionsForFilter).forEach(
                         function(category, categoryIndex) {
                             var formTypeFieldSet = jQuery('[data-filter="'+ category +'"]').first().attr('data-form-fieldset');
@@ -346,18 +375,17 @@ function TableFilterSortFx(selector){
          * set up filter listeners ...
          */
         setupFilterListeners: function() {
+            var myObject = this;
             jQuery(this.myTableHolder).find(".tableFilterSortFilterFormInner input").on(
                 'keyup',
                 function(){
                     jQuery(this).trigger("change");
                 }
             );
-
-
             //add listeners to any change in the checkboxes/inputs
-            var myObject = this;
             jQuery(this.myTableHolder).find(".tableFilterSortFilterFormInner input").change(
                 function(event){
+                    var hiddenRows = false;
                     if(myObject.debug) {console.debug("==============");console.debug(myObject.currentFilter);}
                     var inputChanged = jQuery(this);
                     if(jQuery(inputChanged).attr('type') === 'text') {
@@ -410,7 +438,9 @@ function TableFilterSortFx(selector){
                             }
                         }
                     }
-                    jQuery('tr.tableFilterSortFilterRow').each(
+                    var matchCount = 0;
+                    var noFilter = jQuery(myObject.myTable).find('tr.'+myObject.notMatchClass).length === 0 ? true : false;
+                    jQuery(myObject.myTable).find('tr.tfsRow').each(
                         function(i, el) {
                             if(myObject.debug) {console.log("===");}
                             //innocent until proven guilty
@@ -464,14 +494,25 @@ function TableFilterSortFx(selector){
                             );
                             //hide or show
                             if(rowMatches){
-                                jQuery(el).show();
+                                jQuery(el).addClass(myObject.matchClass).removeClass(myObject.notMatchClass);
+                                matchCount++;
+                                console.debug('match count in filter');
                             }
                             else {
-                                jQuery(el).hide();
+                                jQuery(el).addClass(myObject.notMatchClass).removeClass(myObject.matchClass);
+                                console.debug('no match in filter row');
+                            }
+                            if(matchCount <= myObject.visibleRowCount) {
+                                jQuery(el).addClass(myObject.showClass).removeClass(myObject.hideClass);
+                            }
+                            else {
+                                hiddenRows = true;
+                                jQuery(el).addClass(myObject.hideClass).removeClass(myObject.showClass);
+
                             }
                         }
                     );
-                    if(jQuery('tr.tableFilterSortFilterRow').is(":visible")){
+                    if(jQuery('tr.tfsRow').hasClass(myObject.showClass).length){
                         jQuery('.no-matches-message').hide();
                     }
                     else {
@@ -481,6 +522,11 @@ function TableFilterSortFx(selector){
                     jQuery('html, body').animate({
                         scrollTop: (jQuery(myObject.myTableHolder).offset().top - 550)
                     }, 200);
+                    if(hiddenRows) {
+                        jQuery(myObject.myTableHolder).find(".tableFilterSortMoreEntries").show();
+                    } else {
+                        jQuery(myObject.myTableHolder).find(".tableFilterSortMoreEntries").hide();
+                    }
                 }
             );
         },
@@ -538,6 +584,7 @@ function TableFilterSortFx(selector){
                 "click",
                 "a.sortable",
                 function(event){
+                    var hiddenRows = false;
                     event.preventDefault();
                     jQuery(myObject.myTableHolder).find("a.sortable")
                         .removeClass("sort-asc")
@@ -546,7 +593,7 @@ function TableFilterSortFx(selector){
                     var sortOrder = jQuery(this).attr("data-sort-direction");
                     var sortType = jQuery(this).attr("data-sort-type");
                     var arr = [];
-                    var rows = jQuery(table).find('tr.tableFilterSortFilterRow');
+                    var rows = jQuery(table).find('tr.tfsRow');
                     rows.each(
                         function(i, el) {
                             var dataValue = jQuery(el).find('[data-filter="' + dataFilter + '"]').text();
@@ -575,13 +622,34 @@ function TableFilterSortFx(selector){
                         .addClass("sort-asc");
                     }
                     table.empty();
+                    var html = '';
+                    var matchCount = 0;
+                    var noFilter = table.find('tr.'+myObject.notMatchClass).length === 0 ? true : false;
+                    var hiddenRows = false;
                     arr.forEach(
                         function(entry) {
-                            table.append(rows[entry[1]]);
+                            html = rows[entry[1]];
+                            if(noFilter || jQuery(html).hasClass(myObject.matchClass)) {
+                                matchCount++;
+                            }
+                            if(matchCount <= myObject.visibleRowCount) {
+                                jQuery(html).addClass(myObject.showClass).removeClass(myObject.hideClass);
+                            }
+                            else {
+                                hiddenRows = true;
+                                jQuery(html).addClass(myObject.hideClass).removeClass(myObject.showClass);
+                            }
+                            table.append(html);
                         }
                     );
+                    if(hiddenRows) {
+                        jQuery(myObject.myTableHolder).find(".tableFilterSortMoreEntries").show();
+                    } else {
+                        jQuery(myObject.myTableHolder).find(".tableFilterSortMoreEntries").hide();
+                    }
                 }
             );
+            //do this last
             jQuery(this.myTable).find("a.sortable[data-sort-default=true]").click();
         },
 
