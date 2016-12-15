@@ -1,4 +1,4 @@
--<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
@@ -10,8 +10,12 @@
         <h1>Example of a Filter and Sort Table ... </h1>
 
         <div class="tableFilterSortHolder">
-            <div class="tableFilterSortFilterFormHolder" data-title="My Filter Title"></div>
-            <div class="tableFilterSortCurrentSearchHolder"></div>
+            <div class="tableFilterSortFilterFormHolder"
+                data-title="My Filter Title"
+                data-title-clear-button="Clear"
+                data-title-close-and-apply="Apply"
+            ></div>
+            <div class="tableFilterSortCurrentSearchHolder" data-title="Current Filter"></div>
             <div class="tableFilterSortCommonContentHolder" data-title="Common Info"></div>
             <table class="tableFilterSortTable">
                 <thead>
@@ -180,7 +184,20 @@
 
                 </tbody>
             </table>
-            <p class="tableFilterSortMoreEntries">You have reached the limit of visble entries, there are more entries, but they can not be shown here as this will overload your browser.</p>
+            <p class="tableFilterSortMoreEntries">
+                You have reached the limit of visble entries,
+                there are more entries, but they can not be shown here as this will overload your browser.
+                <br />
+                Filtered <span class="match-row-number">0</span>
+                of  <span class="total-row-number">0</span>.
+                <br />
+                Showing a total of <span class="total-showing-row-number">0</span> rows
+                from <span class="min-row-number">0</span>
+                up to <span class="max-row-number">0</span>.
+                <br />
+                Set starting row <input type="number" name="starting-row" /> and
+                the total number of rows to be shown  <input type="number" name="number-of-rows" />
+            </p>
         </div>
 
 
