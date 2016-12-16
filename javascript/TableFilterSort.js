@@ -656,7 +656,6 @@ function TableFilterSortFx(selector, holderNumber){
             myObject.myTable.hide();
             //show the table as loading
             myObject.myTableHolder.addClass(myObject.loadingClass);
-            console.debug(myObject.myRows.length)
             //hide all the rows
             myObject.myRows.each(
                 function(i, el) {
@@ -713,7 +712,7 @@ function TableFilterSortFx(selector, holderNumber){
                     if(currentPage === i) {
                         pageHTML += '<span>['+(i+1)+']</span>';
                     } else {
-                        onclick = 'TableFilterSortTableList['+myObject.holderNumber+'].gotoPage('+i+'); return false;';
+                        onclick = 'window.TableFilterSortTableList['+myObject.holderNumber+'].gotoPage('+i+'); return false;';
                         pageHTML += '<a href="" onclick="'+onclick+'">'+(i+1)+'</a> ';
                      }
                      pageHTML += ' ';
