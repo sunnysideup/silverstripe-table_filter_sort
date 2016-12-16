@@ -24,4 +24,5 @@ class TableFilterSortAPI extends Object
         Requirements::javascript('table_filter_sort/javascript/TableFilterSort.js');
         Requirements::themedCSS('TableFilterSort', 'table_filter_sort');
     }
+
 }

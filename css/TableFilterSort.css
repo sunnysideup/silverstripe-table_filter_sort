@@ -35,5 +35,9 @@
 }
 
 tr.match {}
-tr.topRow{}
-tr.restRow, tr.no-match {display: none;}
+
+tr.show{}
+
+tr.hide, tr.no-match {display: none!important;}
+
+.loading{opacity: 0.3;}

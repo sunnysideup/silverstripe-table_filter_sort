@@ -9,7 +9,7 @@ jQuery(document).ready(
         if(typeof TableFilterSortTableList !== 'undefined') {
             var i = 0;
             for(i = 0; i < TableFilterSortTableList.length; i++) {
-                new TableFilterSortFx(TableFilterSortTableList[i]);
+                TableFilterSortTableList[i] = new TableFilterSortFx(TableFilterSortTableList[i], i);
             }
         }
 
@@ -17,7 +17,7 @@ jQuery(document).ready(
 
 
 
-function TableFilterSortFx(selector){
+function TableFilterSortFx(selector, holderNumber){
 
 
     var TableFilterSort = {
@@ -27,7 +27,13 @@ function TableFilterSortFx(selector){
          * turn on to see what is going on in console
          * @var boolean
          */
-        debug: true,
+        debug: false,
+
+        /**
+         * the index in TableFilterSortTableList that holds this guy
+         * @var int
+         */
+        holderNumber: holderNumber,
 
         /**
          * selector for holder
@@ -64,6 +70,15 @@ function TableFilterSortFx(selector){
         currentFilter:[],
 
         /**
+         * "Colour" => 'Exact'
+         * "Size" => 'Exact',
+         * "Description" => 'Partial',
+         * show TRS where at least one of the values for EVERY category is matched
+         * @var array
+         */
+        currentFilterTypes:[],
+
+        /**
          * starting point for showing rows
          * @type Int
          */
@@ -73,7 +88,13 @@ function TableFilterSortFx(selector){
          * rows to show
          * @type Int
          */
-        visibleRowCount: 3,
+        visibleRowCount: 50,
+
+        /**
+         * rows to show
+         * @type Int
+         */
+        totalRowCount: 0,
 
         /**
          * maximum number of checkboxes in the filter before it becomes a text filter
@@ -85,7 +106,7 @@ function TableFilterSortFx(selector){
          * number of milliseconds to check if filter is in use ...
          * @type Int
          */
-        intervalForFilterCheck: 200,
+        intervalForFilterCheck: 1000,
 
 
         /**
@@ -122,11 +143,23 @@ function TableFilterSortFx(selector){
 
         /**
          *
+         * @type string
+         */
+        currentFilterText: 'Current Filter',
+
+        /**
+         *
          *
          * SELECTORS
          *
          *
          */
+
+        /**
+        * @var string
+        */
+        uniqueSelector: selector,
+
 
         /**
         * @var string
@@ -194,6 +227,11 @@ function TableFilterSortFx(selector){
         visibleRowCountSelector: ".total-showing-row-number",
 
         /**
+         * @var string
+         */
+        paginationSelector: ".pagination",
+
+        /**
          *
          *
          * Classes
@@ -205,13 +243,19 @@ function TableFilterSortFx(selector){
          * class for rows that should show
          * @type string
          */
-        showClass: 'topRow',
+        loadingClass: 'loading',
+
+        /**
+         * class for rows that should show
+         * @type string
+         */
+        showClass: 'show',
 
         /**
          * class for rows that should not show
          * @type string
          */
-        hideClass: 'restRow',
+        hideClass: 'hide',
 
         /**
          * class for matching rows
@@ -326,16 +370,18 @@ function TableFilterSortFx(selector){
          */
         init: function(){
             var myObject = this;
-            myObject.toggleSlideSetup();
-            myObject.clearFilterListener();
             if(myObject.myTable.find(myObject.rowSelector).length > 1){
-                myObject.tableFilterSetup();
+                myObject.myTableHolder.addClass(myObject.loadingClass);
+                myObject.toggleSlideSetup();
+                myObject.clearFilterListener();
+                myObject.filterItemCollector();
                 myObject.tableHideColsWhichAreAllTheSame();
                 myObject.createFilterForm();
                 myObject.setupFilterListeners();
                 myObject.directFilterLinkListener();
                 myObject.setupSortListeners();
-                myObject.showAndHideForm();
+                myObject.showAndHideFilterForm();
+                myObject.myTableHolder.removeClass(myObject.loadingClass);
             }
         },
 
@@ -392,62 +438,17 @@ function TableFilterSortFx(selector){
                     );
                     //clear directly selected items
                     myObject.myTable.find('.' + myObject.directFilterLinkClass).parent().removeClass(myObject.filterSelectedClass);
-                    jQuery(myObject.currentSearchFilterSelector).html('');
+                    jQuery(myObject.currentSearchFilterSelector).html('no filters');
                     return false;
                 }
             );
         },
 
-        displayCurrentSearchParameters: function(){
-            var html = "";
-            var myObject = this;
-            myObject.myTableHolder.find('.'+myObject.filterOptionsHolderClass+ ' .' + myObject.filterGroupClass).each(
-                function(i, el){
-                    el = jQuery(el);
-                    var leftLabel = el.find('label.'+myObject.groupLabelClass).text();
-                    if(el.hasClass(myObject.textFilterClass)){
-                        var inputVal = el.find('input').val();
-                        if(inputVal.length > 0){
-                            html += "<strong>" + leftLabel + ":</strong> " + inputVal + "; ";
-                        }
-                    }
-                    else if(el.hasClass(myObject.checkboxFilterClass)){
-                        var inputsChecked = "";
-                        var list = el.find("ul li");
-                        list.each(
-                            function(innerI, innerEl){
-                                innerEl = jQuery(innerEl);
-                                var input = innerEl.find('input');
-                                if(input.is(":checked")){
-                                    inputsChecked += '<span>' + input.val() + "</span> ";
-                                }
-                            }
-                        );
-                        if(inputsChecked.length > 0){
-                            html += "<li><strong>" + leftLabel + ":</strong> " + inputsChecked + "</li>";
-                        }
-                    }
-                }
-            );
-            if(html.length === 0) {
-                html = myObject.noFilterSelectedText;
-            }
-            var title = myObject.myTableHolder.find(myObject.currentSearchFilterSelector).attr('data-title');
-            html = "<div><p>" + title + "</p><ul>" + html + "</ul></div>";
-            myObject.myTableHolder.find(myObject.currentSearchFilterSelector).html(html);
-            if(myObject.myTableHolder.hasClass(myObject.filterIsOpenClass)){
-                myObject.myTableHolder.find(myObject.currentSearchFilterSelector).hide();
-            }
-            else {
-                myObject.myTableHolder.find(myObject.currentSearchFilterSelector).show();
-            }
-
-        },
 
         /**
          * find the filters ...
          */
-        tableFilterSetup: function() {
+        filterItemCollector: function() {
             var myObject = this;
             //for each table with specific class ...
             myObject.myRows.find("span[data-filter]").each(
@@ -511,9 +512,9 @@ function TableFilterSortFx(selector){
                                         //get related table header
                                         if(i === 0) {
                                             var colNumber = spanParent.parent("tr").children("td").index(spanParent);
-                                            myObject.myTable.find('th').eq(colNumber).hide();
+                                            myObject.myTable.find('th').eq(colNumber).remove();
                                         }
-                                        spanParent.hide();
+                                        spanParent.remove();
                                     }
                                 }
                             }
@@ -613,7 +614,7 @@ function TableFilterSortFx(selector){
             formHolder.html(content);
         },
 
-        showAndHideForm: function()
+        showAndHideFilterForm: function()
         {
             var myObject = this;
             window.setInterval(
@@ -630,11 +631,31 @@ function TableFilterSortFx(selector){
             );
         },
 
+        startRowManipulation: function()
+        {
+            var myObject = this;
+            myObject.myTable.hide();
+            myObject.myTableHolder.addClass(myObject.loadingClass);
+        },
+
+
+        endRowManipulation: function()
+        {
+            var myObject = this;
+            myObject.myTable.show();
+            myObject.myTableHolder.removeClass(myObject.loadingClass);
+            jQuery('html, body').animate({
+                scrollTop: (myObject.myTableHolder.offset().top - 550)
+            }, 200);
+        },
+
+
         /**
          * set up filter listeners ...
          */
         setupFilterListeners: function() {
             var myObject = this;
+            myObject.startRowManipulation();
             var formHolder = myObject.myTableHolder.find(myObject.filterFormHolderSelector);
             formHolder.find('.' + myObject.filterGroupClass + " input").on(
                 'keyup',
@@ -657,8 +678,12 @@ function TableFilterSortFx(selector){
                                 if(myObject.debug) {console.log("adding "+categoryToMatch);}
                                 myObject.currentFilter[categoryToMatch] = [];
                             }
+                            if(typeof myObject.currentFilterTypes[categoryToMatch] === "undefined") {
+                                myObject.currentFilterTypes[categoryToMatch] = 'Partial';
+                            }
                             var filterValueArray = valueToMatch.split(" ");
-                            for(var i = 0, len = filterValueArray.length; i < len; i++) {
+                            var i = 0;
+                            for(i = 0, len = filterValueArray.length; i < len; i++) {
                                 var tempVal = filterValueArray[i].trim();
                                 if(tempVal.length > 1) {
                                     myObject.currentFilter[categoryToMatch][tempVal] = tempVal;
@@ -668,6 +693,9 @@ function TableFilterSortFx(selector){
                         }
                     }
                     else {
+                      if(typeof myObject.currentFilterTypes[categoryToMatch] === "undefined") {
+                          myObject.currentFilterTypes[categoryToMatch] = 'Exact';
+                      }
                         if(myElInputChanged.is(":checked")){
                             if(typeof myObject.currentFilter[categoryToMatch] === "undefined") {
                                 if(myObject.debug) {console.log("adding "+categoryToMatch);}
@@ -697,8 +725,7 @@ function TableFilterSortFx(selector){
                         }
                     }
                     var matchCount = 0;
-                    var totalRowCount = 0;
-                    var visibleRowCount = 0;
+                    var actualVisibleRowCount = 0;
                     var minRow = myObject.showFromRow;
                     var maxRow = minRow + myObject.visibleRowCount;
                     var noFilter = myObject.myTable.find('tr.'+myObject.notMatchClass).length === 0 ? true : false;
@@ -724,15 +751,29 @@ function TableFilterSortFx(selector){
                                             function(valueToMatch, valueToMatchIndex) {
                                                 if(myObject.debug) {console.log("FILTER - CHECKING: '"+valueToMatch+"' in '"+categoryToMatch+"'");}
                                                 //what is the value .. if it matches, the row is OK and we can go to next category ...
-
                                                 if(stillLookingForValue) {
                                                     el.find('span[data-filter="' + categoryToMatch + '"]').each(
                                                         function(innerI, innerEl) {
                                                             innerEl = jQuery(innerEl);
                                                             var value = innerEl.text().toLowerCase();
-                                                            if(value.indexOf(valueToMatch) !== -1){
+                                                            switch(myObject.currentFilterTypes[categoryToMatch]) {
+                                                                case 'Exact':
+                                                                    if(value === valueToMatch){
+                                                                        rowMatchesForFilterGroup = true;
+                                                                    }
+                                                                    break;
+                                                                case 'Partial':
+                                                                    if(value.indexOf(valueToMatch) !== -1){
+                                                                        rowMatchesForFilterGroup = true;
+                                                                    }
+                                                                    break;
+                                                                default:
+                                                                    if(value == valueToMatch){
+                                                                        rowMatchesForFilterGroup = true;
+                                                                    }
+                                                            }
+                                                            if(rowMatchesForFilterGroup){
                                                                 if(myObject.debug) {console.log("FILTER - MATCH: '"+valueToMatch+"' in '"+categoryToMatch+"'");}
-                                                                rowMatchesForFilterGroup = true;
                                                                 //break out of each loop
                                                                 return false;
                                                             }
@@ -756,7 +797,6 @@ function TableFilterSortFx(selector){
                                     }
                                 }
                             );
-                            totalRowCount++;
                             //hide or show
                             if(rowMatches){
                                 el.addClass(myObject.matchClass).removeClass(myObject.notMatchClass);
@@ -766,12 +806,13 @@ function TableFilterSortFx(selector){
                                 el.addClass(myObject.notMatchClass).removeClass(myObject.matchClass);
                             }
                             if(matchCount > minRow && matchCount <= maxRow ) {
-                                visibleRowCount++;
+                                if(rowMatches) {
+                                    actualVisibleRowCount++;
+                                }
                                 el.addClass(myObject.showClass).removeClass(myObject.hideClass);
                             }
                             else {
                                 el.addClass(myObject.hideClass).removeClass(myObject.showClass);
-
                             }
                         }
                     );
@@ -781,12 +822,151 @@ function TableFilterSortFx(selector){
                     else {
                         jQuery('.'+myObject.noMatchMessageClass).show();
                     }
-                    myObject.renderPagination(matchCount, minRow, maxRow, totalRowCount, visibleRowCount);
+                    myObject.endRowManipulation();
+                    myObject.renderPagination(matchCount, actualVisibleRowCount);
                     if(myObject.debug) {console.debug(myObject.currentFilter);console.debug("==============");}
                 }
             );
         },
 
+        /**
+         * set up sorting mechanism
+         */
+        setupSortListeners: function() {
+            var myObject = this;
+            myObject.startRowManipulation();
+            var tableBody = myObject.myTable.find(" > tbody");
+            myObject.myTableHolder.on(
+                "click",
+                myObject.sortLinkSelector,
+                function(event){
+                    event.preventDefault();
+                    var myEl = jQuery(this);
+                    myObject.myTableHolder.find(myObject.sortLinkSelector)
+                        .removeClass(myObject.sortAscClass)
+                        .removeClass(myObject.sortDescClass);
+                    var dataFilter = myEl.attr("data-filter");
+                    var sortOrder = myEl.attr("data-sort-direction");
+                    var sortType = myEl.attr("data-sort-type");
+                    var arr = [];
+                    myObject.myRows.each(
+                        function(i, el) {
+                            el = jQuery(el);
+                            var dataValue = el.find('[data-filter="' + dataFilter + '"]').text();
+                            if(sortType === "number") {
+                                dataValue = dataValue.replace(/[^\d.-]/g, '');
+                                dataValue = parseFloat(dataValue);
+                            }
+                            else {
+                                //do nothing ...
+                            }
+                            var row = new Array(dataValue, i);
+                            arr.push(row);
+                        }
+                    );
+                    arr.sort(myObject.sortMultiDimensionalArray);
+
+                    if(sortOrder === "desc"){
+                        arr.reverse();
+                        myEl.attr("data-sort-direction", "asc").addClass(myObject.sortDescClass);
+                    }
+                    else{
+                        myEl.attr("data-sort-direction", "desc").addClass(myObject.sortAscClass);
+                    }
+                    tableBody.empty();
+                    var html = '';
+                    var matchCount = 0;
+                    var actualVisibleRowCount = 0;
+                    var minRow = myObject.showFromRow;
+                    var maxRow = minRow + myObject.visibleRowCount;
+                    var noFilter = tableBody.find('tr.'+myObject.notMatchClass).length === 0 ? true : false;
+                    var originalRows = myObject.myRows;
+                    arr.forEach(
+                        function(entry) {
+                            var rowMatches = false;
+                            html = originalRows[entry[1]];
+                            if(noFilter || jQuery(html).hasClass(myObject.matchClass)) {
+                                rowMatches = true;
+                                matchCount++;
+                            }
+                            if(matchCount > minRow && matchCount <= maxRow) {
+                                if(rowMatches) {
+                                    actualVisibleRowCount++;
+                                }
+                                jQuery(html).addClass(myObject.showClass).removeClass(myObject.hideClass);
+                            }
+                            else {
+                                jQuery(html).addClass(myObject.hideClass).removeClass(myObject.showClass);
+                            }
+                            tableBody.append(html);
+                        }
+                    );
+                    myObject.endRowManipulation();
+                    myObject.renderPagination(matchCount, actualVisibleRowCount);
+                }
+            );
+            //do this last
+            myObject.runCurrentSort();
+        },
+
+        renderPagination: function(matchCount, actualVisibleRowCount)
+        {
+            var myObject = this;
+            var minRow = myObject.showFromRow;
+            var maxRow = minRow + actualVisibleRowCount;
+            var totalRowCount = myObject.myRows.length;
+            var pageCount = Math.ceil(matchCount / myObject.visibleRowCount);
+            var pageHTML = '';
+            var i = 0;
+            var currentPage = false;
+            if(pageCount > 1) {
+              for(i = 0; i < pageCount; i++ ) {
+                  pageHTML += '<a href="" onclick="TableFilterSortTableList['.myObject.holderNumber.'].gotoPage('+i+'); return false;">'+(i+1)+'</a> '
+              }
+            }
+            minRow++;
+            if(totalRowCount > maxRow || minRow > 0) {
+                myObject.myTableHolder.find(myObject.moreRowEntriesSelector).show();
+            } else {
+                myObject.myTableHolder.find(myObject.moreRowEntriesSelector).hide();
+            }
+            myObject.myTableHolder.find(myObject.matchRowCountSelector).text(matchCount);
+            myObject.myTableHolder.find(myObject.minRowSelector).text(minRow);
+            myObject.myTableHolder.find(myObject.maxRowSelector).text(maxRow);
+            myObject.myTableHolder.find(myObject.totalRowCountSelector).text(totalRowCount);
+            myObject.myTableHolder.find(myObject.visibleRowCountSelector).text(actualVisibleRowCount);
+            myObject.myTableHolder.find(myObject.paginationSelector).text(pageHTML);
+        },
+
+        /**
+         * [function description]
+         * @param  {int} page [description]
+         */
+        gotoPage: function(page)
+        {
+            var myObject = this;
+            myObject.showFromRow = page;
+            myObject.
+        },
+
+        runCurrentSort: function() {
+            var myObject = this;
+            var currentSortObject = myObject.myTableHolder.find('.'+sortDescClass+', .'+sortAscClass).first();
+            if(currentSortObject && currentSortObject.length > 0) {
+            } else {
+                currentSortObject = myObject.myTableHolder.find("a.sortable[data-sort-default=true]").first();
+            if(currentSortObject && currentSortObject.length > 0) {
+            } else {
+                currentSortObject = myObject.myTableHolder.find("a.sortable").first()
+            }
+            if(currentSortObject && currentSortObject.length > 0) {
+                currentSortObject.click();
+            }
+        }
+        /**
+         * basically runs the filter as per usual
+         * after stuff has been selected.
+         */
         directFilterLinkListener: function() {
             var myObject = this;
             myObject.myTable.on(
@@ -843,104 +1023,56 @@ function TableFilterSortFx(selector){
             );
         },
 
-        /**
-         * set up sorting mechanism
-         */
-        setupSortListeners: function() {
+        displayCurrentSearchParameters: function(){
+            var html = "";
             var myObject = this;
-            var table = myObject.myTable.find(" > tbody");
-            myObject.myTableHolder.on(
-                "click",
-                myObject.sortLinkSelector,
-                function(event){
-                    event.preventDefault();
-                    var myEl = jQuery(this);
-                    myObject.myTableHolder.find(myObject.sortLinkSelector)
-                        .removeClass(myObject.sortAscClass)
-                        .removeClass(myObject.sortDescClass);
-                    var dataFilter = myEl.attr("data-filter");
-                    var sortOrder = myEl.attr("data-sort-direction");
-                    var sortType = myEl.attr("data-sort-type");
-                    var arr = [];
-                    myObject.myRows.each(
-                        function(i, el) {
-                            el = jQuery(el);
-                            var dataValue = el.find('[data-filter="' + dataFilter + '"]').text();
-                            if(sortType === "number") {
-                                dataValue = dataValue.replace(/[^\d.-]/g, '');
-                                dataValue = parseFloat(dataValue);
-                            }
-                            else {
-                                //do nothing ...
-                            }
-                            var row = new Array(dataValue, i);
-                            arr.push(row);
+            myObject.myTableHolder.find('.'+myObject.filterOptionsHolderClass+ ' .' + myObject.filterGroupClass).each(
+                function(i, el){
+                    el = jQuery(el);
+                    var leftLabel = el.find('label.'+myObject.groupLabelClass).text();
+                    if(el.hasClass(myObject.textFilterClass)){
+                        var inputVal = el.find('input').val();
+                        if(inputVal.length > 0){
+                            html += "<strong>" + leftLabel + ":</strong> " + inputVal + "; ";
                         }
-                    );
-                    arr.sort(myObject.sortMultiDimensionalArray);
-
-                    if(sortOrder === "desc"){
-                        arr.reverse();
-                        myEl.attr("data-sort-direction", "asc").addClass(myObject.sortDescClass);
                     }
-                    else{
-                        myEl.attr("data-sort-direction", "desc").addClass(myObject.sortAscClass);
-                    }
-                    table.empty();
-                    var html = '';
-                    var matchCount = 0;
-                    var totalRowCount = 0;
-                    var visibleRowCount = 0;
-                    var minRow = myObject.showFromRow;
-                    var maxRow = minRow + myObject.visibleRowCount;
-                    var noFilter = table.find('tr.'+myObject.notMatchClass).length === 0 ? true : false;
-                    var rows = myObject.myRows;
-                    arr.forEach(
-                        function(entry) {
-                            totalRowCount++;
-                            html = rows[entry[1]];
-                            if(noFilter || jQuery(html).hasClass(myObject.matchClass)) {
-                                matchCount++;
+                    else if(el.hasClass(myObject.checkboxFilterClass)){
+                        var inputsChecked = "";
+                        var list = el.find("ul li");
+                        list.each(
+                            function(innerI, innerEl){
+                                innerEl = jQuery(innerEl);
+                                var input = innerEl.find('input');
+                                if(input.is(":checked")){
+                                    inputsChecked += '<span>' + input.val() + "</span> ";
+                                }
                             }
-                            if(matchCount > minRow && matchCount <= maxRow) {
-                                visibleRowCount++;
-                                jQuery(html).addClass(myObject.showClass).removeClass(myObject.hideClass);
-                            }
-                            else {
-                                jQuery(html).addClass(myObject.hideClass).removeClass(myObject.showClass);
-                            }
-                            table.append(html);
+                        );
+                        if(inputsChecked.length > 0){
+                            html += "<li><strong>" + leftLabel + ":</strong> " + inputsChecked + "</li>";
                         }
-                    );
-                    myObject.renderPagination(matchCount, minRow, maxRow, totalRowCount, visibleRowCount);
+                    }
                 }
             );
-            //do this last
-            myObject.myTable.find("a.sortable[data-sort-default=true]").click();
+            if(html.length === 0) {
+                html = myObject.noFilterSelectedText;
+            }
+            var title = myObject.myTableHolder.find(myObject.currentSearchFilterSelector).attr('data-title');
+            if(typeof title === 'undefined') {
+                title = myObject.currentFilterText;
+            }
+            html = "<div><h3>" + title + "</h3><ul>" + html + "</ul></div>";
+            myObject.myTableHolder.find(myObject.currentSearchFilterSelector).html(html);
+            if(myObject.myTableHolder.hasClass(myObject.filterIsOpenClass)){
+                myObject.myTableHolder.find(myObject.currentSearchFilterSelector).hide();
+            }
+            else {
+                myObject.myTableHolder.find(myObject.currentSearchFilterSelector).show();
+            }
+
         },
 
-        renderPagination: function(matchCount, minRow, maxRow, totalRowCount, visibleRowCount)
-        {
-            var myObject = this;
-            if(totalRowCount > maxRow || minRow > 0) {
-                myObject.myTableHolder.find(myObject.moreRowEntriesSelector).show();
-            } else {
-                myObject.myTableHolder.find(myObject.moreRowEntriesSelector).hide();
-            }
-            if(matchCount < visibleRowCount) {
-                visibleRowCount = matchCount;
-                maxRow = minRow + visibleRowCount;
-            }
-            minRow++;
-            myObject.myTableHolder.find(myObject.matchRowCountSelector).text(matchCount);
-            myObject.myTableHolder.find(myObject.minRowSelector).text(minRow);
-            myObject.myTableHolder.find(myObject.maxRowSelector).text(maxRow);
-            myObject.myTableHolder.find(myObject.totalRowCountSelector).text(totalRowCount);
-            myObject.myTableHolder.find(myObject.visibleRowCountSelector).text(visibleRowCount);
-            jQuery('html, body').animate({
-                scrollTop: (myObject.myTableHolder.offset().top - 550)
-            }, 200);
-        },
+
 
         /**
          *
@@ -980,7 +1112,8 @@ function TableFilterSortFx(selector){
                 return a < b ? -1 : (a > b ? 1 : 0);
             });
             var newObject = {};
-            for(var i =0; i < sortedObject.length; i++) {
+            var i = 0;
+            for(i =0; i < sortedObject.length; i++) {
                 if((typeof sortedObject[i][1]) === 'string') {
                     newObject[sortedObject[i][0]] = sortedObject[i][1];
                 }
@@ -1044,7 +1177,11 @@ function TableFilterSortFx(selector){
         setVar: function(variableName, value) {
             TableFilterSort[variableName] = value;
             return this;
+        },
+        gotoPage: function(i) {
+            TableFilterSort.gotoPage(i);
         }
+
     };
 
 
