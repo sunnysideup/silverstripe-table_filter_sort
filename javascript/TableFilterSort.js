@@ -36,20 +36,26 @@ function TableFilterSortFx(selector, holderNumber){
         holderNumber: holderNumber,
 
         /**
-         * selector for holder
-         * this is set at the bottom of the TableFilterSortFx method
+         * selector for outer holder
+         *
          * @var jQuery Object
          */
         myTableHolder: null,
 
         /**
-         * this is set at the bottom of the TableFilterSortFx method
+         * selector for the table
          * @var jQuery Object
          */
         myTable: null,
 
         /**
-         * this is set at the bottom of the TableFilterSortFx method
+         * selector for the tbody
+         * @var jQuery Object
+         */
+        myTableBody: null,
+
+        /**
+         * the sortable rows
          * @var jQuery Object
          */
         myRows: null,
@@ -158,7 +164,7 @@ function TableFilterSortFx(selector, holderNumber){
         /**
         * @var string
         */
-        uniqueSelector: selector,
+        selector: selector,
 
 
         /**
@@ -370,7 +376,11 @@ function TableFilterSortFx(selector, holderNumber){
          */
         init: function(){
             var myObject = this;
-            if(myObject.myTable.find(myObject.rowSelector).length > 1){
+            myObject.myTableHolder = jQuery(myObject.selector).first();
+            myObject.myTable = myObject.myTableHolder.find(myObject.tableSelector).first();
+            myObject.myTableBody = myObject.myTable.find(" > tbody");
+            myObject.resetObjects();
+            if(myObject.myRows.length > 1){
                 myObject.myTableHolder.addClass(myObject.loadingClass);
                 myObject.toggleSlideSetup();
                 myObject.clearFilterListener();
@@ -382,7 +392,14 @@ function TableFilterSortFx(selector, holderNumber){
                 myObject.setupSortListeners();
                 myObject.showAndHideFilterForm();
                 myObject.myTableHolder.removeClass(myObject.loadingClass);
+                myObject.runCurrentSort();
             }
+        },
+
+        resetObjects: function()
+        {
+            var myObject = this;
+            myObject.myRows = myObject.myTable.find(myObject.rowSelector);
         },
 
         /**
@@ -634,28 +651,99 @@ function TableFilterSortFx(selector, holderNumber){
         startRowManipulation: function()
         {
             var myObject = this;
+            myObject.resetObjects();
+            //hide the table
             myObject.myTable.hide();
+            //show the table as loading
             myObject.myTableHolder.addClass(myObject.loadingClass);
+            console.debug(myObject.myRows.length)
+            //hide all the rows
+            myObject.myRows.each(
+                function(i, el) {
+                    jQuery(el).addClass(myObject.hideClass).removeClass(myObject.showClass);
+                }
+            );
         },
-
 
         endRowManipulation: function()
         {
             var myObject = this;
+            //crucial!
+            myObject.resetObjects();
+            //get basic numbers
+            var minRow = myObject.showFromRow;
+            var totalRowCount = 0;
+            var matchCount = 0;
+            var actualVisibleRowCount = 0;
+            var noFilter = myObject.myTableBody.find('tr.'+myObject.notMatchClass).length === 0 ? true : false;
+            var rowMatches = false;
+            myObject.myRows.each(
+                function(i, el) {
+                    el = jQuery(el);
+                    totalRowCount++;
+                    rowMatches = false;
+                    if(noFilter || el.hasClass(myObject.matchClass)) {
+                        rowMatches = true;
+                        matchCount++;
+                    }
+                    if(rowMatches) {
+                        if(matchCount > minRow && actualVisibleRowCount < myObject.visibleRowCount) {
+                            actualVisibleRowCount++;
+                            el.removeClass(myObject.hideClass).addClass(myObject.showClass);
+                        }
+                    }
+                }
+            );
+            //calculate final stuff ...
+            if(matchCount > 0){
+                jQuery('.'+myObject.noMatchMessageClass).hide();
+            }
+            else {
+                jQuery('.'+myObject.noMatchMessageClass).show();
+            }            //
+            var maxRow = minRow + actualVisibleRowCount;
+            var pageCount = Math.ceil(matchCount / myObject.visibleRowCount);
+            var currentPage = Math.floor(myObject.showFromRow / myObject.visibleRowCount);
+            //create html for pagination
+            var pageHTML = '';
+            var i = 0;
+            var onclick = '';
+            if(pageCount > 1) {
+                  for(i = 0; i < pageCount; i++ ) {
+                    if(currentPage === i) {
+                        pageHTML += '<span>['+(i+1)+']</span>';
+                    } else {
+                        onclick = 'TableFilterSortTableList['+myObject.holderNumber+'].gotoPage('+i+'); return false;';
+                        pageHTML += '<a href="" onclick="'+onclick+'">'+(i+1)+'</a> ';
+                     }
+                     pageHTML += ' ';
+                 }
+            }
+            minRow++;
+            if(totalRowCount > maxRow || minRow > 0) {
+                myObject.myTableHolder.find(myObject.moreRowEntriesSelector).show();
+            } else {
+                myObject.myTableHolder.find(myObject.moreRowEntriesSelector).hide();
+            }
+            myObject.myTableHolder.find(myObject.matchRowCountSelector).text(matchCount);
+            myObject.myTableHolder.find(myObject.minRowSelector).text(minRow);
+            myObject.myTableHolder.find(myObject.maxRowSelector).text(maxRow);
+            myObject.myTableHolder.find(myObject.totalRowCountSelector).text(totalRowCount);
+            myObject.myTableHolder.find(myObject.visibleRowCountSelector).text(actualVisibleRowCount);
+            myObject.myTableHolder.find(myObject.paginationSelector).html(pageHTML);
             myObject.myTable.show();
             myObject.myTableHolder.removeClass(myObject.loadingClass);
             jQuery('html, body').animate({
                 scrollTop: (myObject.myTableHolder.offset().top - 550)
             }, 200);
+            myObject.resetObjects();
         },
-
 
         /**
          * set up filter listeners ...
          */
         setupFilterListeners: function() {
             var myObject = this;
-            myObject.startRowManipulation();
             var formHolder = myObject.myTableHolder.find(myObject.filterFormHolderSelector);
             formHolder.find('.' + myObject.filterGroupClass + " input").on(
                 'keyup',
@@ -666,6 +754,7 @@ function TableFilterSortFx(selector, holderNumber){
             )
             .change(
                 function(event){
+                    myObject.startRowManipulation();
                     if(myObject.debug) {console.debug("==============");console.debug(myObject.currentFilter);}
                     var myElInputChanged = jQuery(this);
                     var categoryToMatch = myElInputChanged.attr("data-to-filter");
@@ -683,7 +772,8 @@ function TableFilterSortFx(selector, holderNumber){
                             }
                             var filterValueArray = valueToMatch.split(" ");
                             var i = 0;
-                            for(i = 0, len = filterValueArray.length; i < len; i++) {
+                            var len = filterValueArray.length
+                            for(i = 0; i < len; i++) {
                                 var tempVal = filterValueArray[i].trim();
                                 if(tempVal.length > 1) {
                                     myObject.currentFilter[categoryToMatch][tempVal] = tempVal;
@@ -724,11 +814,6 @@ function TableFilterSortFx(selector, holderNumber){
                             }
                         }
                     }
-                    var matchCount = 0;
-                    var actualVisibleRowCount = 0;
-                    var minRow = myObject.showFromRow;
-                    var maxRow = minRow + myObject.visibleRowCount;
-                    var noFilter = myObject.myTable.find('tr.'+myObject.notMatchClass).length === 0 ? true : false;
                     myObject.myRows.each(
                         function(i, el) {
                             el = jQuery(el);
@@ -800,30 +885,13 @@ function TableFilterSortFx(selector, holderNumber){
                             //hide or show
                             if(rowMatches){
                                 el.addClass(myObject.matchClass).removeClass(myObject.notMatchClass);
-                                matchCount++;
                             }
                             else {
                                 el.addClass(myObject.notMatchClass).removeClass(myObject.matchClass);
                             }
-                            if(matchCount > minRow && matchCount <= maxRow ) {
-                                if(rowMatches) {
-                                    actualVisibleRowCount++;
-                                }
-                                el.addClass(myObject.showClass).removeClass(myObject.hideClass);
-                            }
-                            else {
-                                el.addClass(myObject.hideClass).removeClass(myObject.showClass);
-                            }
                         }
                     );
-                    if(myObject.myRows.hasClass(myObject.showClass).length){
-                        jQuery('.'+myObject.noMatchMessageClass).hide();
-                    }
-                    else {
-                        jQuery('.'+myObject.noMatchMessageClass).show();
-                    }
                     myObject.endRowManipulation();
-                    myObject.renderPagination(matchCount, actualVisibleRowCount);
                     if(myObject.debug) {console.debug(myObject.currentFilter);console.debug("==============");}
                 }
             );
@@ -834,13 +902,12 @@ function TableFilterSortFx(selector, holderNumber){
          */
         setupSortListeners: function() {
             var myObject = this;
-            myObject.startRowManipulation();
-            var tableBody = myObject.myTable.find(" > tbody");
             myObject.myTableHolder.on(
                 "click",
                 myObject.sortLinkSelector,
                 function(event){
                     event.preventDefault();
+                    myObject.startRowManipulation();
                     var myEl = jQuery(this);
                     myObject.myTableHolder.find(myObject.sortLinkSelector)
                         .removeClass(myObject.sortAscClass)
@@ -864,8 +931,15 @@ function TableFilterSortFx(selector, holderNumber){
                             arr.push(row);
                         }
                     );
+
+                    //start doing stuff
+                    //clear table ...
+                    myObject.myTableBody.empty();
+
+                    //sort
                     arr.sort(myObject.sortMultiDimensionalArray);
 
+                    //show direction
                     if(sortOrder === "desc"){
                         arr.reverse();
                         myEl.attr("data-sort-direction", "asc").addClass(myObject.sortDescClass);
@@ -873,96 +947,51 @@ function TableFilterSortFx(selector, holderNumber){
                     else{
                         myEl.attr("data-sort-direction", "desc").addClass(myObject.sortAscClass);
                     }
-                    tableBody.empty();
                     var html = '';
-                    var matchCount = 0;
-                    var actualVisibleRowCount = 0;
-                    var minRow = myObject.showFromRow;
-                    var maxRow = minRow + myObject.visibleRowCount;
-                    var noFilter = tableBody.find('tr.'+myObject.notMatchClass).length === 0 ? true : false;
                     var originalRows = myObject.myRows;
                     arr.forEach(
                         function(entry) {
-                            var rowMatches = false;
                             html = originalRows[entry[1]];
-                            if(noFilter || jQuery(html).hasClass(myObject.matchClass)) {
-                                rowMatches = true;
-                                matchCount++;
-                            }
-                            if(matchCount > minRow && matchCount <= maxRow) {
-                                if(rowMatches) {
-                                    actualVisibleRowCount++;
-                                }
-                                jQuery(html).addClass(myObject.showClass).removeClass(myObject.hideClass);
-                            }
-                            else {
-                                jQuery(html).addClass(myObject.hideClass).removeClass(myObject.showClass);
-                            }
-                            tableBody.append(html);
+                            myObject.myTableBody.append(html);
                         }
                     );
                     myObject.endRowManipulation();
-                    myObject.renderPagination(matchCount, actualVisibleRowCount);
                 }
             );
-            //do this last
-            myObject.runCurrentSort();
         },
 
-        renderPagination: function(matchCount, actualVisibleRowCount)
-        {
-            var myObject = this;
-            var minRow = myObject.showFromRow;
-            var maxRow = minRow + actualVisibleRowCount;
-            var totalRowCount = myObject.myRows.length;
-            var pageCount = Math.ceil(matchCount / myObject.visibleRowCount);
-            var pageHTML = '';
-            var i = 0;
-            var currentPage = false;
-            if(pageCount > 1) {
-              for(i = 0; i < pageCount; i++ ) {
-                  pageHTML += '<a href="" onclick="TableFilterSortTableList['.myObject.holderNumber.'].gotoPage('+i+'); return false;">'+(i+1)+'</a> '
-              }
-            }
-            minRow++;
-            if(totalRowCount > maxRow || minRow > 0) {
-                myObject.myTableHolder.find(myObject.moreRowEntriesSelector).show();
-            } else {
-                myObject.myTableHolder.find(myObject.moreRowEntriesSelector).hide();
-            }
-            myObject.myTableHolder.find(myObject.matchRowCountSelector).text(matchCount);
-            myObject.myTableHolder.find(myObject.minRowSelector).text(minRow);
-            myObject.myTableHolder.find(myObject.maxRowSelector).text(maxRow);
-            myObject.myTableHolder.find(myObject.totalRowCountSelector).text(totalRowCount);
-            myObject.myTableHolder.find(myObject.visibleRowCountSelector).text(actualVisibleRowCount);
-            myObject.myTableHolder.find(myObject.paginationSelector).text(pageHTML);
-        },
 
         /**
-         * [function description]
+         * switch to a different page
          * @param  {int} page [description]
          */
         gotoPage: function(page)
         {
             var myObject = this;
-            myObject.showFromRow = page;
-            myObject.
+            myObject.showFromRow = page * myObject.visibleRowCount;
+            myObject.startRowManipulation();
+            myObject.endRowManipulation();
         },
+
 
         runCurrentSort: function() {
             var myObject = this;
-            var currentSortObject = myObject.myTableHolder.find('.'+sortDescClass+', .'+sortAscClass).first();
+            var currentSortLinkSelector = '.'+myObject.sortDescClass+', .'+myObject.sortAscClass
+            var currentSortObject = myObject.myTableHolder.find(currentSortLinkSelector).first();
             if(currentSortObject && currentSortObject.length > 0) {
             } else {
                 currentSortObject = myObject.myTableHolder.find("a.sortable[data-sort-default=true]").first();
+            }
             if(currentSortObject && currentSortObject.length > 0) {
             } else {
-                currentSortObject = myObject.myTableHolder.find("a.sortable").first()
+                currentSortObject = myObject.myTableHolder.find("a.sortable").first();
             }
             if(currentSortObject && currentSortObject.length > 0) {
                 currentSortObject.click();
             }
-        }
+        },
+
+
         /**
          * basically runs the filter as per usual
          * after stuff has been selected.
@@ -1138,7 +1167,6 @@ function TableFilterSortFx(selector, holderNumber){
          * array sorter function ...
          */
         sortMultiDimensionalArray: function(a, b) {
-
             var testA = a[0];
             if(typeof testA === 'string'){
                 testA = testA.toLowerCase();
@@ -1160,9 +1188,6 @@ function TableFilterSortFx(selector, holderNumber){
 
 
     if(jQuery(selector).length > 0) {
-        TableFilterSort.myTableHolder = jQuery(selector);
-        TableFilterSort.myTable = TableFilterSort.myTableHolder.find(TableFilterSort.tableSelector).first();
-        TableFilterSort.myRows = TableFilterSort.myTable.find(TableFilterSort.rowSelector);
         TableFilterSort.init();
     }
 
@@ -1178,8 +1203,8 @@ function TableFilterSortFx(selector, holderNumber){
             TableFilterSort[variableName] = value;
             return this;
         },
-        gotoPage: function(i) {
-            TableFilterSort.gotoPage(i);
+        gotoPage: function(pageNumber) {
+            TableFilterSort.gotoPage(pageNumber);
         }
 
     };

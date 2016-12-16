@@ -160,7 +160,8 @@ function create_test()
     $html = '';
     for($i = 0; $i < 1000; $i++) {
         $html .= '
-        <tr class="tfsRow hide">
+        <tr class="tfsRow">
+            <td><span data-filter="SKU">'.($i+1).'</span></td>
             <td><span data-filter="Type">'.$type.'</span></td>
             <td><span data-filter="Original Producer">'.$producer.'</span></td>
             <td><span data-filter="Colour">'.$colours[rand(0, 6)].'</span></td>
@@ -209,6 +210,9 @@ $html = create_test();
             <table class="tableFilterSortTable">
                 <thead>
                     <tr>
+                        <th scope="col">
+                            <a href="#" class="sortable" data-filter="SKU" data-sort-direction="asc" data-sort-type="number">SKU</a>
+                        </th>
                         <th scope="col">Type</th>
                         <th scope="col">Producer</th>
                         <th scope="col">Colour</th>
@@ -235,17 +239,13 @@ $html = create_test();
                 You have reached the limit of visble entries,
                 there are more entries, but they can not be shown here as this will overload your browser.
                 <br />
-                Filtered <span class="match-row-number">0</span>
-                of  <span class="total-row-number">0</span>.
+                Filter: <span class="match-row-number">0</span> /  <span class="total-row-number">0</span>.
                 <br />
-                Showing a total of <span class="total-showing-row-number">0</span> rows
-                from <span class="min-row-number">0</span>
-                up to <span class="max-row-number">0</span>.
+                Display: <span class="total-showing-row-number">0</span>
+                (<span class="min-row-number">0</span>
+                - <span class="max-row-number">0</span>).
                 <br />
-                Set starting row <input type="number" name="starting-row" /> and
-                the total number of rows to be shown  <input type="number" name="number-of-rows" />
-                <br />
-                <span class="pagination"></p>
+                Select Page: <span class="pagination"></p>
             </p>
 
         </div>
