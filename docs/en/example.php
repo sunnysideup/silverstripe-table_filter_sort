@@ -207,6 +207,7 @@ $html = create_test();
             ></div>
             <div class="tableFilterSortCurrentSearchHolder" data-title="Current Filter"></div>
             <div class="tableFilterSortCommonContentHolder" data-title="Common Info"></div>
+            <span class="pagination"></span>
             <table class="tableFilterSortTable">
                 <thead>
                     <tr>
@@ -245,7 +246,7 @@ $html = create_test();
                 (<span class="min-row-number">0</span>
                 - <span class="max-row-number">0</span>).
                 <br />
-                Select Page: <span class="pagination"></p>
+                Select Page: <span class="pagination"></span>
             </p>
 
         </div>
