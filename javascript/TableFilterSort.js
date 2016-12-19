@@ -383,29 +383,29 @@ jQuery(document).ready(
                 myObject.resetObjects();
                 if(myObject.myRows.length > 1){
                     myObject.myTableHolder.addClass(myObject.loadingClass);
-                    console.profile('toggleSlideSetup');
+                    // console.profile('toggleSlideSetup');
                     myObject.toggleSlideSetup();
-                    console.profileEnd();console.profile('filterItemCollector');
+                    // console.profileEnd();console.profile('filterItemCollector');
                     myObject.filterItemCollector();
-                    console.profileEnd();console.profile('tableHideColsWhichAreAllTheSame');
+                    // console.profileEnd();console.profile('tableHideColsWhichAreAllTheSame');
                     myObject.tableHideColsWhichAreAllTheSame();
-                    console.profileEnd();console.profile('createFilterForm');
+                    // console.profileEnd();console.profile('createFilterForm');
                     myObject.createFilterForm();
-                    console.profileEnd();console.profile('setupFilterListeners');
+                    // console.profileEnd();console.profile('setupFilterListeners');
                     myObject.setupFilterListeners();
-                    console.profileEnd();console.profile('clearFilterListener');
+                    // console.profileEnd();console.profile('clearFilterListener');
                     myObject.clearFilterListener();
-                    console.profileEnd();console.profile('directFilterLinkListener');
+                    // console.profileEnd();console.profile('directFilterLinkListener');
                     myObject.directFilterLinkListener();
-                    console.profileEnd();console.profile('setupSortListeners');
+                    // console.profileEnd();console.profile('setupSortListeners');
                     myObject.setupSortListeners();
-                    console.profileEnd();console.profile('showAndHideFilterForm');
+                    // console.profileEnd();console.profile('showAndHideFilterForm');
                     myObject.showAndHideFilterForm();
-                    console.profileEnd();
+                    // console.profileEnd();
                     myObject.myTableHolder.removeClass(myObject.loadingClass);
-                    console.profile('runCurrentSort');
+                    // console.profile('runCurrentSort');
                     myObject.runCurrentSort();
-                    console.profileEnd();
+                    // console.profileEnd();
                 }
             },
 
@@ -483,19 +483,25 @@ jQuery(document).ready(
             filterItemCollector: function() {
                 var myObject = TableFilterSort;
                 //for each table with specific class ...
-                myObject.myRows.find("span[data-filter]").each(
-                    function(i, el) {
-                        el = jQuery(el);
-                        var value = el.text();
-                        el.addClass(myObject.directFilterLinkClass);
-                        var category = el.attr("data-filter");
-                        if(value.trim().length > 0) {
-                            if(typeof myObject.optionsForFilter[category] === "undefined") {
-                                myObject.optionsForFilter[category] = [];
+                var value = '';
+                var category = '';
+                myObject.myRows.each(
+                    function(i, row) {
+                        jQuery(row).find("span[data-filter]").each(
+                            function(j, el) {
+                                el = jQuery(el);
+                                value = el.text();
+                                category = el.attr("data-filter");
+                                el.addClass(myObject.directFilterLinkClass);
+                                if(value.trim().length > 0) {
+                                    if(typeof myObject.optionsForFilter[category] === "undefined") {
+                                        myObject.optionsForFilter[category] = [];
+                                    }
+                                    if(myObject.debug) { console.debug("adding "+value+" to "+category);}
+                                    myObject.optionsForFilter[category][value] = value;
+                                }
                             }
-                            if(myObject.debug) { console.debug("adding "+value+" to "+category);}
-                            myObject.optionsForFilter[category][value] = value;
-                        }
+                        );
                     }
                 );
             },
@@ -670,10 +676,12 @@ jQuery(document).ready(
             {
                 var myObject = TableFilterSort;
                 myObject.resetObjects();
+                //show the table as loading
+                myObject.myTableHolder
+                    .addClass(myObject.loadingClass)
+                    .find(myObject.moreRowEntriesSelector).hide();
                 //hide the table
                 myObject.myTable.hide();
-                //show the table as loading
-                myObject.myTableHolder.addClass(myObject.loadingClass);
                 //hide all the rows
                 myObject.myRows.each(
                     function(i, el) {
