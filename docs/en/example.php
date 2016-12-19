@@ -158,7 +158,7 @@ function create_test()
         'Zucchini'
     );
     $html = '';
-    for($i = 0; $i < 3000; $i++) {
+    for($i = 0; $i < 7000; $i++) {
         $html .= '
         <tr class="tfsRow hide">
             <td><span data-filter="SKU">'.($i+1).'</span></td>

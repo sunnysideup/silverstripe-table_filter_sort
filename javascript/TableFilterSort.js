@@ -383,29 +383,34 @@ jQuery(document).ready(
                 myObject.resetObjects();
                 if(myObject.myRows.length > 1){
                     myObject.myTableHolder.addClass(myObject.loadingClass);
-                    // console.profile('toggleSlideSetup');
-                    myObject.toggleSlideSetup();
-                    // console.profileEnd();console.profile('filterItemCollector');
-                    myObject.filterItemCollector();
-                    // console.profileEnd();console.profile('tableHideColsWhichAreAllTheSame');
-                    myObject.tableHideColsWhichAreAllTheSame();
-                    // console.profileEnd();console.profile('createFilterForm');
-                    myObject.createFilterForm();
-                    // console.profileEnd();console.profile('setupFilterListeners');
-                    myObject.setupFilterListeners();
-                    // console.profileEnd();console.profile('clearFilterListener');
-                    myObject.clearFilterListener();
-                    // console.profileEnd();console.profile('directFilterLinkListener');
-                    myObject.directFilterLinkListener();
-                    // console.profileEnd();console.profile('setupSortListeners');
-                    myObject.setupSortListeners();
-                    // console.profileEnd();console.profile('showAndHideFilterForm');
-                    myObject.showAndHideFilterForm();
-                    // console.profileEnd();
-                    myObject.myTableHolder.removeClass(myObject.loadingClass);
-                    // console.profile('runCurrentSort');
-                    myObject.runCurrentSort();
-                    // console.profileEnd();
+                    window.setTimeout(
+                        function() {
+                            // console.profile('toggleSlideSetup');
+                            myObject.toggleSlideSetup();
+                            // console.profileEnd();console.profile('filterItemCollector');
+                            myObject.filterItemCollector();
+                            // console.profileEnd();console.profile('tableHideColsWhichAreAllTheSame');
+                            myObject.tableHideColsWhichAreAllTheSame();
+                            // console.profileEnd();console.profile('createFilterForm');
+                            myObject.createFilterForm();
+                            // console.profileEnd();console.profile('setupFilterListeners');
+                            myObject.setupFilterListeners();
+                            // console.profileEnd();console.profile('clearFilterListener');
+                            myObject.clearFilterListener();
+                            // console.profileEnd();console.profile('directFilterLinkListener');
+                            myObject.directFilterLinkListener();
+                            // console.profileEnd();console.profile('setupSortListeners');
+                            myObject.setupSortListeners();
+                            // console.profileEnd();console.profile('showAndHideFilterForm');
+                            myObject.showAndHideFilterForm();
+                            // console.profileEnd();
+                            myObject.myTableHolder.removeClass(myObject.loadingClass);
+                            // console.profile('runCurrentSort');
+                            myObject.runCurrentSort();
+                            // console.profileEnd();
+                        },
+                        10
+                    );
                 }
             },
 
@@ -455,22 +460,37 @@ jQuery(document).ready(
                     '.' + myObject.clearFilterClass + ' a',
                     function(event) {
                         event.preventDefault();
+
                         var myEl = jQuery(this);
                         var id = myEl.attr("data-rel");
-                        myObject.myTableHolder.find(myObject.filterInputSelector).each(
+                        var lastEl = null;
+                        myObject.myTableHolder.find(myObject.filterFormHolderSelector).find(myObject.filterInputSelector).each(
                             function(i, el){
                                 el = jQuery(el);
                                 if(el.is(":checkbox")){
-                                    el.prop('checked', false).trigger('change');
+                                    el.prop('checked', false);
                                 }
                                 else {
-                                    el.val('').trigger('change');
+                                    el.val('');;
                                 }
+                                lastEl = el;
                             }
                         );
+                        if(lastEl !== null) {
+                            lastEl.trigger('change');
+                        }
                         //clear directly selected items
-                        myObject.myTable.find('.' + myObject.directFilterLinkClass).parent().removeClass(myObject.filterSelectedClass);
-                        jQuery(myObject.currentSearchFilterSelector).html('no filters');
+                        jQuery(myObject.currentSearchFilterSelector).html('');
+                        window.setTimeout(
+                            function() {
+                                myObject.myRows.each(
+                                    function(i, row) {
+                                        jQuery(row).find('.' + myObject.directFilterLinkClass).parent().removeClass(myObject.filterSelectedClass);
+                                    }
+                                );
+                            },
+                            10
+                        );
                         return false;
                     }
                 );
@@ -779,144 +799,151 @@ jQuery(document).ready(
                     function(event){
                         myObject.showFromRow = 0;
                         myObject.startRowManipulation();
-                        if(myObject.debug) {console.debug("==============");console.debug(myObject.currentFilter);}
-                        var myElInputChanged = jQuery(this);
-                        var categoryToMatch = myElInputChanged.attr("data-to-filter");
-                        var valueToMatch = myElInputChanged.val().toLowerCase().trim();
-                        var noCheckboxesSelectedAtAll = jQuery(myObject.filterFormHolderSelector + ' input').is(":checked").length === 0;
-                        if(myElInputChanged.attr('type') === 'text') {
-                            delete myObject.currentFilter[categoryToMatch];
-                            if(valueToMatch.length > 1) {
-                                if(typeof myObject.currentFilter[categoryToMatch] === "undefined") {
-                                    if(myObject.debug) {console.log("adding "+categoryToMatch);}
-                                    myObject.currentFilter[categoryToMatch] = [];
-                                }
-                                if(typeof myObject.currentFilterTypes[categoryToMatch] === "undefined") {
-                                    myObject.currentFilterTypes[categoryToMatch] = 'Partial';
-                                }
-                                var filterValueArray = valueToMatch.split(" ");
-                                var i = 0;
-                                var len = filterValueArray.length
-                                for(i = 0; i < len; i++) {
-                                    var tempVal = filterValueArray[i].trim();
-                                    if(tempVal.length > 1) {
-                                        myObject.currentFilter[categoryToMatch][tempVal] = tempVal;
-                                        if(myObject.debug) {console.log("... adding '"+categoryToMatch+"' to '"+valueToMatch+"'");}
-                                    }
-                                }
-                            }
-                        }
-                        else {
-                          if(typeof myObject.currentFilterTypes[categoryToMatch] === "undefined") {
-                              myObject.currentFilterTypes[categoryToMatch] = 'Exact';
-                          }
-                            if(myElInputChanged.is(":checked")){
-                                if(typeof myObject.currentFilter[categoryToMatch] === "undefined") {
-                                    if(myObject.debug) {console.log("adding "+categoryToMatch);}
-                                    myObject.currentFilter[categoryToMatch] = [];
-                                }
-                                myObject.currentFilter[categoryToMatch][valueToMatch] = valueToMatch;
-                                if(myObject.debug) {console.log("... adding '"+categoryToMatch+"' to '"+valueToMatch+"'");}
-                            }
-                            else {
-                                if(typeof myObject.currentFilter[categoryToMatch] !== "undefined") {
-                                    if(typeof myObject.currentFilter[categoryToMatch][valueToMatch] !== "undefined") {
-                                        if(myObject.debug) {console.log("remove "+valueToMatch+" from "+categoryToMatch);}
-                                        delete myObject.currentFilter[categoryToMatch][valueToMatch];
-                                    }
-                                    if(myObject.objectSize(myObject.currentFilter, categoryToMatch) === 0) {
-                                        if(myObject.debug) {console.log("removing category: "+categoryToMatch);}
-                                        delete myObject.currentFilter[categoryToMatch];
-                                    }
-                                }
-                            }
-                            //no check boxes selected
-                            if(noCheckboxesSelectedAtAll) {
-                                if(typeof myObject.currentFilter[categoryToMatch] !== "undefined") {
-                                    if(myObject.debug) {console.log("removing altogether"+categoryToMatch);}
+                        var myElInputChanged = this;
+                        window.setTimeout(
+                            function() {
+                                if(myObject.debug) {console.debug("==============");console.debug(myObject.currentFilter);}
+                                myElInputChanged = jQuery(myElInputChanged);
+                                var categoryToMatch = myElInputChanged.attr("data-to-filter");
+                                var valueToMatch = myElInputChanged.val().toLowerCase().trim();
+                                var noCheckboxesSelectedAtAll = jQuery(myObject.filterFormHolderSelector + ' input').is(":checked").length === 0;
+                                if(myElInputChanged.attr('type') === 'text') {
                                     delete myObject.currentFilter[categoryToMatch];
-                                }
-                            }
-                        }
-                        myObject.myRows.each(
-                            function(i, el) {
-                                el = jQuery(el);
-                                if(myObject.debug) {console.log("===");}
-                                //innocent until proven guilty
-                                var rowMatches = true;
-
-                                var stillLookingForCategory = true;
-
-                                //check for each category
-                                Object.keys(myObject.currentFilter).forEach(
-                                    function(categoryToMatch, categoryToMatchIndex) {
-                                        if(stillLookingForCategory) {
-                                            //lets not assume there is anything
-                                            var rowMatchesForFilterGroup = false;
-
-                                            //values selected in category
-                                            var stillLookingForValue = true;
-                                            Object.keys(myObject.currentFilter[categoryToMatch]).forEach(
-                                                function(valueToMatch, valueToMatchIndex) {
-                                                    if(myObject.debug) {console.log("FILTER - CHECKING: '"+valueToMatch+"' in '"+categoryToMatch+"'");}
-                                                    //what is the value .. if it matches, the row is OK and we can go to next category ...
-                                                    if(stillLookingForValue) {
-                                                        el.find('span[data-filter="' + categoryToMatch + '"]').each(
-                                                            function(innerI, innerEl) {
-                                                                innerEl = jQuery(innerEl);
-                                                                var value = innerEl.text().toLowerCase();
-                                                                switch(myObject.currentFilterTypes[categoryToMatch]) {
-                                                                    case 'Exact':
-                                                                        if(value === valueToMatch){
-                                                                            rowMatchesForFilterGroup = true;
-                                                                        }
-                                                                        break;
-                                                                    case 'Partial':
-                                                                        if(value.indexOf(valueToMatch) !== -1){
-                                                                            rowMatchesForFilterGroup = true;
-                                                                        }
-                                                                        break;
-                                                                    default:
-                                                                        if(value == valueToMatch){
-                                                                            rowMatchesForFilterGroup = true;
-                                                                        }
-                                                                }
-                                                                if(rowMatchesForFilterGroup){
-                                                                    if(myObject.debug) {console.log("FILTER - MATCH: '"+valueToMatch+"' in '"+categoryToMatch+"'");}
-                                                                    //break out of each loop
-                                                                    return false;
-                                                                }
-                                                                else {
-                                                                    if(myObject.debug) {console.log("FILTER - NO MATCH: '"+valueToMatch+"' in '"+categoryToMatch+"'");}
-                                                                }
-                                                            }
-                                                        );
-                                                    }
-                                                    if(rowMatchesForFilterGroup) {
-                                                        stillLookingForValue = false;
-                                                    }
-                                                }
-                                            );
-                                            // you are out ...
-                                            if(!rowMatchesForFilterGroup) {
-                                                rowMatches = false;
-                                                //by breaking here, we have an "AND" filter search....
-                                                stillLookingForCategory = false;
+                                    if(valueToMatch.length > 1) {
+                                        if(typeof myObject.currentFilter[categoryToMatch] === "undefined") {
+                                            if(myObject.debug) {console.log("adding "+categoryToMatch);}
+                                            myObject.currentFilter[categoryToMatch] = [];
+                                        }
+                                        if(typeof myObject.currentFilterTypes[categoryToMatch] === "undefined") {
+                                            myObject.currentFilterTypes[categoryToMatch] = 'Partial';
+                                        }
+                                        var filterValueArray = valueToMatch.split(" ");
+                                        var i = 0;
+                                        var len = filterValueArray.length
+                                        for(i = 0; i < len; i++) {
+                                            var tempVal = filterValueArray[i].trim();
+                                            if(tempVal.length > 1) {
+                                                myObject.currentFilter[categoryToMatch][tempVal] = tempVal;
+                                                if(myObject.debug) {console.log("... adding '"+categoryToMatch+"' to '"+valueToMatch+"'");}
                                             }
                                         }
                                     }
-                                );
-                                //hide or show
-                                if(rowMatches){
-                                    el.addClass(myObject.matchClass).removeClass(myObject.notMatchClass);
                                 }
                                 else {
-                                    el.addClass(myObject.notMatchClass).removeClass(myObject.matchClass);
+                                  if(typeof myObject.currentFilterTypes[categoryToMatch] === "undefined") {
+                                      myObject.currentFilterTypes[categoryToMatch] = 'Exact';
+                                  }
+                                    if(myElInputChanged.is(":checked")){
+                                        if(typeof myObject.currentFilter[categoryToMatch] === "undefined") {
+                                            if(myObject.debug) {console.log("adding "+categoryToMatch);}
+                                            myObject.currentFilter[categoryToMatch] = [];
+                                        }
+                                        myObject.currentFilter[categoryToMatch][valueToMatch] = valueToMatch;
+                                        if(myObject.debug) {console.log("... adding '"+categoryToMatch+"' to '"+valueToMatch+"'");}
+                                    }
+                                    else {
+                                        if(typeof myObject.currentFilter[categoryToMatch] !== "undefined") {
+                                            if(typeof myObject.currentFilter[categoryToMatch][valueToMatch] !== "undefined") {
+                                                if(myObject.debug) {console.log("remove "+valueToMatch+" from "+categoryToMatch);}
+                                                delete myObject.currentFilter[categoryToMatch][valueToMatch];
+                                            }
+                                            if(myObject.objectSize(myObject.currentFilter, categoryToMatch) === 0) {
+                                                if(myObject.debug) {console.log("removing category: "+categoryToMatch);}
+                                                delete myObject.currentFilter[categoryToMatch];
+                                            }
+                                        }
+                                    }
+                                    //no check boxes selected
+                                    if(noCheckboxesSelectedAtAll) {
+                                        if(typeof myObject.currentFilter[categoryToMatch] !== "undefined") {
+                                            if(myObject.debug) {console.log("removing altogether"+categoryToMatch);}
+                                            delete myObject.currentFilter[categoryToMatch];
+                                        }
+                                    }
                                 }
-                            }
-                        );
-                        myObject.endRowManipulation();
-                        if(myObject.debug) {console.debug(myObject.currentFilter);console.debug("==============");}
+                                myObject.myRows.each(
+                                    function(i, el) {
+                                        el = jQuery(el);
+                                        if(myObject.debug) {console.log("===");}
+                                        //innocent until proven guilty
+                                        var rowMatches = true;
+
+                                        var stillLookingForCategory = true;
+
+                                        //check for each category
+                                        Object.keys(myObject.currentFilter).forEach(
+                                            function(categoryToMatch, categoryToMatchIndex) {
+                                                if(stillLookingForCategory) {
+                                                    //lets not assume there is anything
+                                                    var rowMatchesForFilterGroup = false;
+
+                                                    //values selected in category
+                                                    var stillLookingForValue = true;
+                                                    Object.keys(myObject.currentFilter[categoryToMatch]).forEach(
+                                                        function(valueToMatch, valueToMatchIndex) {
+                                                            if(myObject.debug) {console.log("FILTER - CHECKING: '"+valueToMatch+"' in '"+categoryToMatch+"'");}
+                                                            //what is the value .. if it matches, the row is OK and we can go to next category ...
+                                                            if(stillLookingForValue) {
+                                                                el.find('span[data-filter="' + categoryToMatch + '"]').each(
+                                                                    function(innerI, innerEl) {
+                                                                        innerEl = jQuery(innerEl);
+                                                                        var value = innerEl.text().toLowerCase();
+                                                                        switch(myObject.currentFilterTypes[categoryToMatch]) {
+                                                                            case 'Exact':
+                                                                                if(value === valueToMatch){
+                                                                                    rowMatchesForFilterGroup = true;
+                                                                                }
+                                                                                break;
+                                                                            case 'Partial':
+                                                                                if(value.indexOf(valueToMatch) !== -1){
+                                                                                    rowMatchesForFilterGroup = true;
+                                                                                }
+                                                                                break;
+                                                                            default:
+                                                                                if(value == valueToMatch){
+                                                                                    rowMatchesForFilterGroup = true;
+                                                                                }
+                                                                        }
+                                                                        if(rowMatchesForFilterGroup){
+                                                                            if(myObject.debug) {console.log("FILTER - MATCH: '"+valueToMatch+"' in '"+categoryToMatch+"'");}
+                                                                            //break out of each loop
+                                                                            return false;
+                                                                        }
+                                                                        else {
+                                                                            if(myObject.debug) {console.log("FILTER - NO MATCH: '"+valueToMatch+"' in '"+categoryToMatch+"'");}
+                                                                        }
+                                                                    }
+                                                                );
+                                                            }
+                                                            if(rowMatchesForFilterGroup) {
+                                                                stillLookingForValue = false;
+                                                            }
+                                                        }
+                                                    );
+                                                    // you are out ...
+                                                    if(!rowMatchesForFilterGroup) {
+                                                        rowMatches = false;
+                                                        //by breaking here, we have an "AND" filter search....
+                                                        stillLookingForCategory = false;
+                                                    }
+                                                }
+                                            }
+                                        );
+                                        //hide or show
+                                        if(rowMatches){
+                                            el.addClass(myObject.matchClass).removeClass(myObject.notMatchClass);
+                                        }
+                                        else {
+                                            el.addClass(myObject.notMatchClass).removeClass(myObject.matchClass);
+                                        }
+                                    }
+                                );
+                                myObject.endRowManipulation();
+                                if(myObject.debug) {console.debug(myObject.currentFilter);console.debug("==============");}
+                            },
+                            10
+                        )
+
                     }
                 );
             },
@@ -932,55 +959,60 @@ jQuery(document).ready(
                     function(event){
                         event.preventDefault();
                         myObject.showFromRow = 0;
-                        myObject.startRowManipulation();
                         var myEl = jQuery(this);
-                        myObject.myTableHolder.find(myObject.sortLinkSelector)
-                            .removeClass(myObject.sortAscClass)
-                            .removeClass(myObject.sortDescClass);
-                        var dataFilter = myEl.attr("data-filter");
-                        var sortOrder = myEl.attr("data-sort-direction");
-                        var sortType = myEl.attr("data-sort-type");
-                        var arr = [];
-                        myObject.myRows.each(
-                            function(i, el) {
-                                el = jQuery(el);
-                                var dataValue = el.find('[data-filter="' + dataFilter + '"]').text();
-                                if(sortType === "number") {
-                                    dataValue = dataValue.replace(/[^\d.-]/g, '');
-                                    dataValue = parseFloat(dataValue);
+                        myObject.startRowManipulation();
+                        window.setTimeout(
+                            function() {
+                                myObject.myTableHolder.find(myObject.sortLinkSelector)
+                                    .removeClass(myObject.sortAscClass)
+                                    .removeClass(myObject.sortDescClass);
+                                var dataFilter = myEl.attr("data-filter");
+                                var sortOrder = myEl.attr("data-sort-direction");
+                                var sortType = myEl.attr("data-sort-type");
+                                var arr = [];
+                                myObject.myRows.each(
+                                    function(i, el) {
+                                        el = jQuery(el);
+                                        var dataValue = el.find('[data-filter="' + dataFilter + '"]').text();
+                                        if(sortType === "number") {
+                                            dataValue = dataValue.replace(/[^\d.-]/g, '');
+                                            dataValue = parseFloat(dataValue);
+                                        }
+                                        else {
+                                            //do nothing ...
+                                        }
+                                        var row = new Array(dataValue, i);
+                                        arr.push(row);
+                                    }
+                                );
+
+                                //start doing stuff
+                                //clear table ...
+                                myObject.myTableBody.empty();
+
+                                //sort
+                                arr.sort(myObject.sortMultiDimensionalArray);
+
+                                //show direction
+                                if(sortOrder === "desc"){
+                                    arr.reverse();
+                                    myEl.attr("data-sort-direction", "asc").addClass(myObject.sortDescClass);
                                 }
-                                else {
-                                    //do nothing ...
+                                else{
+                                    myEl.attr("data-sort-direction", "desc").addClass(myObject.sortAscClass);
                                 }
-                                var row = new Array(dataValue, i);
-                                arr.push(row);
-                            }
+                                var html = '';
+                                var originalRows = myObject.myRows;
+                                arr.forEach(
+                                    function(entry) {
+                                        html = originalRows[entry[1]];
+                                        myObject.myTableBody.append(html);
+                                    }
+                                );
+                                myObject.endRowManipulation();
+                            },
+                            10
                         );
-
-                        //start doing stuff
-                        //clear table ...
-                        myObject.myTableBody.empty();
-
-                        //sort
-                        arr.sort(myObject.sortMultiDimensionalArray);
-
-                        //show direction
-                        if(sortOrder === "desc"){
-                            arr.reverse();
-                            myEl.attr("data-sort-direction", "asc").addClass(myObject.sortDescClass);
-                        }
-                        else{
-                            myEl.attr("data-sort-direction", "desc").addClass(myObject.sortAscClass);
-                        }
-                        var html = '';
-                        var originalRows = myObject.myRows;
-                        arr.forEach(
-                            function(entry) {
-                                html = originalRows[entry[1]];
-                                myObject.myTableBody.append(html);
-                            }
-                        );
-                        myObject.endRowManipulation();
                     }
                 );
             },
@@ -1031,45 +1063,56 @@ jQuery(document).ready(
                         var myEl = jQuery(this);
                         var dataFilter = myEl.attr('data-filter');
                         var filterValue = jQuery.trim(myEl.text());
-                        var filterToTriger = myObject.myTableHolder.find('input[data-to-filter="'+ dataFilter + '"][value="'+ filterValue + '"]').first();
-                        if(filterToTriger && filterToTriger.is(':checkbox')){
-                            if(filterToTriger.prop('checked') === true){
-                                filterToTriger.prop('checked', false).trigger('change');
-                                myObject.myTableHolder.find('.' + myObject.directFilterLinkClass + '[data-filter="' + dataFilter + '"]')
-                                    .filter(
-                                        function(){
-                                            return myEl.text() === filterValue;
-                                        }
-                                    )
-                                    .parent()
-                                    .removeClass(myObject.filterSelectedClass);
+                        var filterToTriger = myObject.myTableHolder
+                            .find(myObject.filterFormHolderSelector)
+                            .find('input[data-to-filter="'+ dataFilter + '"][value="'+ filterValue + '"]')
+                            .first();
+                        if(filterToTriger && filterToTriger.length > 0) {
+                            if(filterToTriger.is(':checkbox')){
+                                if(filterToTriger.prop('checked') === true){
+                                    filterToTriger.prop('checked', false).trigger('change');
+                                }
+                                else {
+                                    filterToTriger.prop('checked', true).trigger('change');
+                                }
                             }
-                            else {
-                                filterToTriger.prop('checked', true).trigger('change');
-                                jQuery('.' + myObject.directFilterLinkClass + '[data-filter="' + dataFilter + '"]')
-                                    .filter(
-                                        function(){
-                                            return myEl.text() === filterValue;
-                                        }
-                                    )
-                                    .parent()
-                                    .addClass(myObject.filterSelectedClass);
+                            else  {
+                                filterToTriger = myObject.myTableHolder
+                                    .find(myObject.filterFormHolderSelector)
+                                    .find('input[data-to-filter="'+ dataFilter + '"]').first();
                             }
-                            myObject.displayCurrentSearchParameters();
-                        }
-                        else {
-                            filterToTriger = myObject.myTableHolder.find('input[data-to-filter="'+ dataFilter + '"]').first();
-                            var holder = myObject.myTable
-                                .find('.' + myObject.directFilterLinkClass + '[data-filter="' + dataFilter + '"]')
-                                .parent();
-                            var isFiltered = holder.hasClass(myObject.filterSelectedClass);
-                            if(isFiltered){
+                            var isFiltered = false;
+                            myObject.myRows.each(
+                                function(i, row) {
+                                    row = jQuery(row);
+                                    var holderInRow = row
+                                        .find('.' + myObject.directFilterLinkClass + '[data-filter="' + dataFilter + '"]')
+                                        .filter(
+                                            function(i, dataFilterEl){
+                                                var rowValue = jQuery.trim(jQuery(dataFilterEl).text());
+                                                return rowValue === filterValue;
+                                            }
+                                        )
+                                        .parent();
+                                    if(i === 0) {
+                                        isFiltered = holderInRow.hasClass(myObject.filterSelectedClass);
+                                    }
+                                    if(isFiltered) {
+                                        holderInRow.removeClass(myObject.filterSelectedClass)
+                                    } else {
+                                        holderInRow.addClass(myObject.filterSelectedClass)
+                                    }
+                                }
+                            );
+                            if(isFiltered) {
                                 filterToTriger.val('').trigger('change');
-                                holder.removeClass(myObject.filterSelectedClass);
-                            }
-                            else {
+                            } else {
                                 filterToTriger.val(filterValue).trigger('change');
-                                holder.addClass(myObject.filterSelectedClass);
+                            }
+                            if(myObject.myTableHolder.find('.' + myObject.openFilterFormClass).hasClass(myObject.filterIsOpenClass)) {
+                                //no need to do anything...
+                            } else {
+                                myObject.displayCurrentSearchParameters();
                             }
                         }
                         return false;
