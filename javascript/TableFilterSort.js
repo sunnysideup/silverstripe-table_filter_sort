@@ -375,6 +375,7 @@ jQuery(document).ready(
              */
             init: function(holderNumber){
                 var myObject = TableFilterSort;
+
                 myObject.holderNumber = holderNumber;
                 myObject.myTableHolder = myTableHolder;
                 myObject.myTable = myObject.myTableHolder.find(myObject.tableSelector).first();
@@ -382,17 +383,29 @@ jQuery(document).ready(
                 myObject.resetObjects();
                 if(myObject.myRows.length > 1){
                     myObject.myTableHolder.addClass(myObject.loadingClass);
+                    console.profile('toggleSlideSetup');
                     myObject.toggleSlideSetup();
-                    myObject.clearFilterListener();
+                    console.profileEnd();console.profile('filterItemCollector');
                     myObject.filterItemCollector();
+                    console.profileEnd();console.profile('tableHideColsWhichAreAllTheSame');
                     myObject.tableHideColsWhichAreAllTheSame();
+                    console.profileEnd();console.profile('createFilterForm');
                     myObject.createFilterForm();
+                    console.profileEnd();console.profile('setupFilterListeners');
                     myObject.setupFilterListeners();
+                    console.profileEnd();console.profile('clearFilterListener');
+                    myObject.clearFilterListener();
+                    console.profileEnd();console.profile('directFilterLinkListener');
                     myObject.directFilterLinkListener();
+                    console.profileEnd();console.profile('setupSortListeners');
                     myObject.setupSortListeners();
+                    console.profileEnd();console.profile('showAndHideFilterForm');
                     myObject.showAndHideFilterForm();
+                    console.profileEnd();
                     myObject.myTableHolder.removeClass(myObject.loadingClass);
+                    console.profile('runCurrentSort');
                     myObject.runCurrentSort();
+                    console.profileEnd();
                 }
             },
 
@@ -421,7 +434,7 @@ jQuery(document).ready(
                 )
                 .on(
                     'click',
-                    '.'+myObject.openFilterFormClass,
+                    '.' + myObject.openFilterFormClass,
                     function(event) {
                         event.preventDefault();
                         var myEl = jQuery(this);
@@ -439,9 +452,11 @@ jQuery(document).ready(
                 //add toggle
                 myObject.myTableHolder.on(
                     'click',
-                    '.'+myObject.clearFilterClass,
+                    '.' + myObject.clearFilterClass + ' a',
                     function(event) {
                         event.preventDefault();
+                        var myEl = jQuery(this);
+                        var id = myEl.attr("data-rel");
                         myObject.myTableHolder.find(myObject.filterInputSelector).each(
                             function(i, el){
                                 el = jQuery(el);
@@ -567,7 +582,6 @@ jQuery(document).ready(
                 }
                 var content = '<form>' +
                               '<h3><a href="#'+id+'" class="'+myObject.openFilterFormClass+' button closed" data-rel="'+id+'">'+filterFormTitle+'</a></h3>' +
-                              '<h4><a href="#'+id+'" class="'+myObject.clearFilterClass+' button" data-rel="'+id+'">' + clearButtonTitle + '</a></h4>' +
                               '<div id="'+id+'" style="display: none;" class="'+myObject.filterOptionsHolderClass+'">';
                 Object.keys(myObject.optionsForFilter).forEach(
                     function(category, categoryIndex) {
@@ -623,9 +637,13 @@ jQuery(document).ready(
                 if(typeof closeAndApplyFilterText === "undefined") {
                     closeAndApplyFilterText = myObject.closeAndApplyFilterText;
                 }
-
-                content += '<h4 class="'+myObject.applyFilterClass+'">' +
-                           '<a href="#'+id+'" class="'+myObject.openFilterFormClass+' button" data-rel="'+id+'">'+closeAndApplyFilterText+'</a></h4>' +
+                content += '' +
+                           '<h4 class="'+myObject.clearFilterClass+'">' +
+                           '<a href="#'+id+'" class="button">' + clearButtonTitle + '</a>' +
+                           '</h4>' +
+                           '<h4 class="'+myObject.applyFilterClass+'">' +
+                           '<a href="#'+id+'" class="'+myObject.openFilterFormClass+' button" data-rel="'+id+'">'+closeAndApplyFilterText+'</a>' +
+                           '</h4>' +
                            '</div>' +
                            '</form>';
                 formHolder.html(content);
@@ -717,13 +735,11 @@ jQuery(document).ready(
                          }
                          pageHTML += ' ';
                      }
-                }
-                minRow++;
-                if(totalRowCount > maxRow || minRow > 0) {
-                    myObject.myTableHolder.find(myObject.moreRowEntriesSelector).show();
+                     myObject.myTableHolder.find(myObject.moreRowEntriesSelector).show();
                 } else {
                     myObject.myTableHolder.find(myObject.moreRowEntriesSelector).hide();
                 }
+                minRow++;
                 myObject.myTableHolder.find(myObject.matchRowCountSelector).text(matchCount);
                 myObject.myTableHolder.find(myObject.minRowSelector).text(minRow);
                 myObject.myTableHolder.find(myObject.maxRowSelector).text(maxRow);
@@ -753,7 +769,7 @@ jQuery(document).ready(
                 )
                 .change(
                     function(event){
-                        myObject.gotoPage(0);
+                        myObject.showFromRow = 0;
                         myObject.startRowManipulation();
                         if(myObject.debug) {console.debug("==============");console.debug(myObject.currentFilter);}
                         var myElInputChanged = jQuery(this);
@@ -907,6 +923,7 @@ jQuery(document).ready(
                     myObject.sortLinkSelector,
                     function(event){
                         event.preventDefault();
+                        myObject.showFromRow = 0;
                         myObject.startRowManipulation();
                         var myEl = jQuery(this);
                         myObject.myTableHolder.find(myObject.sortLinkSelector)

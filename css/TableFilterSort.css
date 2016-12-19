@@ -8,9 +8,9 @@
  table td ul li {padding: 0; margin: 0; display: inline;}
  table td ul li:after {content: ";";}
 
- .tableFilterSortFilterFormHolder { }
- .tableFilterSortFilterFormHolder .filterColumn{ width: calc(33% - 2em); float: left; oveflow: auto; margin: 1em;}
- .tableFilterSortFilterFormHolder .filterColumn:nth-child(3n+1){clear:left;}
+ .tableFilterSortFilterFormHolder { border: 1px solid #fff; overflow: hidden; padding: 10px;}
+ .tableFilterSortFilterFormHolder .filterColumn{ width: calc(20% - 2em); float: left; oveflow: auto; margin: 1em;}
+ .tableFilterSortFilterFormHolder .filterColumn:nth-child(5n+1){clear:left;}
  .tableFilterSortFilterFormHolder .filterColumn ul,
  .tableFilterSortFilterFormHolder .filterColumn ul li{list-style: none; padding: 0; margin: 0;}
 
@@ -30,6 +30,10 @@
 
 .filter-selected { background-color: yellow; }
 
+.tableFilterSortClearFilterForm {
+    clear: both;
+    float: left;
+}
 .applyFilter {
     float: right;
 }
@@ -40,4 +44,4 @@ tr.show{}
 
 tr.hide, tr.no-match {display: none!important;}
 
-.loading{opacity: 0.3;}
+.loading{opacity: 0.3!important;}

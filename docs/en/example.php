@@ -158,9 +158,9 @@ function create_test()
         'Zucchini'
     );
     $html = '';
-    for($i = 0; $i < 1000; $i++) {
+    for($i = 0; $i < 3000; $i++) {
         $html .= '
-        <tr class="tfsRow">
+        <tr class="tfsRow hide">
             <td><span data-filter="SKU">'.($i+1).'</span></td>
             <td><span data-filter="Type">'.$type.'</span></td>
             <td><span data-filter="Original Producer">'.$producer.'</span></td>
@@ -206,8 +206,19 @@ $html = create_test();
                 data-title-close-and-apply="Apply"
             ></div>
             <div class="tableFilterSortCurrentSearchHolder" data-title="Current Filter"></div>
+            <p class="tableFilterSortMoreEntries">
+                <span class="line">
+                    Filter:
+                    <strong class="match-row-number">0</strong> /
+                    <strong class="total-row-number">0</strong>.
+                </span>
+            </p>
             <div class="tableFilterSortCommonContentHolder" data-title="Common Info"></div>
-            <span class="pagination"></span>
+            <p class="tableFilterSortMoreEntries">
+                <span class="line">
+                    Select Page: <strong class="pagination"></strong>
+                </span>
+            </p>
             <table class="tableFilterSortTable">
                 <thead>
                     <tr>
@@ -237,16 +248,23 @@ $html = create_test();
                 </tbody>
             </table>
             <p class="tableFilterSortMoreEntries">
-                You have reached the limit of visble entries,
-                there are more entries, but they can not be shown here as this will overload your browser.
-                <br />
-                Filter: <span class="match-row-number">0</span> /  <span class="total-row-number">0</span>.
-                <br />
-                Display: <span class="total-showing-row-number">0</span>
-                (<span class="min-row-number">0</span>
-                - <span class="max-row-number">0</span>).
-                <br />
-                Select Page: <span class="pagination"></span>
+                <span class="line">
+                    You have reached the limit of visble entries,
+                    there are more entries, but they can not be shown here as this will overload your browser.
+                </span>
+                <span class="line">
+                    Filter:
+                    <strong class="match-row-number">0</strong> /
+                    <strong class="total-row-number">0</strong>.
+                </span>
+                <span class="line">
+                    Display: <strong class="total-showing-row-number">0</strong>
+                    (<strong class="min-row-number">0</strong>
+                    - <strong class="max-row-number">0</strong>).
+                </span>
+                <span class="line">
+                    Select Page: <strong class="pagination"></strong>
+                </span>
             </p>
 
         </div>
