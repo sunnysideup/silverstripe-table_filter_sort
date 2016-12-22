@@ -119,6 +119,11 @@ jQuery(document).ready(
              */
             intervalForFilterCheck: 1000,
 
+            /**
+             *
+             * @type {Boolean}
+             */
+            hasFixedTableHeader: true,
 
             /**
              *
@@ -133,12 +138,6 @@ jQuery(document).ready(
              * @var string
              */
             filterTitle: "Filter Table",
-
-            /**
-             * customise the title of the filter button
-             * @var string
-             */
-            filterTitleClearButton: "Clear",
 
             /**
              *
@@ -185,11 +184,6 @@ jQuery(document).ready(
             * @var string
             */
             filterInputSelector: 'input[data-to-filter]',
-
-            /**
-            * @var string
-            */
-            currentSearchFilterSelector: '.tableFilterSortCurrentSearchHolder',
 
             /**
             * @var string
@@ -315,14 +309,14 @@ jQuery(document).ready(
             commonContentHolderClass: 'tableFilterSortCommonContentHolder',
 
             /**
-             * @var string
-             */
-            openFilterFormClass: 'tableFilterSortOpenFilterForm',
+            * @var string
+            */
+            currentSearchFilterClass: 'tableFilterSortCurrentSearchHolder',
 
             /**
              * @var string
              */
-            clearFilterClass: 'tableFilterSortClearFilterForm',
+            openFilterFormClass: 'tableFilterSortOpenFilterForm',
 
             /**
              * @var string
@@ -385,29 +379,31 @@ jQuery(document).ready(
                     myObject.myTableHolder.addClass(myObject.loadingClass);
                     window.setTimeout(
                         function() {
-                            // console.profile('toggleSlideSetup');
+                            if(myObject.debug) { console.profile('toggleSlideSetup');}
                             myObject.toggleSlideSetup();
-                            // console.profileEnd();console.profile('filterItemCollector');
+                            if(myObject.debug) { console.profileEnd();console.profile('filterItemCollector');}
                             myObject.filterItemCollector();
-                            // console.profileEnd();console.profile('tableHideColsWhichAreAllTheSame');
+                            if(myObject.debug) { console.profileEnd();console.profile('tableHideColsWhichAreAllTheSame');}
                             myObject.tableHideColsWhichAreAllTheSame();
-                            // console.profileEnd();console.profile('createFilterForm');
+                            if(myObject.debug) { console.profileEnd();console.profile('createFilterForm');}
                             myObject.createFilterForm();
-                            // console.profileEnd();console.profile('setupFilterListeners');
+                            if(myObject.debug) { console.profileEnd();console.profile('setupFilterListeners');}
                             myObject.setupFilterListeners();
-                            // console.profileEnd();console.profile('clearFilterListener');
-                            myObject.clearFilterListener();
-                            // console.profileEnd();console.profile('directFilterLinkListener');
+                            if(myObject.debug) { console.profileEnd();console.profile('directFilterLinkListener');}
                             myObject.directFilterLinkListener();
-                            // console.profileEnd();console.profile('setupSortListeners');
+                            if(myObject.debug) { console.profileEnd();console.profile('setupSortListeners');}
                             myObject.setupSortListeners();
-                            // console.profileEnd();console.profile('showAndHideFilterForm');
+                            if(myObject.debug) { console.profileEnd();console.profile('showAndHideFilterForm');}
                             myObject.showAndHideFilterForm();
-                            // console.profileEnd();
+                            if(myObject.debug) { console.profileEnd();console.profile('paginationListeners');}
+                            myObject.paginationListeners();
+                            if(myObject.debug) { console.profileEnd();}
                             myObject.myTableHolder.removeClass(myObject.loadingClass);
-                            // console.profile('runCurrentSort');
+                            if(myObject.debug) { console.profile('runCurrentSort');}
                             myObject.runCurrentSort();
-                            // console.profileEnd();
+                            if(myObject.debug) { console.profileEnd(); console.profile('fixTableHeader');}
+                            myObject.fixTableHeader();
+                            if(myObject.debug) { console.profileEnd();}
                         },
                         10
                     );
@@ -451,51 +447,6 @@ jQuery(document).ready(
                     }
                 );
             },
-
-            clearFilterListener: function(){
-                var myObject = TableFilterSort;
-                //add toggle
-                myObject.myTableHolder.on(
-                    'click',
-                    '.' + myObject.clearFilterClass + ' a',
-                    function(event) {
-                        event.preventDefault();
-
-                        var myEl = jQuery(this);
-                        var id = myEl.attr("data-rel");
-                        var lastEl = null;
-                        myObject.myTableHolder.find(myObject.filterFormHolderSelector).find(myObject.filterInputSelector).each(
-                            function(i, el){
-                                el = jQuery(el);
-                                if(el.is(":checkbox")){
-                                    el.prop('checked', false);
-                                }
-                                else {
-                                    el.val('');;
-                                }
-                                lastEl = el;
-                            }
-                        );
-                        if(lastEl !== null) {
-                            lastEl.trigger('change');
-                        }
-                        //clear directly selected items
-                        jQuery(myObject.currentSearchFilterSelector).html('');
-                        window.setTimeout(
-                            function() {
-                                myObject.myRows.each(
-                                    function(i, row) {
-                                        jQuery(row).find('.' + myObject.directFilterLinkClass).parent().removeClass(myObject.filterSelectedClass);
-                                    }
-                                );
-                            },
-                            10
-                        );
-                        return false;
-                    }
-                );
-            },
-
 
             /**
              * find the filters ...
@@ -602,12 +553,15 @@ jQuery(document).ready(
                 if(typeof filterFormTitle === "undefined") {
                     filterFormTitle = myObject.filterTitle;
                 }
-                var clearButtonTitle = formHolder.attr("data-title-clear-button");
-                if(typeof clearButtonTitle === "undefined") {
-                    clearButtonTitle = myObject.filterTitleClearButton;
+                var currentFilterHTML = '';
+                if(myObject.myTableHolder.find('.' + myObject.currentSearchFilterClass).length === 0) {
+                    currentFilterHTML = '<div class="'+myObject.currentSearchFilterClass+'"></div>';
                 }
                 var content = '<form>' +
-                              '<h3><a href="#'+id+'" class="'+myObject.openFilterFormClass+' button closed" data-rel="'+id+'">'+filterFormTitle+'</a></h3>' +
+                              currentFilterHTML +
+                              '<h3>' +
+                              '<a href="#'+id+'" class="'+myObject.openFilterFormClass+' button closed" data-rel="'+id+'">'+filterFormTitle+'</a>' +
+                              '</h3>' +
                               '<div id="'+id+'" style="display: none;" class="'+myObject.filterOptionsHolderClass+'">';
                 Object.keys(myObject.optionsForFilter).forEach(
                     function(category, categoryIndex) {
@@ -664,9 +618,6 @@ jQuery(document).ready(
                     closeAndApplyFilterText = myObject.closeAndApplyFilterText;
                 }
                 content += '' +
-                           '<h4 class="'+myObject.clearFilterClass+'">' +
-                           '<a href="#'+id+'" class="button">' + clearButtonTitle + '</a>' +
-                           '</h4>' +
                            '<h4 class="'+myObject.applyFilterClass+'">' +
                            '<a href="#'+id+'" class="'+myObject.openFilterFormClass+' button" data-rel="'+id+'">'+closeAndApplyFilterText+'</a>' +
                            '</h4>' +
@@ -689,6 +640,20 @@ jQuery(document).ready(
                         }
                     },
                     myObject.intervalForFilterCheck
+                );
+            },
+
+            paginationListeners: function()
+            {
+                var myObject = TableFilterSort;
+                myObject.myTableHolder.on(
+                    'click',
+                    myObject.paginationSelector+' a',
+                    function(event) {
+                        event.preventDefault();
+                        var pageNumber = jQuery(this).attr('data-page');
+                        myObject.gotoPage(pageNumber);
+                    }
                 );
             },
 
@@ -752,14 +717,12 @@ jQuery(document).ready(
                 //create html for pagination
                 var pageHTML = '';
                 var i = 0;
-                var onclick = '';
                 if(pageCount > 1) {
                       for(i = 0; i < pageCount; i++ ) {
                         if(currentPage === i) {
                             pageHTML += '<span>['+(i+1)+']</span>';
                         } else {
-                            onclick = 'window.TableFilterSortTableList['+myObject.holderNumber+'].gotoPage('+i+'); return false;';
-                            pageHTML += '<a href="" onclick="'+onclick+'">'+(i+1)+'</a> ';
+                            pageHTML += '<a href="#" data-page="'+i+'">'+(i+1)+'</a> ';
                          }
                          pageHTML += ' ';
                      }
@@ -1154,22 +1117,57 @@ jQuery(document).ready(
                 if(html.length === 0) {
                     html = myObject.noFilterSelectedText;
                 }
-                var title = myObject.myTableHolder.find(myObject.currentSearchFilterSelector).attr('data-title');
+                var targetDomElement = myObject.myTableHolder.find('.'+myObject.currentSearchFilterClass);
+                var title = targetDomElement.attr('data-title');
                 if(typeof title === 'undefined') {
                     title = myObject.currentFilterText;
                 }
                 html = "<div><h3>" + title + "</h3><ul>" + html + "</ul></div>";
-                myObject.myTableHolder.find(myObject.currentSearchFilterSelector).html(html);
+                targetDomElement.html(html);
                 if(myObject.myTableHolder.hasClass(myObject.filterIsOpenClass)){
-                    myObject.myTableHolder.find(myObject.currentSearchFilterSelector).hide();
+                    targetDomElement.hide();
                 }
                 else {
-                    myObject.myTableHolder.find(myObject.currentSearchFilterSelector).show();
+                    targetDomElement.show();
                 }
 
             },
 
+            fixTableHeader: function()
+            {
+                var myObject = this;
+                if(myObject.hasFixedTableHeader) {
+                    jQuery('<table class="fixed-header" style="position: fixed; top: 0px; display:none;"></table>').insertAfter(myObject.tableSelector);
+                    var header = myObject.myTable.find("thead").clone();
+                    var fixedHeader = myObject.myTableHolder.find(".fixed-header").append(header);
 
+                    jQuery(window).bind(
+                        "scroll",
+                        function() {
+                            var tableOffset = myObject.myTable.offset().top;
+                            var offset = jQuery(this).scrollTop();
+                            if (offset > tableOffset && fixedHeader.is(":hidden")) {
+                                myObject.myTable.addClass('fake-header');
+                                fixedHeader.show();
+                                fixedHeader.width(myObject.myTable.outerWidth());
+                                var fakeHeaders = fixedHeader.find('thead tr:first th, thead tr:first td');
+                                myObject.myTable.find('thead tr:first th, thead tr:first td').each(
+                                    function(colNumber, cel) {
+                                        var width = jQuery(cel).width();
+                                        jQuery(fakeHeaders.eq(colNumber))
+                                            .width(width);
+                                    }
+                                )
+                            }
+                            else if (offset <= tableOffset) {
+                                myObject.myTable.removeClass('fake-header');
+                                fixedHeader.hide();
+                            }
+                        }
+                    );
+
+                }
+            },
 
             /**
              *
