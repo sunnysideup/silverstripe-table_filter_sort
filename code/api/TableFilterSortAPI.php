@@ -20,7 +20,7 @@ class TableFilterSortAPI extends Object
             ',
             'table_filter_sort'
         );
-        Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
+        // Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
         Requirements::javascript('table_filter_sort/javascript/TableFilterSort.js');
         Requirements::themedCSS('TableFilterSort', 'table_filter_sort');
     }
