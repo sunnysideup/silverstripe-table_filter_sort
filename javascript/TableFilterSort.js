@@ -178,7 +178,7 @@ jQuery(document).ready(
             /**
             * @var string
             */
-            moreDetailsSelector: '.tableFilterSortMoreDetails',
+            moreDetailsSelector: '.more',
 
             /**
             * @var string

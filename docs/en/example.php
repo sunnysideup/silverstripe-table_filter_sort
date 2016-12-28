@@ -170,7 +170,7 @@ function create_test()
             <td><span data-filter="Price">$'.(rand(0,99999)/100).'</span></td>
             <td><span data-filter="Rating">'.rand(1,5).' Stars</span></td>
             <td>
-                <a href="#" class="tableFilterSortMoreDetails" data-rel="Row_'.$i.'_Details">more</a>
+                <a href="#" class="more" data-rel="Row_'.$i.'_Details">more</a>
                 <div style="display: none;" id="Row_'.$i.'_Details">
                     <h6>Tags</h6>
                     <ul>
