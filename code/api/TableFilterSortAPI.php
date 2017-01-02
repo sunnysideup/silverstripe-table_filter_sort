@@ -21,11 +21,12 @@ class TableFilterSortAPI extends Object
             'table_filter_sort'
         );
         // Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
-        Requirements::javascript('table_filter_sort/javascript/TableFilterSort.js');
         Requirements::javascript('table_filter_sort/javascript/awesomplete.js');
-        Requirements::themedCSS('TableFilterSort', 'table_filter_sort');
+        Requirements::javascript('table_filter_sort/javascript/TableFilterSort.js');
         Requirements::themedCSS('awesomplete', 'table_filter_sort');
         Requirements::themedCSS('awesomplete.theme', 'table_filter_sort');
+        Requirements::themedCSS('TableFilterSort', 'table_filter_sort');
+        Requirements::themedCSS('TableFilterSort.theme', 'table_filter_sort');
     }
 
 }

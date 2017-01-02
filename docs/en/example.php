@@ -210,7 +210,7 @@ $html = create_test();
             ></div>
             <p class="tableFilterSortMoreEntries">
                 <span class="line">
-                    <strong>Filter:</strong>
+                    <strong>Filtered:</strong>
                     <span class="match-row-number">0</span> /
                     <span class="total-row-number">0</span>.
                 </span>
@@ -281,12 +281,12 @@ $html = create_test();
                     there are more entries, but they can not be shown here as this will overload your browser.
                 </span>
                 <span class="line">
-                    <strong>Filter:</strong>
+                    <strong>Filtered:</strong>
                     <span class="match-row-number">0</span> /
                     <span class="total-row-number">0</span>.
                 </span>
                 <span class="line">
-                    <strong>Display:</strong> <span class="total-showing-row-number">0</span>
+                    <strong>Currently Shown:</strong> <span class="total-showing-row-number">0</span>
                     (<span class="min-row-number">0</span>
                     - <span class="max-row-number">0</span>).
                 </span>

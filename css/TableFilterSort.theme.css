@@ -28,8 +28,9 @@ table th, table td {
   width: 12.5%;
   border: 1px solid #fff;
   background-color: #ddd;
-  text-align: center;
+  text-align: left;
   padding: 1em;
+  vertical-align: top;
 }
 
 table th {
