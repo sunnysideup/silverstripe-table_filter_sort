@@ -170,8 +170,8 @@ function create_test()
             <td><span data-filter="Price">$'.(rand(0,99999)/100).'</span></td>
             <td><span data-filter="Rating">'.rand(1,5).' Stars</span></td>
             <td>
-                <a href="#" class="more" data-rel="Row_'.$i.'_Details">more</a>
-                <div style="display: none;" id="Row_'.$i.'_Details">
+                <a href="#" class="more">more</a>
+                <div style="display: none;" class="hidden">
                     <h6>Tags</h6>
                     <ul>
                         <li><span data-filter="Tags">'.$veg[rand(0, count($veg)-1)].'</span></li>
@@ -193,7 +193,10 @@ $html = create_test();
     <head>
         <meta charset="UTF-8">
         <title>Example Filter Table</title>
-        <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.css">
+        <link rel="stylesheet" type="text/css" href="../../css/awesomplete.css?x=<?php echo rand(0,9999999999) ?>">
+        <link rel="stylesheet" type="text/css" href="../../css/awesomplete.theme.css?x=<?php echo rand(0,9999999999) ?>">
+        <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.css?x=<?php echo rand(0,9999999999) ?>">
+        <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.theme.css?x=<?php echo rand(0,9999999999) ?>">
     </head>
     <body>
 
@@ -201,20 +204,20 @@ $html = create_test();
 
         <div class="tableFilterSortHolder">
             <div class="tableFilterSortFilterFormHolder"
-                data-title="My Filter Title"
+                data-title="Filter Table Below"
                 data-title-clear-button="Clear"
-                data-title-close-and-apply="Apply"
+                data-title-close-and-apply="Apply Your Selection"
             ></div>
             <p class="tableFilterSortMoreEntries">
                 <span class="line">
-                    Filter:
-                    <strong class="match-row-number">0</strong> /
-                    <strong class="total-row-number">0</strong>.
+                    <strong>Filter:</strong>
+                    <span class="match-row-number">0</span> /
+                    <span class="total-row-number">0</span>.
                 </span>
             </p>
             <p class="tableFilterSortMoreEntries">
                 <span class="line">
-                    Select Page: <strong class="pagination"></strong>
+                    <strong>Select Page:</strong> <span class="pagination"></span>
                 </span>
             </p>
             <div class="tableFilterSortCommonContentHolder" data-title="Common Info"></div>
@@ -222,22 +225,48 @@ $html = create_test();
                 <thead>
                     <tr>
                         <th scope="col">
-                            <a href="#" class="sortable" data-filter="SKU" data-sort-direction="asc" data-sort-type="number">SKU</a>
+                            <a href="#"
+                                class="sortable"
+                                data-sort-field="SKU"
+                                data-sort-direction="asc"
+                                data-sort-type="number"
+                            >SKU</a>
                         </th>
                         <th scope="col">Type</th>
                         <th scope="col">Producer</th>
                         <th scope="col">Colour</th>
                         <th scope="col">
-                            <a href="#" class="sortable" data-filter="Size" data-sort-direction="asc" data-sort-type="text">Size</a>
+                            <a href="#"
+                                class="sortable"
+                                data-sort-field="Size"
+                                data-sort-direction="asc"
+                                data-sort-type="string"
+                            >Size</a>
                         </th>
                         <th scope="col">
-                            <a href="#" class="sortable" data-filter="Weight" data-sort-direction="asc" data-sort-type="number">Weight</a>
+                            <a href="#"
+                                class="sortable"
+                                data-sort-field="Weight"
+                                data-sort-direction="asc"
+                                data-sort-type="number"
+                            >Weight</a>
                         </th>
                         <th scope="col">
-                            <a href="#" class="sortable" data-filter="Price" data-sort-direction="asc" data-sort-type="number" data-sort-default="true">Price</a>
+                            <a href="#"
+                                class="sortable"
+                                data-sort-field="Price"
+                                data-sort-direction="asc"
+                                data-sort-type="number"
+                                data-sort-default="true"
+                            >Price</a>
                         </th>
                         <th scope="col">
-                            <a href="#" class="sortable" data-filter="Rating" data-sort-direction="desc" data-sort-type="number">Rating</a>
+                            <a href="#"
+                                class="sortable"
+                                data-sort-field="Rating"
+                                data-sort-direction="desc"
+                                data-sort-type="number"
+                            >Rating</a>
                         </th>
                         <th scope="col">Description</th>
                     </tr>
@@ -252,29 +281,28 @@ $html = create_test();
                     there are more entries, but they can not be shown here as this will overload your browser.
                 </span>
                 <span class="line">
-                    Filter:
-                    <strong class="match-row-number">0</strong> /
-                    <strong class="total-row-number">0</strong>.
+                    <strong>Filter:</strong>
+                    <span class="match-row-number">0</span> /
+                    <span class="total-row-number">0</span>.
                 </span>
                 <span class="line">
-                    Display: <strong class="total-showing-row-number">0</strong>
-                    (<strong class="min-row-number">0</strong>
-                    - <strong class="max-row-number">0</strong>).
+                    <strong>Display:</strong> <span class="total-showing-row-number">0</span>
+                    (<span class="min-row-number">0</span>
+                    - <span class="max-row-number">0</span>).
                 </span>
                 <span class="line">
-                    Select Page: <strong class="pagination"></strong>
+                    <strong>Select Page:</strong> <span class="pagination"></span>
                 </span>
             </p>
 
         </div>
-
-
 
         <script src="https://code.jquery.com/jquery-git.min.js"></script>
         <script type="text/javascript">
             var TableFilterSortTableList = []
             TableFilterSortTableList.push('.tableFilterSortHolder');
         </script>
-        <script src="../../javascript/TableFilterSort.js"></script>
+        <script src="../../javascript/TableFilterSort.js?x=<?php echo rand(0,9999999999) ?>"></script>
+        <script src="../../javascript/awesomplete.js?x=<?php echo rand(0,9999999999) ?>"></script>
 
 </html>

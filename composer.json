@@ -20,7 +20,10 @@
         }
     ],
     "require": {
-        "silverstripe/framework": "*",
+        "silverstripe/framework": "^3.5"
+    },
+    "extra": {
+        "installer-name": "table_filter_sort"
     },
     "extra": {
         "installer-name": "table_filter_sort"
