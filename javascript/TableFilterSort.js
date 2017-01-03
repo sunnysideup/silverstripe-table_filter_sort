@@ -199,14 +199,20 @@ jQuery(document).ready(
             rowSelector: 'tr.tfsRow',
 
             /**
+             *
+             * @var string
+             */
+            directLinkIgnoreClass: 'ignore',
+
+            /**
              * items that can be filtered / sorted for ...
              * @var string
              */
             filterItemSelector: 'span[data-filter]',
 
             /**
-            * @var string
-            */
+             * @var string
+             */
             showMoreDetailsSelector: '.more',
 
             /**
@@ -319,7 +325,7 @@ jQuery(document).ready(
             /**
              * @var string
              */
-            tagFilterClass: 'textFilter',
+            tagFilterClass: 'tagFilter',
 
             /**
              * @var string
@@ -494,6 +500,7 @@ jQuery(document).ready(
                         event.preventDefault();
                         var myEl = jQuery(this);
                         var myRow = myEl.closest('tr');
+                        myRow.toggleClass(myob.openedClass);
                         myRow.find(myob.moreDetailsSelector).each(
                             function(i, moreDetailsItem) {
                                 moreDetailsItem = jQuery(moreDetailsItem);
@@ -692,11 +699,16 @@ jQuery(document).ready(
                     currentFilterHTML = '<div class="'+myob.currentSearchFilterClass+'"></div>';
                 }
                 var tabIndex = 1;
-                var content = '<form>' +
-                              currentFilterHTML +
-                              '<a href="#'+id+'" class="'+myob.openAndCloseFilterFormClass+' button closed" data-rel="'+id+'">'+filterFormTitle+'</a>' +
-                              '<div id="'+id+'" style="display: none;" class="'+myob.filterOptionsHolderClass+'">';
-                              '<input class="keyword text" name="Keyword" placeholder="keyword(s)" tabindex="'+tabIndex+'" data-to-filter="*" />';
+                var headerContent = '';
+                var tagContent = '';
+                var numberContent = '';
+                var checkContent = '';
+                var footerContent = '';
+                headerContent  = '<form>' +
+                                 currentFilterHTML +
+                                 '<a href="#'+id+'" class="'+myob.openAndCloseFilterFormClass+' button closed" data-rel="'+id+'">'+filterFormTitle+'</a>' +
+                                 '<div id="'+id+'" style="display: none;" class="'+myob.filterOptionsHolderClass+'">';
+                                 '<input class="keyword text" name="Keyword" placeholder="keyword(s)" tabindex="'+tabIndex+'" data-to-filter="*" />';
                 var awesompleteFields = [];
                 Object.keys(myob.dataDictionary).forEach(
                     function(category, categoryIndex) {
@@ -709,34 +721,34 @@ jQuery(document).ready(
                         var cleanCategory = category.replace(/\W/g, '');
                         var categoryID = cleanCategory+"_TFC";
                         if(optionCount > 1 && optionCount <= myob.maximumNumberOfFilterOptions) {
-                            content += '<div id="' + categoryID + '" class="'+myob.filterGroupClass+' '+myob.checkboxFilterClass+'" data-to-filter="'+category.raw2attr()+'">' +
-                                       '<label class="'+myob.groupLabelClass+'">' + category.split('-').join(' ') + '</label>' +
-                                       '<ul>';
+                            checkContent += '<div id="' + categoryID + '" class="'+myob.filterGroupClass+' '+myob.checkboxFilterClass+'" data-to-filter="'+category.raw2attr()+'">' +
+                                            '<label class="'+myob.groupLabelClass+'">' + category.split('-').join(' ') + '</label>' +
+                                            '<ul>';
                             count = 0;
                             for(count = 0; count < optionCount; count++) {
                                 var value = myob.dataDictionary[category]['Options'][count];
                                 valueID = cleanCategory + "_TFS_" + count;
-                                content += '<li class="checkbox">' +
-                                           '<input class="checkbox" type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + value.raw2attr() + '" tabindex="'+tabIndex+'" />' +
-                                           '<label for="' + valueID + '">' + value + '</label>' +
-                                           '</li>';
+                                checkContent += '<li class="checkbox">' +
+                                                '<input class="checkbox" type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + value.raw2attr() + '" tabindex="'+tabIndex+'" />' +
+                                                '<label for="' + valueID + '">' + value + '</label>' +
+                                                '</li>';
                             }
-                            content += '</ul>' +
-                                       '</div>';
+                            checkContent += '</ul>' +
+                                            '</div>';
                         }
                         else if (
                             optionCount > myob.maximumNumberOfFilterOptions &&
                             myob.dataDictionary[category]['DataType'] === 'string'
                         ) {
                             valueID = cleanCategory+"_TFC_0";
-                            content += '<div id="' + categoryID + '"  class="'+myob.filterGroupClass+' '+myob.tagFilterClass+'"  data-to-filter="'+category.raw2attr()+'">' +
-                                       '<label class="'+myob.groupLabelClass+'">' + category.split('-').join(' ') + '</label>' +
-                                       '<ul>';
-                            content += '<li>' +
-                                       '<input class="text" type="text" name="' + valueID + '" id="' + valueID + '" class="awesomplete" />' +
-                                       '</li>' +
-                                       '</ul>' +
-                                       '</div>';
+                            tagContent += '<div id="' + categoryID + '"  class="'+myob.filterGroupClass+' '+myob.tagFilterClass+'"  data-to-filter="'+category.raw2attr()+'">' +
+                                          '<label class="'+myob.groupLabelClass+'">' + category.split('-').join(' ') + '</label>' +
+                                          '<ul>';
+                            tagContent += '<li>' +
+                                          '<input class="text" type="text" name="' + valueID + '" id="' + valueID + '" class="awesomplete" />' +
+                                          '</li>' +
+                                          '</ul>' +
+                                          '</div>';
                             awesompleteFields.push([category, valueID]);
                         }
                         else if (
@@ -751,12 +763,13 @@ jQuery(document).ready(
                 if(typeof closeAndApplyFilterText === "undefined") {
                     closeAndApplyFilterText = myob.closeAndApplyFilterText;
                 }
-                content += '' +
-                           '<div class="'+myob.applyFilterClass+'">' +
-                           '<a href="#'+id+'" class="'+myob.openAndCloseFilterFormClass+' button" data-rel="'+id+'">'+closeAndApplyFilterText+'</a>' +
-                           '</div>' +
-                           '</div>' +
-                           '</form>';
+                footerContent += '' +
+                                 '<div class="'+myob.applyFilterClass+'">' +
+                                 '<a href="#'+id+'" class="'+myob.openAndCloseFilterFormClass+' button" data-rel="'+id+'">'+closeAndApplyFilterText+'</a>' +
+                                 '</div>' +
+                                 '</div>' +
+                                 '</form>';
+                var content = headerContent + tagContent + numberContent + checkContent + footerContent;
                 formHolder.html(content);
                 var i = 0;
                 var input;
@@ -876,13 +889,28 @@ jQuery(document).ready(
                 var currentPage = Math.floor(myob.showFromRow / myob.visibleRowCount);
                 //create html for pagination
                 var pageHTML = '';
-                var i = 0;
                 if(pageCount > 1) {
+                    var i = 0;
+                    var dotCount = 0;
+                    var startOfPaginator = currentPage - 2;
+                    var endOfPaginator = currentPage + 2;
                       for(i = 0; i < pageCount; i++ ) {
                         if(currentPage === i) {
+                            dotCount = 0;
                             pageHTML += '<span>['+(i+1)+']</span>';
                         } else {
-                            pageHTML += '<a href="#" data-page="'+i+'">'+(i+1)+'</a> ';
+                            test1 = (i > startOfPaginator && i < endOfPaginator);
+                            test2 = (i >= (pageCount - 3));
+                            test3 = (i < (0 + 3));
+                            if(test1 || test2 || test3) {
+                                dotCount = 0;
+                                pageHTML += '<a href="#" data-page="'+i+'">'+(i+1)+'</a> ';
+                            } else {
+                                if(dotCount < 3) {
+                                    dotCount++;
+                                    pageHTML += ' . ';
+                                }
+                            }
                          }
                          pageHTML += ' ';
                      }
@@ -1132,6 +1160,9 @@ jQuery(document).ready(
                     function(event){
                         event.preventDefault();
                         var myEl = jQuery(this);
+                        if(myEl.hasClass(myob.directLinkIgnoreClass)) {
+                            return;
+                        }
                         var category = myEl.attr('data-filter');
                         var filterValue = jQuery.trim(myEl.text());
                         var filterToTriger = myob.myTableHolder

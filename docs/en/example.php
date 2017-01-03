@@ -158,7 +158,7 @@ function create_test()
         'Zucchini'
     );
     $html = '';
-    for($i = 0; $i < 300; $i++) {
+    for($i = 0; $i < 3000; $i++) {
         $html .= '
         <tr class="tfsRow hide">
             <td><span data-filter="SKU">'.($i+1).'</span></td>
@@ -200,7 +200,9 @@ $html = create_test();
     </head>
     <body>
 
-        <h1>Example of a Filter and Sort Table ... </h1>
+        <header>
+            <h1>Example of a Filter and Sort Table ... </h1>
+        </header>
 
         <div class="tableFilterSortHolder">
             <div class="tableFilterSortFilterFormHolder"
@@ -208,6 +210,11 @@ $html = create_test();
                 data-title-clear-button="Clear"
                 data-title-close-and-apply="Apply Your Selection"
             ></div>
+            <p class="tableFilterSortMoreEntries paginationTop">
+                <span class="line">
+                    <strong>Select Page:</strong> <span class="pagination"></span>
+                </span>
+            </p>
             <p class="tableFilterSortMoreEntries">
                 <span class="line">
                     <strong>Filtered:</strong>
@@ -215,11 +222,7 @@ $html = create_test();
                     <span class="total-row-number">0</span>.
                 </span>
             </p>
-            <p class="tableFilterSortMoreEntries">
-                <span class="line">
-                    <strong>Select Page:</strong> <span class="pagination"></span>
-                </span>
-            </p>
+
             <div class="tableFilterSortCommonContentHolder" data-title="Common Info"></div>
             <table class="tableFilterSortTable">
                 <thead>

@@ -2,7 +2,12 @@
   font-family: sans-serif;
   font-size: 13px!important;
 }
-h1 {font-size: 20px!important; text-align: center;}
+
+h1 {
+  font-size: 20px!important;
+  text-align: center;
+}
+
 h3 {
   font-size: 17px!important;
   margin-bottom: 0;
@@ -53,9 +58,6 @@ ul li {
   list-style: none;
 }
 
-table td ul li:after {
-  content: ";";
-}
 
 .tableFilterSortFilterFormHolder {
   background-color: #ddd;
@@ -63,21 +65,22 @@ table td ul li:after {
   padding: 10px;
   position: relative;
   padding-bottom: 30px;
+  border: 3px solid #fff;
+  border-radius: 10px;
 }
 
-
-.tableFilterSortFilterFormHolder .filterColumn {
-  width: calc(20% - 2em);
+.tableFilterSortFilterFormHolder .filterColumn.checkboxFilter {
+  width: calc(20% - 2.3em);
   float: left;
   oveflow: auto;
   margin: 1em;
 }
 
 .tableFilterSortFilterFormHolder label.groupLabel {
-    font-weight: bold;
+  font-weight: bold;
 }
 
-.tableFilterSortFilterFormHolder .filterColumn:nth-child(5n+1) {
+.tableFilterSortFilterFormHolder .filterColumn.checkboxFilter:nth-child(5n+1) {
   clear: left;
 }
 
@@ -88,13 +91,37 @@ table td ul li:after {
   margin: 0;
 }
 
-.tableFilterSortFilterFormHolder .filterColumn ul li input.text {
-  width: 95%;
+.tableFilterSortFilterFormHolder .filterColumn.tagFilter {
+  margin: 1em;
+  width: 100%;
+  position: relative;
+}
+
+.tableFilterSortFilterFormHolder .filterColumn.tagFilter .awesomplete {
+  display: block;
+}
+
+.tableFilterSortFilterFormHolder .filterColumn.tagFilter .awesomplete > ul {
+  min-width: auto!important;
+}
+
+.tableFilterSortFilterFormHolder .filterColumn.tagFilter .awesomplete > ul li {
+  padding: 10px;
+}
+
+.tableFilterSortFilterFormHolder .filterColumn.tagFilter input {
+  width: 95%
 }
 
 .tableFilterSortFilterFormHolder .tableFilterSortCurrentSearchHolder {
-  width: 300px;
+  width: calc(100% - 17em);
   float: right;
+  text-align: right;
+  color: #555;
+}
+
+.tableFilterSortFilterFormHolder .tableFilterSortCurrentSearchHolder  h3 {
+  display: none;
 }
 
 .tableFilterSortFilterFormHolder .applyFilter {
@@ -113,6 +140,10 @@ table td ul li:after {
 
 .tableFilterSortCurrentSearchHolder ul li span:last-child:after {
   content: ""
+}
+
+.tableFilterSortMoreEntries {
+  padding: 13px;
 }
 
 .tableFilterSortCommonContentHolder {
@@ -182,6 +213,7 @@ tr.hide, tr.no-match {
   font-size: 20px;
   padding: 10px 20px 10px 20px;
   text-decoration: none;
+  font-weight: bold;
 }
 
 .button:hover {
@@ -194,8 +226,23 @@ tr.hide, tr.no-match {
   text-decoration: none;
 }
 
-.pagination span, .pagination a {
-  padding: 10px;
+.paginationTop {
+  width: calc(100% - 17em);
+  float: right;
+  text-align: right;
 }
 
-.line {display: block;}
+.paginationTop strong {
+  display: none;
+}
+
+.pagination span, .pagination a {
+  padding: 0 10px;
+  display: inline-block;
+}
+
+.line {
+  display: block;
+}
+
+span[data-filter] {text-decoration: underline;}
