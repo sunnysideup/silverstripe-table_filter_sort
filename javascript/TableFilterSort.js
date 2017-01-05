@@ -895,8 +895,10 @@ jQuery(document).ready(
                     var input;
                     for(i = 0; i < awesompleteFields.length; i++) {
                         category = awesompleteFields[i];
+                        console.debug(category);
                         var jQueryInput = myob.myFilterFormHolder.find('input[name="'+category+'"].awesomplete').first();
                         var id = jQuery(jQueryInput).attr('id');
+                        console.debug(id);
                         var input = document.getElementById(id);
                         new Awesomplete(
                             input,
@@ -965,7 +967,7 @@ jQuery(document).ready(
                                 extraClass = 'awesomplete';
                             }
                             return startString +
-                                    '<input class="text ' + extraClass + '" type="text" name="'+cleanCategory+'" id="'+valueID+'" tabindex="'+tabIndex+'" />' +
+                                    '<input class="text ' + extraClass + '" type="text" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" />' +
                                     endString;
                         case 'checkbox':
                             var checked = '';
