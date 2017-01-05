@@ -51,6 +51,12 @@ jQuery(document).ready(
             myTableHolder: myTableHolder,
 
             /**
+             * selector for the filter form
+             * @var jQuery Object
+             */
+            myFilterFormHolder: null,
+
+            /**
              * selector for the table
              * @var jQuery Object
              */
@@ -179,6 +185,18 @@ jQuery(document).ready(
              * @type string
              */
             currentFilterText: 'Current Filter',
+
+            /**
+             *
+             * @type string
+             */
+            greaterThanLabel: '&gt; ',
+
+            /**
+             *
+             * @type string
+             */
+            lowerThanLabel: '&lt; ',
 
             /**
              *
@@ -325,22 +343,7 @@ jQuery(document).ready(
             /**
              * @var string
              */
-            tagFilterClass: 'tagFilter',
-
-            /**
-             * @var string
-             */
-            dateFilterClass: 'dateFilter',
-
-            /**
-             * @var string
-             */
-            numberFilterClass: 'numberFilter',
-
-            /**
-             * @var string
-             */
-            checkboxFilterClass: 'checkboxFilter',
+            sectionFilterClassAppendix: 'Filter',
 
             /**
              * class for element that holds common content (that is the same in ALL rows)
@@ -688,110 +691,95 @@ jQuery(document).ready(
             createFilterForm: function() {
                 //create html content and add to top of page
                 var myob = TableFilterSort;
-                var formHolder = myob.myTableHolder.find(myob.filterFormHolderSelector).first();
-                var id = myob.makeID();
-                var filterFormTitle = formHolder.attr("data-title");
-                if(typeof filterFormTitle === "undefined") {
-                    filterFormTitle = myob.filterTitle;
-                }
-                var currentFilterHTML = '';
-                if(myob.myTableHolder.find('.' + myob.currentSearchFilterClass).length === 0) {
-                    currentFilterHTML = '<div class="'+myob.currentSearchFilterClass+'"></div>';
-                }
-                var tabIndex = 1;
-                var headerContent = '';
-                var tagContent = '';
-                var numberContent = '';
-                var checkContent = '';
-                var footerContent = '';
-                headerContent  = '<form>' +
-                                 currentFilterHTML +
-                                 '<a href="#'+id+'" class="'+myob.openAndCloseFilterFormClass+' button closed" data-rel="'+id+'">'+filterFormTitle+'</a>' +
-                                 '<div id="'+id+'" style="display: none;" class="'+myob.filterOptionsHolderClass+'">';
-                                 '<input class="keyword text" name="Keyword" placeholder="keyword(s)" tabindex="'+tabIndex+'" data-to-filter="*" />';
-                var awesompleteFields = [];
-                Object.keys(myob.dataDictionary).forEach(
-                    function(category, categoryIndex) {
-                        tabIndex++;
-                        var cleanValue = '';
-                        var cleanedValues = [];
-                        var valueID = '';
-                        var count = 0;
-                        var optionCount = myob.dataDictionary[category]['Options'].length;
-                        var cleanCategory = category.replace(/\W/g, '');
-                        var categoryID = cleanCategory+"_TFC";
-                        if(optionCount > 1 && optionCount <= myob.maximumNumberOfFilterOptions) {
-                            checkContent += '<div id="' + categoryID + '" class="'+myob.filterGroupClass+' '+myob.checkboxFilterClass+'" data-to-filter="'+category.raw2attr()+'">' +
-                                            '<label class="'+myob.groupLabelClass+'">' + category.split('-').join(' ') + '</label>' +
-                                            '<ul>';
-                            count = 0;
-                            for(count = 0; count < optionCount; count++) {
-                                var value = myob.dataDictionary[category]['Options'][count];
-                                valueID = cleanCategory + "_TFS_" + count;
-                                checkContent += '<li class="checkbox">' +
-                                                '<input class="checkbox" type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + value.raw2attr() + '" tabindex="'+tabIndex+'" />' +
-                                                '<label for="' + valueID + '">' + value + '</label>' +
-                                                '</li>';
-                            }
-                            checkContent += '</ul>' +
-                                            '</div>';
-                        }
-                        else if (
-                            optionCount > myob.maximumNumberOfFilterOptions &&
-                            myob.dataDictionary[category]['DataType'] === 'string'
-                        ) {
-                            valueID = cleanCategory+"_TFC_0";
-                            tagContent += '<div id="' + categoryID + '"  class="'+myob.filterGroupClass+' '+myob.tagFilterClass+'"  data-to-filter="'+category.raw2attr()+'">' +
-                                          '<label class="'+myob.groupLabelClass+'">' + category.split('-').join(' ') + '</label>' +
-                                          '<ul>';
-                            tagContent += '<li>' +
-                                          '<input class="text" type="text" name="' + valueID + '" id="' + valueID + '" class="awesomplete" />' +
-                                          '</li>' +
-                                          '</ul>' +
-                                          '</div>';
-                            awesompleteFields.push([category, valueID]);
-                        }
-                        else if (
-                            optionCount > myob.maximumNumberOfFilterOptions &&
-                            myob.dataDictionary[category]['DataType'] === 'number'
-                        ) {
-                            //to be completed
-                        }
+                myob.myFilterFormHolder = myob.myTableHolder.find(myob.filterFormHolderSelector).first();
+                if(myob.myFilterFormHolder.length) {
+                    var filterFormTitle = myob.myFilterFormHolder.attr("data-title");
+                    if(typeof filterFormTitle === "undefined") {
+                        filterFormTitle = myob.filterTitle;
                     }
-                );
-                var closeAndApplyFilterText = formHolder.attr("data-title-close-and-apply");
-                if(typeof closeAndApplyFilterText === "undefined") {
-                    closeAndApplyFilterText = myob.closeAndApplyFilterText;
-                }
-                footerContent += '' +
-                                 '<div class="'+myob.applyFilterClass+'">' +
-                                 '<a href="#'+id+'" class="'+myob.openAndCloseFilterFormClass+' button" data-rel="'+id+'">'+closeAndApplyFilterText+'</a>' +
-                                 '</div>' +
-                                 '</div>' +
-                                 '</form>';
-                var content = headerContent + tagContent + numberContent + checkContent + footerContent;
-                formHolder.html(content);
-                var i = 0;
-                var input;
-                for(i = 0; i < awesompleteFields.length; i++) {
-                    category = awesompleteFields[i][0];
-                    valueID = awesompleteFields[i][1];
-                    input = document.getElementById(valueID);
-                    new Awesomplete(
-                        input,
-                        {
-                            list: myob.dataDictionary[category]['Options'],
-                            autoFirst: true,
-                            filter: function(text, input) {
-                                return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
-                            },
-
-                            replace: function(text) {
-                                var before = this.input.value.match(/^.+,\s*|/)[0];
-                                this.input.value = before + text + ', ';
+                    if(myob.myTableHolder.find('.' + myob.currentSearchFilterClass).length === 0) {
+                        var currentFilterHTML = '<div class="'+myob.currentSearchFilterClass+'"></div>';
+                    }
+                    var tabIndex = 1;
+                    var awesompleteFields = [];
+                    var formID = myob.makeID();
+                    var content  = '<form id="' + formID + '">' +
+                                     currentFilterHTML +
+                                     '<a href="#" class="'+myob.openAndCloseFilterFormClass+' button closed">'+filterFormTitle+'</a>' +
+                                     '<div style="display: none;" class="'+myob.filterOptionsHolderClass+'">';
+                    var category = 'Keywords';
+                    content += myob.makeSectionHeaderForForm(
+                        'keyword',
+                        category
+                    );
+                    content += myob.makeFieldForForm('keyword', category, tabIndex, 0);
+                    content += myob.makeSectionFooterForForm();
+                    Object.keys(myob.dataDictionary).forEach(
+                        function(category, categoryIndex) {
+                            tabIndex++;
+                            var cleanValue = '';
+                            var cleanedValues = [];
+                            var count = 0;
+                            var optionCount = myob.dataDictionary[category]['Options'].length;
+                            if(optionCount > 1 && optionCount <= myob.maximumNumberOfFilterOptions) {
+                                content += myob.makeSectionHeaderForForm(
+                                    'checkbox',
+                                    category
+                                );
+                                count = 0;
+                                for(count = 0; count < optionCount; count++) {
+                                    var valueIndex = myob.dataDictionary[category]['Options'][count];
+                                    content += myob.makeFieldForForm('checkbox', category, tabIndex, valueIndex);
+                                }
+                                content += myob.makeSectionFooterForForm();
+                            }
+                            else if(optionCount > myob.maximumNumberOfFilterOptions) {
+                                var type = myob.dataDictionary[category]['DataType'];
+                                if(myob.dataDictionary[category]['DataType'] === 'string') {
+                                    awesompleteFields.push(category);
+                                    type = 'tag';
+                                }
+                                content += myob.makeSectionHeaderForForm(type, category);
+                                content += myob.makeFieldForForm(type, category, tabIndex, 0);
+                                content += myob.makeSectionFooterForForm();
                             }
                         }
                     );
+                    var closeAndApplyFilterText = myob.myFilterFormHolder.attr("data-title-close-and-apply");
+                    if(typeof closeAndApplyFilterText === "undefined") {
+                        closeAndApplyFilterText = myob.closeAndApplyFilterText;
+                    }
+                    content += '' +
+                                     '<div class="'+myob.applyFilterClass+'">' +
+                                     '<a href="#'+id+'" class="'+myob.openAndCloseFilterFormClass+' button" data-rel="'+id+'">'+closeAndApplyFilterText+'</a>' +
+                                     '</div>' +
+                                     '</div>' +
+                                     '</form>';
+                    myob.myFilterFormHolder.html(content);
+                    var i = 0;
+                    var input;
+                    for(i = 0; i < awesompleteFields.length; i++) {
+                        category = awesompleteFields[i];
+                        var jQueryInput = myob.myTableHolder.find('input[name="'+category+'"].awesomplete').first();
+                        var id = jQuery(jQueryInput).attr('id');
+                        var input = document.getElementById(id);
+                        new Awesomplete(
+                            input,
+                            {
+                                list: myob.dataDictionary[category]['Options'],
+                                autoFirst: true,
+                                filter: function(text, input) {
+                                    console.debug(id);
+                                    return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
+                                },
+
+                                replace: function(text) {
+                                    var before = this.input.value.match(/^.+,\s*|/)[0];
+                                    this.input.value = before + text + ', ';
+                                }
+                            }
+                        );
+                    }
                 }
             },
 
@@ -938,7 +926,6 @@ jQuery(document).ready(
              */
             setupFilterListeners: function() {
                 var myob = TableFilterSort;
-                var formHolder = myob.myTableHolder.find(myob.filterFormHolderSelector);
                 myob.myTableHolder.on(
                     'click',
                     '.' + myob.openAndCloseFilterFormClass,
@@ -1179,8 +1166,7 @@ jQuery(document).ready(
                                 }
                             }
                         } else  {
-                            filterToTriger = myob.myTableHolder
-                                .find(myob.filterFormHolderSelector)
+                            filterToTriger = myob.myFilterFormHolder
                                 .find('div[data-to-filter="'+ category + '"] input')
                                 .first();
                             filterToTriger.val(filterValue);
@@ -1202,50 +1188,82 @@ jQuery(document).ready(
                 var filterValueArray = [];
                 //reset
                 myob.currentFilter = {};
-                myob.myTableHolder
-                    .find('.'+myob.filterOptionsHolderClass+ ' .' + myob.filterGroupClass)
+                myob.myFilterFormHolder
+                    .find(' .' + myob.filterGroupClass)
                     .each(
                         function(i, el){
                             categoryHolder = jQuery(el);
                             category = categoryHolder.attr('data-to-filter');
-                            type = myob.dataDictionary[category]['DataType'];
+                            if(category === 'Keywords') {
+                                type = 'keyword';
+                            } else {
+                                type = myob.dataDictionary[category]['DataType'];
+                            }
                             var inputVals = [];
                             categoryHolder.find('input').each(
                                 function(i, input) {
                                     input = jQuery(input);
                                     var inputVal = input.val();
                                     var valueToMatch = inputVal.toLowerCase();
-                                    if(categoryHolder.hasClass(myob.tagFilterClass)) {
-                                        if(valueToMatch.length > 1) {
-                                            if(typeof myob.currentFilter[category] === "undefined") {
-                                                if(myob.debug) {console.log("adding "+category);}
-                                                myob.currentFilter[category] = {};
-                                            }
-                                            var filterValueArray = valueToMatch.split(",");
-                                            var i = 0;
-                                            var len = filterValueArray.length;
-                                            var tempVal = '';
-                                            for(i = 0; i < len; i++) {
-                                                innerInputVal = filterValueArray[i].trim();
-                                                innerValueToMatch = innerInputVal;
-                                                if(innerValueToMatch.length > 1) {
-                                                    myob.currentFilter[category][innerValueToMatch] = innerInputVal;
-                                                    inputVals.push(innerInputVal);
-                                                    if(myob.debug) {console.log("... adding '"+innerValueToMatch+"' to '"+category+"'");}
+                                    switch(categoryHolder.attr('data-type')) {
+                                        case 'tag':
+                                            if(valueToMatch.length > 1) {
+                                                if(typeof myob.currentFilter[category] === "undefined") {
+                                                    if(myob.debug) {console.log("adding "+category);}
+                                                    myob.currentFilter[category] = {};
+                                                }
+                                                if(type === 'keyword') {
+                                                    var filterValueArray = valueToMatch.split(" ");
+                                                } else {
+                                                    var filterValueArray = valueToMatch.split(",");
+                                                }
+                                                var i = 0;
+                                                var len = filterValueArray.length;
+                                                var tempVal = '';
+                                                for(i = 0; i < len; i++) {
+                                                    innerInputVal = filterValueArray[i].trim();
+                                                    innerValueToMatch = innerInputVal;
+                                                    if(innerValueToMatch.length > 1) {
+                                                        myob.currentFilter[category][innerValueToMatch] = innerInputVal;
+                                                        inputVals.push(innerInputVal);
+                                                        if(myob.debug) {console.log("... adding '"+innerValueToMatch+"' to '"+category+"'");}
+                                                    }
                                                 }
                                             }
-                                        }
-                                    }
-                                    else if(categoryHolder.hasClass(myob.checkboxFilterClass)) {
-                                        if(input.is(":checked")){
-                                            if(typeof myob.currentFilter[category] === "undefined") {
-                                                if(myob.debug) {console.log("adding "+category);}
-                                                myob.currentFilter[category] = {};
+                                            break;
+                                        case 'checkbox':
+                                            if(input.is(":checked")){
+                                                if(typeof myob.currentFilter[category] === "undefined") {
+                                                    if(myob.debug) {console.log("adding "+category);}
+                                                    myob.currentFilter[category] = {};
+                                                }
+                                                myob.currentFilter[category][valueToMatch] = inputVal;
+                                                inputVals.push(inputVal);
+                                                if(myob.debug) {console.log("... adding '"+category+"' to '"+valueToMatch+"'");}
                                             }
-                                            myob.currentFilter[category][valueToMatch] = inputVal;
-                                            inputVals.push(inputVal);
-                                            if(myob.debug) {console.log("... adding '"+category+"' to '"+valueToMatch+"'");}
-                                        }
+                                            break;
+                                        case 'number':
+                                            var val = parseFloat(input.val());
+                                            if(val !== 0) {
+                                                if(typeof myob.currentFilter[category] === "undefined") {
+                                                    if(myob.debug) {console.log("adding "+category);}
+                                                    myob.currentFilter[category] = {};
+                                                }
+                                                inputVals.push(val);
+                                                myob.currentFilter[category][input.attr('data-dir')] = val;
+                                            }
+                                            break;
+                                        case 'date':
+                                            var val = input.val().trim();
+                                            if(val !== '0' && val !== '') {
+                                                if(typeof myob.currentFilter[category] === "undefined") {
+                                                    if(myob.debug) {console.log("adding "+category);}
+                                                    myob.currentFilter[category] = {};
+                                                }
+                                                inputVals.push(val);
+                                                myob.currentFilter[category][input.attr('data-dir')] = val;
+                                            }
+                                            break;
                                     }
                                 }
                             );
@@ -1311,6 +1329,103 @@ jQuery(document).ready(
                 }
             },
 
+            makeSectionHeaderForForm: function(type, category)
+            {
+                var myob = TableFilterSort;
+                var myClass = type + myob.sectionFilterClassAppendix;
+                var cleanCategory = category.replace(/\W/g, '');
+                var categoryID = cleanCategory + "_0";
+                var myob = TableFilterSort;
+                return '<div id="' + categoryID + '" class="' + myob.filterGroupClass + ' ' + myClass + '" data-type="'+type+'" data-to-filter="' + category.raw2attr() + '">' +
+                        '<label class="'+myob.groupLabelClass+'">' + myob.replaceAll(category, '-', ' ') + '</label>' +
+                        '<ul>';
+            },
+
+            makeFieldForForm: function(type, category, tabIndex, valueIndex)
+            {
+                var myob = TableFilterSort;
+                var cleanCategory = category.replace(/\W/g, '');
+                var cleanValue = valueIndex.toString().replace(/[^a-zA-Z0-9]+/g, '');
+                var valueID = cleanCategory + '_' + cleanValue;
+                if(myob.myFilterFormHolder.find('input#'+valueID).length === 0){
+                    var startString = '<li class="' + type + 'Field">';
+                    var endString = '</li>';
+                    switch (type) {
+                        case 'keyword':
+                        case 'tag':
+                            var currentValueForForm = '';
+                            if(typeof myob.currentFilter[category] !== 'undefined') {
+                                if(typeof myob.currentFilter[category][0] !== 'undefined') {
+                                    currentValueForForm = myob.currentFilter[category][0];
+                                    currentValueForForm = currentValueForForm.raw2attr();
+                                }
+                            }
+                            if(type === 'keyword') {
+                                extraClass = 'keyword';
+                            } else if(type === 'tag') {
+                                extraClass = 'awesomplete';
+                            }
+                            return startString +
+                                    '<input class="text ' + extraClass + '" type="text" name="'+cleanCategory+'" id="'+valueID+'" tabindex="'+tabIndex+'" value="'+currentValueForForm+'" />' +
+                                    endString;
+                        case 'checkbox':
+                            var checked = '';
+                            if(typeof myob.currentFilter[category] !== 'undefined') {
+                                var arrayIndex = jQuery.inArray(valueIndex, myob.currentFilter[category]);
+                                if(arrayIndex > -1) {
+                                    checked = 'checked="checked"';
+                                }
+                            }
+                            return startString +
+                                    '<input class="checkbox" type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + valueIndex.raw2attr() + ' ' + checked + ' " tabindex="'+tabIndex+'" />' +
+                                    '<label for="' + valueID + '">' + valueIndex + '</label>' +
+                                    endString;
+
+                        case 'number':
+                        case 'date':
+                            var currentValueForForm = ['', ''];
+                            if(typeof myob.currentFilter[category] !== 'undefined') {
+                                currentValueForForm = myob.currentFilter[category];
+                            }
+                            var s = startString +
+                                    '<span class="gt">' +
+                                    '<label for="' + valueID + '_gt">' + myob.greaterThanLabel + '</label>' +
+                                    '<input data-dir="gt" class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '" class="awesomplete" tabindex="'+tabIndex+'" value="'+currentValueForForm[0].raw2attr()+'" />' +
+                                    '</span><span class="lt">' +
+                                    '<label for="' + valueID + '_lt">' + myob.lowerThanLabel + '</label>' +
+                                    '<input dat-dir="lt" class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '_lt" class="awesomplete" tabindex="'+tabIndex+'" value="'+currentValueForForm[1].raw2attr()+'" />' +
+                                    '</span>' +
+                                    endString;
+                            if(type === 'date') {
+                                s = myob.replaceAll(s, 'number', 'datetime-local');
+                                s = myob.replaceAll(s, 'step', '86400');
+                            }
+                            return s;
+
+                    }
+                }
+
+            },
+
+            makeSectionFooterForForm: function()
+            {
+                return '</ul></div>';
+            },
+
+            makeCheckboxSection: function(input, valueIndex)
+            {
+                input = jQuery(input);
+                var category = input.attr('name');
+                tabIndex = -1;
+                var html = myob.makeFieldForForm('checkbox', category, tabIndex, valueIndex)
+                input.closest('ul').append(html);
+            },
+
+            replaceAll: function(string, search, replacement) {
+                string.split(search).join(replacement);
+                return string;
+            },
+
             /**
              *
              * @param object object
@@ -1361,7 +1476,7 @@ jQuery(document).ready(
              * returns random string
              * @return string
              */
-            makeID:function() {
+            makeID: function() {
                 var text = "";
                 var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
                 for( var i=0; i < 9; i++ ) {
@@ -1369,6 +1484,7 @@ jQuery(document).ready(
                 }
                 return text;
             },
+
 
             /**
              * array sorter function ...

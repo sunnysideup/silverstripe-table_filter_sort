@@ -158,6 +158,7 @@ function create_test()
         'Zucchini'
     );
     $html = '';
+    $limit = isset($_GET['i']) ? $_GET['i'] : 300;
     for($i = 0; $i < 3000; $i++) {
         $html .= '
         <tr class="tfsRow hide">
@@ -166,7 +167,7 @@ function create_test()
             <td><span data-filter="Original Producer">'.$producer.'</span></td>
             <td><span data-filter="Colour">'.$colours[rand(0, 6)].'</span></td>
             <td><span data-filter="Size">'.$sizes[rand(0,4)].'</span></td>
-            <td><span data-filter="Weight">'.rand(1,20).'kg.</span></td>
+            <td><span data-filter="Weight">'.rand(1,100).'kg.</span></td>
             <td><span data-filter="Price">$'.(rand(0,99999)/100).'</span></td>
             <td><span data-filter="Rating">'.rand(1,5).' Stars</span></td>
             <td>
