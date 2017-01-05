@@ -58,29 +58,40 @@ ul li {
   list-style: none;
 }
 
+.tableFilterSortFilterFormHolder:before,
+.tableFilterSortFilterFormHolder:after {
+    content: ".";
+    display: block;
+    height: 0;
+    overflow: hidden;
+}
+.tableFilterSortFilterFormHolder:after { clear: both; }
+.tableFilterSortFilterFormHolder { zoom: 1; } /* IE < 8 */
 
 .tableFilterSortFilterFormHolder {
   background-color: #ddd;
-  overflow: hidden;
   padding: 10px;
   position: relative;
-  padding-bottom: 30px;
   border: 3px solid #fff;
   border-radius: 10px;
+  border: 1px solid #ccc;
 }
 
-.tableFilterSortFilterFormHolder .filterColumn.checkboxFilter {
-  width: calc(20% - 2.3em);
-  float: left;
-  oveflow: auto;
-  margin: 1em;
+.tableFilterSortFilterFormHolder .filterColumn {
+    width: calc(20% - 2.3em - 10px);
+    float: left;
+    oveflow: auto;
+    margin: 1em;
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    padding: 10px 0 0 10px;
 }
 
 .tableFilterSortFilterFormHolder label.groupLabel {
   font-weight: bold;
 }
 
-.tableFilterSortFilterFormHolder .filterColumn.checkboxFilter:nth-child(5n+1) {
+.tableFilterSortFilterFormHolder .filterColumn:nth-child(5n+1) {
   clear: left;
 }
 
@@ -89,12 +100,6 @@ ul li {
   list-style: none;
   padding: 0;
   margin: 0;
-}
-
-.tableFilterSortFilterFormHolder .filterColumn.tagFilter {
-  margin: 1em;
-  width: 100%;
-  position: relative;
 }
 
 .tableFilterSortFilterFormHolder .filterColumn.tagFilter .awesomplete {
@@ -109,8 +114,12 @@ ul li {
   padding: 10px;
 }
 
-.tableFilterSortFilterFormHolder .filterColumn.tagFilter input {
+.tableFilterSortFilterFormHolder .filterColumn.tagFilter input.tag {
   width: 95%
+}
+
+.tableFilterSortFilterFormHolder .filterColumn.numberFilter input {
+  width: 5em;
 }
 
 .tableFilterSortFilterFormHolder .tableFilterSortCurrentSearchHolder {
@@ -125,7 +134,7 @@ ul li {
 }
 
 .tableFilterSortFilterFormHolder .applyFilter {
-  position: absolute;
+    clear: left;
   bottom: 10px;
   right: 10px;
 }
@@ -245,4 +254,4 @@ tr.hide, tr.no-match {
   display: block;
 }
 
-span[data-filter] {text-decoration: underline;}
+span[data-filter].dl {text-decoration: underline;}

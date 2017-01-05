@@ -220,7 +220,7 @@ jQuery(document).ready(
              *
              * @var string
              */
-            directLinkIgnoreClass: 'ignore',
+            directLinkClass: 'dl',
 
             /**
              * items that can be filtered / sorted for ...
@@ -657,8 +657,8 @@ jQuery(document).ready(
                             case 'number':
                                 myob.dataDictionary[category]['Options'].sort(
                                     function(a,b){
-                                        a = parseFloat(a.replace(/\D/g,''));
-                                        b = parseFloat(b.replace(/\D/g,''));
+                                        a = parseFloat(a.replace(/[^0-9.]/g,''));
+                                        b = parseFloat(b.replace(/[^0-9.]/g,''));
                                         return a - b
                                     }
                                 );
@@ -895,7 +895,7 @@ jQuery(document).ready(
                     var input;
                     for(i = 0; i < awesompleteFields.length; i++) {
                         category = awesompleteFields[i];
-                        var jQueryInput = myob.myTableHolder.find('input[name="'+category+'"].awesomplete').first();
+                        var jQueryInput = myob.myFilterFormHolder.find('input[name="'+category+'"].awesomplete').first();
                         var id = jQuery(jQueryInput).attr('id');
                         var input = document.getElementById(id);
                         new Awesomplete(
@@ -903,17 +903,27 @@ jQuery(document).ready(
                             {
                                 list: myob.dataDictionary[category]['Options'],
                                 autoFirst: true,
-                                filter: function(text, input) {
-                                    console.debug(id);
-                                    return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
-                                },
-
+                                // filter: function(text, input) {
+                                //     return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
+                                // },
                                 replace: function(text) {
-                                    var before = this.input.value.match(/^.+,\s*|/)[0];
-                                    this.input.value = before + text + ', ';
+                                    // var before = this.input.value.match(/^.+,\s*|/)[0];
+                                    // this.input.value = before + text + ', ';
+                                    myob.makeCheckboxSection(this.input, text.value);
+                                    this.input.value = '';
+                                    var index = this._list.indexOf(text.value);
+                                    if (index > -1) {
+                                        this._list.splice(index, 1);
+                                    }
                                 }
                             }
                         );
+                        // jQueryInput.on(
+                        //     'awesomplete-selectcomplete',
+                        //     function() {
+                        //         //myob.makeCheckboxSection(this, jQuery(this).val());
+                        //     }
+                        // )
                     }
                 }
             },
@@ -924,9 +934,8 @@ jQuery(document).ready(
                 var myob = TableFilterSort;
                 var myClass = type + myob.sectionFilterClassAppendix;
                 var cleanCategory = category.replace(/\W/g, '');
-                var categoryID = cleanCategory + "_0";
                 var myob = TableFilterSort;
-                return '<div id="' + categoryID + '" class="' + myob.filterGroupClass + ' ' + myClass + '" field-type="'+type+'" data-to-filter="' + category.raw2attr() + '">' +
+                return '<div class="' + myob.filterGroupClass + ' ' + myClass + '" field-type="'+type+'" data-to-filter="' + category.raw2attr() + '">' +
                         '<label class="'+myob.groupLabelClass+'">' + myob.replaceAll(category, '-', ' ') + '</label>' +
                         '<ul>';
             },
@@ -935,8 +944,8 @@ jQuery(document).ready(
             {
                 var myob = TableFilterSort;
                 var cleanCategory = category.replace(/\W/g, '');
-                var cleanValue = valueIndex.toString().replace(/[^a-zA-Z0-9]+/g, '');
-                var valueID = cleanCategory + '_' + cleanValue;
+                var cleanValue = valueIndex.toString();
+                var valueID = ('TFS_' + cleanCategory + '_' + cleanValue).replace(/[^a-zA-Z0-9]+/g, '');
                 if(myob.myFilterFormHolder.find('input#'+valueID).length === 0){
                     var startString = '<li class="' + type + 'Field">';
                     var endString = '</li>';
@@ -956,7 +965,7 @@ jQuery(document).ready(
                                 extraClass = 'awesomplete';
                             }
                             return startString +
-                                    '<input class="text ' + extraClass + '" type="text" name="'+cleanCategory+'" id="'+valueID+'" tabindex="'+tabIndex+'" value="'+currentValueForForm+'" />' +
+                                    '<input class="text ' + extraClass + '" type="text" name="'+cleanCategory+'" id="'+valueID+'" tabindex="'+tabIndex+'" />' +
                                     endString;
                         case 'checkbox':
                             var checked = '';
@@ -979,12 +988,12 @@ jQuery(document).ready(
                             }
                             var s = startString +
                                     '<span class="gt">' +
-                                    '<label for="' + valueID + '_gt">' + myob.greaterThanLabel + '</label>' +
-                                    '<input data-dir="gt" data-label="' + myob.greaterThanLabel.raw2attr() + '" class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '" class="awesomplete" tabindex="'+tabIndex+'" value="'+currentValueForForm[0].raw2attr()+'" />' +
-                                    '</span><span class="lt">' +
-                                    '<label for="' + valueID + '_lt">' + myob.lowerThanLabel + '</label>' +
-                                    '<input dat-dir="lt" data-label="' + myob.lowerThanLabel.raw2attr() + '"  class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '_lt" class="awesomplete" tabindex="'+tabIndex+'" value="'+currentValueForForm[1].raw2attr()+'" />' +
-                                    '</span>' +
+                                    ' <label for="' + valueID + '_gt">' + myob.greaterThanLabel + '</label>' +
+                                    ' <input data-dir="gt" data-label="' + myob.greaterThanLabel.raw2attr() + '" class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '" tabindex="'+tabIndex+'" value="'+currentValueForForm[0].raw2attr()+'" />' +
+                                    ' </span><span class="lt">' +
+                                    ' <label for="' + valueID + '_lt">' + myob.lowerThanLabel + '</label>' +
+                                    ' <input data-dir="lt" data-label="' + myob.lowerThanLabel.raw2attr() + '"  class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '_lt" tabindex="'+tabIndex+'" value="'+currentValueForForm[1].raw2attr()+'" />' +
+                                    ' </span>' +
                                     endString;
                             if(type === 'date') {
                                 s = myob.replaceAll(s, 'number', 'datetime-local');
@@ -1004,11 +1013,16 @@ jQuery(document).ready(
 
             makeCheckboxSection: function(input, valueIndex)
             {
+                var myob = TableFilterSort;
                 input = jQuery(input);
                 var category = input.attr('name');
-                tabIndex = -1;
-                var html = myob.makeFieldForForm('checkbox', category, tabIndex, valueIndex)
-                input.closest('ul').append(html);
+                tabIndex = input.attr('tabindex');
+                var html = myob.makeFieldForForm('checkbox', category, tabIndex, valueIndex);
+                if(html.length > 5) {
+                    html = html.replace('<input ', '<input checked="checked" ');
+                    input.closest('ul').append(html);
+                }
+
             },
 
             /**
@@ -1020,19 +1034,23 @@ jQuery(document).ready(
                 var myob = TableFilterSort;
                 myob.myTableBody.on(
                     'click',
-                    'span[data-filter]',
+                    'span[data-filter].' + myob.directLinkClass,
                     function(event){
                         event.preventDefault();
                         var myEl = jQuery(this);
-                        if(myEl.hasClass(myob.directLinkIgnoreClass)) {
-                            return;
-                        }
                         var category = myEl.attr('data-filter');
-                        var filterValue = jQuery.trim(myEl.text());
-                        var filterToTriger = myob.myTableHolder
-                            .find(myob.filterFormHolderSelector)
-                            .find('div[data-to-filter="'+ category + '"] input[value="'+ filterValue + '"]')
+                        var filterValue = myEl.text().toLowerCase().trim();
+                        var filterHolder = myob.myFilterFormHolder
+                            .find('.'+myob.filterGroupClass+'[data-to-filter="'+category+'"]');
+                        var fieldType = filterHolder.attr('field-type');
+                        var filterToTriger = filterHolder
+                            .find('input[value="'+ filterValue + '"].checkbox')
                             .first();
+                        console.debug(myEl);
+                        console.debug(category);
+                        console.debug(filterValue);
+                        console.debug(filterHolder);
+                        console.debug(filterToTriger);
                         if(filterToTriger && filterToTriger.length > 0) {
                             if(filterToTriger.is(':checkbox')){
                                 if(filterToTriger.prop('checked') === true){
@@ -1042,11 +1060,11 @@ jQuery(document).ready(
                                     filterToTriger.prop('checked', true).trigger('change');
                                 }
                             }
-                        } else  {
-                            filterToTriger = myob.myFilterFormHolder
-                                .find('div[data-to-filter="'+ category + '"] input')
-                                .first();
-                            filterToTriger.val(filterValue);
+                        } else if(fieldType === 'tag')  {
+                            myob.makeCheckboxSection(
+                                filterHolder.find('input.awesomplete').first(),
+                                filterValue
+                            );
                         }
                         myob.applyFilter();
                         return false;
@@ -1083,9 +1101,7 @@ jQuery(document).ready(
                 var myob = TableFilterSort;
                 myob.showFromRow = 0;
                 myob.workOutCurrentFilter();
-                console.debug(myob.currentFilter);
                 myob.startRowManipulation();
-                console.debug(myob.currentFilter);
                 window.setTimeout(
                     function() {
                         if(myob.debug) {console.debug("==============");console.debug(myob.currentFilter);}
@@ -1118,7 +1134,7 @@ jQuery(document).ready(
                                                         var matches = true;
                                                         for(var i = 0; i < keywords.length; i++) {
                                                             var keyword = keywords[i].trim();
-                                                            if(text.indexOf(keyword) === -1) {
+                                                            if(rowText.indexOf(keyword) === -1) {
                                                                 matches = false;
                                                                 break;
                                                             }
@@ -1136,12 +1152,10 @@ jQuery(document).ready(
                                                                         //to do ....
                                                                         break;
                                                                     case 'number':
-                                                                        rowValue = parseFloat(rowValue.replace(/\D/g,''));
-                                                                        console.debug('rowValue: '+rowValue);
+                                                                        rowValue = parseFloat(rowValue.replace(/[^0-9.]/g,''));
                                                                         var lt = searchObject['lt'];
                                                                         var match = true;
                                                                         if(jQuery.isNumeric(lt) && lt !== 0) {
-                                                                            console.debug('lt: '+lt);
                                                                             if(lt < rowValue) {
                                                                                 match = false;
                                                                             }
@@ -1149,7 +1163,6 @@ jQuery(document).ready(
                                                                         if(match) {
                                                                             var gt = searchObject['gt'];
                                                                             if(jQuery.isNumeric(gt) && gt !== 0) {
-                                                                                console.debug('gt: '+gt);
                                                                                 if(gt > rowValue) {
                                                                                     match = false;
                                                                                 }
@@ -1423,11 +1436,10 @@ jQuery(document).ready(
                                     var valueToMatch = inputVal.toLowerCase().trim();
                                     switch(fieldType) {
                                         case 'keyword':
-                                        case 'tag':
                                             if(valueToMatch.length > 1) {
                                                 if(typeof myob.currentFilter[category] === "undefined") {
                                                     if(myob.debug) {console.log("adding "+category);}
-                                                    myob.currentFilter[category] = {};
+                                                    myob.currentFilter[category] = [];
                                                 }
                                                 if(type === 'keyword') {
                                                     myob.currentFilter[category].push({valueToMatch: valueToMatch, inputVal: inputVal});
@@ -1449,6 +1461,7 @@ jQuery(document).ready(
                                                 }
                                             }
                                             break;
+                                        case 'tag':
                                         case 'checkbox':
                                             if(input.is(":checked")){
                                                 if(typeof myob.currentFilter[category] === "undefined") {
