@@ -84,11 +84,12 @@ ul li {
     margin: 1em;
     border-left: 1px solid #ccc;
     border-top: 1px solid #ccc;
-    padding: 10px 0 0 10px;
+    padding: 0 0 0 10px;
 }
 
 .tableFilterSortFilterFormHolder label.groupLabel {
   font-weight: bold;
+  padding-bottom: 10px;
 }
 
 .tableFilterSortFilterFormHolder .filterColumn:nth-child(5n+1) {
@@ -135,8 +136,9 @@ ul li {
 
 .tableFilterSortFilterFormHolder .applyFilter {
     clear: left;
-  bottom: 10px;
-  right: 10px;
+    width: 100%;
+    padding-top: 40px;
+    margin-top: 40px;
 }
 
 .tableFilterSortCurrentSearchHolder ul li span {
