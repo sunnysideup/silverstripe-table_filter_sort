@@ -159,7 +159,7 @@ function create_test()
     );
     $html = '';
     $limit = isset($_GET['i']) ? $_GET['i'] : 300;
-    for($i = 0; $i < 3000; $i++) {
+    for($i = 0; $i < $limit; $i++) {
         $html .= '
         <tr class="tfsRow hide">
             <td><span data-filter="SKU">'.($i+1).'</span></td>
@@ -203,6 +203,9 @@ $html = create_test();
 
         <header>
             <h1>Example of a Filter and Sort Table ... </h1>
+            <p style="text-align: center;">
+                You can set the number of rows by adding a GET veriable <strong>i</strong> to the current URL. (e.g. ...example.php?i=500).
+            </p>
         </header>
 
         <div class="tableFilterSortHolder">
@@ -216,7 +219,7 @@ $html = create_test();
                     <strong>Select Page:</strong> <span class="pagination"></span>
                 </span>
             </p>
-            <p class="tableFilterSortMoreEntries">
+            <p class="tableFilterSortMoreEntriesAlwaysShow">
                 <span class="line">
                     <strong>Filtered:</strong>
                     <span class="match-row-number">0</span> /

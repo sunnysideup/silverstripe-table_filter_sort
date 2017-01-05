@@ -142,7 +142,7 @@ ul li {
   content: ""
 }
 
-.tableFilterSortMoreEntries {
+.tableFilterSortMoreEntries, .tableFilterSortMoreEntriesAlwaysShow {
   padding: 13px;
 }
 
