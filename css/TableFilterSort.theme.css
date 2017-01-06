@@ -115,7 +115,7 @@ ul li {
   padding: 5px;
   background: #ccc;
   border: 1px solid #fff;
-  margin: 5px 0;
+  margin: 0 0 5px 0;
   border-radius: 5px;
   width: calc(100% - 10px);
   outline: none;
