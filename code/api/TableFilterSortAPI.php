@@ -20,13 +20,18 @@ class TableFilterSortAPI extends Object
             ',
             'table_filter_sort'
         );
+        if(Director::isDev()) {
+            $min = '';
+        } else {
+            $min = '.min';
+        }
         // Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
-        Requirements::javascript('table_filter_sort/javascript/awesomplete.min.js');
-        Requirements::javascript('table_filter_sort/javascript/TableFilterSort.min.js');
-        Requirements::themedCSS('awesomplete.min', 'table_filter_sort');
-        Requirements::themedCSS('awesomplete.theme.min', 'table_filter_sort');
-        Requirements::themedCSS('TableFilterSort.min', 'table_filter_sort');
-        Requirements::themedCSS('TableFilterSort.theme.min', 'table_filter_sort');
+        Requirements::javascript('table_filter_sort/javascript/awesomplete'.$min.'.js');
+        Requirements::javascript('table_filter_sort/javascript/TableFilterSort'.$min.'.js');
+        Requirements::themedCSS('awesomplete'.$min, 'table_filter_sort');
+        Requirements::themedCSS('awesomplete.theme'.$min, 'table_filter_sort');
+        Requirements::themedCSS('TableFilterSort'.$min, 'table_filter_sort');
+        Requirements::themedCSS('TableFilterSort.theme'.$min, 'table_filter_sort');
     }
 
 }

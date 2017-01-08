@@ -38,6 +38,18 @@ jQuery(document).ready(
             debug: false,
 
             /**
+             * url before the ?
+             * @type {String}
+             */
+            baseURL: '',
+
+            /**
+             * url before the ?
+             * @type {String}
+             */
+            useBackAndForwardButtons: false,
+
+            /**
              * the index in TableFilterSortTableList that holds this guy
              * @var int
              */
@@ -61,6 +73,12 @@ jQuery(document).ready(
              * @var jQuery Object
              */
             myTable: null,
+
+            /**
+             * selector for the both the fake and real table header
+             * @var jQuery Object
+             */
+            myTableHeaders: null,
 
             /**
              * selector for the tbody
@@ -98,6 +116,14 @@ jQuery(document).ready(
              * @var array
              */
             currentFilter: {},
+
+            /**
+             * has two variables:
+             * "Direction" => 'ASC'
+             * "Field" => 'MyField'
+             * @var array
+             */
+            currentSorter: {},
 
             /**
              * starting point for showing rows
@@ -217,12 +243,6 @@ jQuery(document).ready(
             rowSelector: 'tr.tfsRow',
 
             /**
-             *
-             * @var string
-             */
-            directLinkClass: 'dl',
-
-            /**
              * items that can be filtered / sorted for ...
              * @var string
              */
@@ -246,7 +266,13 @@ jQuery(document).ready(
             /**
             * @var string
             */
-            sortLinkSelector: 'thead a.sortable',
+            sortLinkSelector: 'a.sortable',
+
+            /**
+             * selector used to identify add to favourite Links
+             * @type {String}
+             */
+            favouriteLinkSelector: 'a.addFav',
 
             /**
              * class for an element showing details of hidden rows
@@ -417,15 +443,30 @@ jQuery(document).ready(
             sortDescClass: 'sort-desc',
 
             /**
+             *
+             * @var string
+             */
+            directLinkClass: 'dl',
+
+            /**
+             * class to show which TRs are favourites...
+             * @type {String}
+             */
+            favouriteClass: 'fav',
+
+            /**
              * startup
              *
              */
             init: function(holderNumber){
                 var myob = TableFilterSort;
 
+                myob.baseURL = location.protocol + '//' + location.host + location.pathname;
+
                 myob.holderNumber = holderNumber;
                 myob.myTableHolder = myTableHolder;
                 myob.myTable = myob.myTableHolder.find(myob.tableSelector).first();
+                myob.myTableHeaders = myob.myTableHolder.find("table thead");
                 myob.myTableBody = myob.myTable.find(" > tbody");
                 myob.resetObjects();
                 if(myob.myRows.length > 1){
@@ -457,6 +498,11 @@ jQuery(document).ready(
                             //allow things to slide up and down
                             if(myob.debug) { console.profile('toggleSlideSetup');}
                             myob.toggleSlideSetup();
+                            //listen for forward and back buttons
+                            if(myob.debug) { console.profile('addURLChangeListener');}
+                            myob.addURLChangeListener();
+                            if(myob.debug) { console.profileEnd();console.profile('favouriteLinkListener');}
+                            myob.favouriteLinkListener();
 
                             //FILTER FORM
                             //create filter form
@@ -482,6 +528,7 @@ jQuery(document).ready(
                             if(myob.debug) { console.profileEnd(); console.profile('fixTableHeader');}
                             myob.fixTableHeader();
                             if(myob.debug) { console.profileEnd();}
+
                         },
                         myob.millisecondsBetweenActions
                     );
@@ -709,7 +756,7 @@ jQuery(document).ready(
             setupSortListeners: function()
             {
                 var myob = TableFilterSort;
-                myob.myTable.on(
+                myob.myTableHolder.on(
                     "click",
                     myob.sortLinkSelector,
                     function(event){
@@ -717,23 +764,24 @@ jQuery(document).ready(
                         var myEl = jQuery(this);
                         myob.showFromRow = 0;
                         myob.startRowManipulation();
-                        myob.myTable.find(myob.sortLinkSelector)
-                        .removeClass(myob.sortAscClass)
-                        .removeClass(myob.sortDescClass);
+                        myob.myTableHeaders.find(myob.sortLinkSelector)
+                            .removeClass(myob.sortAscClass)
+                            .removeClass(myob.sortDescClass);
                         window.setTimeout(
                             function() {
-                                var category = myEl.attr("data-sort-field");
-                                var sortOrder = myEl.attr("data-sort-direction");
-                                var sortType = myEl.attr("data-sort-type");
-                                if(typeof sortType === 'undefined') {
-                                    sortType = myob.dataDictionary[category]['DataType'];
+                                myob.currentSorter.category = myEl.attr("data-sort-field");
+                                myob.currentSorter.direction = myEl.attr("data-sort-direction");
+                                myob.currentSorter.sortType = myEl.attr("data-sort-type");
+
+                                if(typeof myob.currentSorter.sortType === 'undefined') {
+                                    myob.currentSorter.sortType = myob.dataDictionary[myob.currentSorter.category]['DataType'];
                                 }
                                 var arr = [];
                                 myob.myRows.each(
                                     function(i, el) {
                                         var row = jQuery(el);
-                                        var dataValue = row.find('[data-filter="' + category + '"]').text();
-                                        if(sortType === "number") {
+                                        var dataValue = row.find('[data-filter="' + myob.currentSorter.category + '"]').text();
+                                        if(myob.currentSorter.sortType === "number") {
                                             dataValue = dataValue.replace(/[^\d.-]/g, '');
                                             dataValue = parseFloat(dataValue);
                                         }
@@ -753,12 +801,14 @@ jQuery(document).ready(
                                 arr.sort(myob.sortMultiDimensionalArray);
 
                                 //show direction
-                                if(sortOrder === "desc"){
+                                var sortLinkSelection = myob.myTableHeaders
+                                    .find(myob.sortLinkSelector + '[data-sort-field="'+myob.currentSorter.category+'"]');
+                                if(myob.currentSorter.direction === "desc"){
                                     arr.reverse();
-                                    myEl.attr("data-sort-direction", "asc").addClass(myob.sortDescClass);
+                                    sortLinkSelection.attr("data-sort-direction", "asc").addClass(myob.sortDescClass);
                                 }
                                 else{
-                                    myEl.attr("data-sort-direction", "desc").addClass(myob.sortAscClass);
+                                    sortLinkSelection.attr("data-sort-direction", "desc").addClass(myob.sortAscClass);
                                 }
                                 arr.forEach(
                                     function(entry) {
@@ -815,6 +865,42 @@ jQuery(document).ready(
                         myEl.toggleClass(myob.openedClass);
                     }
                 );
+            },
+
+            addURLChangeListener: function()
+            {
+                var myob = TableFilterSort;
+                if(myob.useBackAndForwardButtons) {
+                    window.addEventListener(
+                        "popstate",
+                        function(e) {
+                            myob.findAndApplyGetVariables();
+                        }
+                    );
+                }
+            },
+
+            findAndApplyGetVariables: function()
+            {
+                var myob = TableFilterSort;
+                var qd = {};
+                location.search.substr(1).split("&").forEach(
+                    function(item) {
+                        var s = item.split("="),
+                            k = s[0],
+                            v = s[1] && decodeURIComponent(s[1]);
+                        //(k in qd) ? qd[k].push(v) : qd[k] = [v]
+                        (qd[k] = qd[k] || []).push(v) //short-circuit
+                    }
+                );
+                if(typeof qd.tfs !== 'undefined') {
+                    var json = JSON.parse(qd['tfs']);
+                    myob.currentFilter = json.f;
+                    myob.currentSorter = json.s;
+                }
+                //set filter form values
+
+                //set filter sort data
             },
 
             //===================================================================
@@ -899,10 +985,10 @@ jQuery(document).ready(
                     var input;
                     for(i = 0; i < awesompleteFields.length; i++) {
                         category = awesompleteFields[i];
-                        console.debug(category);
+                        //console.debug(category);
                         var jQueryInput = myob.myFilterFormHolder.find('input[name="'+category+'"].awesomplete').first();
                         var id = jQuery(jQueryInput).attr('id');
-                        console.debug(id);
+                        //console.debug(id);
                         var input = document.getElementById(id);
                         new Awesomplete(
                             input,
@@ -1052,11 +1138,6 @@ jQuery(document).ready(
                         var filterToTriger = filterHolder
                             .find('input[value="'+ filterValue + '"].checkbox')
                             .first();
-                        console.debug(myEl);
-                        console.debug(category);
-                        console.debug(filterValue);
-                        console.debug(filterHolder);
-                        console.debug(filterToTriger);
                         if(filterToTriger && filterToTriger.length > 0) {
                             if(filterToTriger.is(':checkbox')){
                                 if(filterToTriger.prop('checked') === true){
@@ -1076,6 +1157,19 @@ jQuery(document).ready(
                         return false;
                     }
                 );
+            },
+
+            favouriteLinkListener: function(){
+                var myob = TableFilterSort;
+                myob.myTableHolder.on(
+                    'click',
+                    myob.favouriteLinkSelector,
+                    function(event){
+                        event.preventDefault();
+                        jQuery(this).closest('tr').toggleClass(myob.favouriteClass);
+                        return false;
+                    }
+                )
             },
 
 
@@ -1268,6 +1362,12 @@ jQuery(document).ready(
             {
                 var myob = this;
                 if(myob.hasFixedTableHeader) {
+                    jQuery(window).unbind('scroll');
+                    myob.myTableHolder.find('table.fixed-header').each(
+                        function(i, el) {
+                            jQuery(el).remove();
+                        }
+                    );
                     jQuery('<table class="fixed-header" style="position: fixed; top: 0px; display:none;"></table>').insertAfter(myob.tableSelector);
                     var header = myob.myTable.find("thead").clone();
                     var fixedHeader = myob.myTableHolder.find(".fixed-header").append(header);
@@ -1296,7 +1396,7 @@ jQuery(document).ready(
                             }
                         }
                     );
-
+                    myob.myTableHeaders = myob.myTableHolder.find("table thead");
                 }
             },
 
@@ -1401,10 +1501,25 @@ jQuery(document).ready(
                 myob.myTableHolder.find(myob.paginationSelector).html(pageHTML);
                 myob.myTable.show();
                 myob.myTableHolder.removeClass(myob.loadingClass);
-                jQuery('html, body').animate({
-                    scrollTop: (myob.myTableHolder.offset().top - 550)
-                }, 200);
+                jQuery('html, body').animate(
+                    {
+                        scrollTop: myob.myTableHolder.position().top
+                    },
+                    200
+                );
+                if(myob.useBackAndForwardButtons) {
+                    history.pushState(null, null, myob.currentURL());
+                }
                 myob.resetObjects();
+            },
+
+            currentURL: function ()
+            {
+                var urlObject = {};
+                urlObject.f = myob.currentFilter;
+                urlObject.s = myob.currentSorter;
+                var urlpart = "tfs=" + encodeURI(JSON.stringify(urlObject));
+                return myob.baseURL + '?' + urlpart
             },
 
             //===================================================================
