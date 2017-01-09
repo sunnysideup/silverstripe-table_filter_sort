@@ -1017,8 +1017,7 @@ jQuery(document).ready(
 
             favouriteLinkListener: function(){
                 var myob = TableFilterSort;
-
-                if(myob.hasFavourites) {
+                if(myob.myTableBody.find(myob.favouriteLinkSelector).length > 0) {
                     myob.myTableHolder.on(
                         'click',
                         myob.favouriteLinkSelector,
@@ -1075,9 +1074,6 @@ jQuery(document).ready(
                         }
                         parentPageID = parentPageID.split('/').join('--');
                         dataAsString = JSON.stringify(data);
-                        console.debug(data);
-                        console.debug(url);
-                        console.debug(parentPageID);
                         fullURL = url + encodeURI(parentPageID) + '/?data='+encodeURI(dataAsString);
                         jQuery.modal('<iframe src="' + fullURL + '" height="450" width="830" style="border:0">', {
                             closeHTML:"",
@@ -1087,7 +1083,7 @@ jQuery(document).ready(
                                 height:450,
                                 padding:0,
                                 width:830
-                            },                            
+                            },
                             overlayClose:true
                         });
                         // myEl.attr('href', fullURL);
