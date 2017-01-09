@@ -162,9 +162,10 @@ function create_test()
     $limit = isset($_GET['i']) ? $_GET['i'] : 300;
     for($i = 0; $i < $limit; $i++) {
         $html .= '
-        <tr class="tfsRow hide">
+        <tr class="tfsRow hide" id="tfs'.$i.'">
             <td>
-                <a href="#" class="more">+</a>
+                <a href="#" class="externalLink addFav" target="_blank" title="Add to Favourites">♥</a> /
+                <a href="#" class="more">+</a> /
                 <span data-filter="SKU">'.($i+1).'</span><br />
                 <p style="display: none;" class="hidden">
                     Some more content goes here.
@@ -223,7 +224,12 @@ $html = create_test();
                 data-title="Filter Table Below"
                 data-title-clear-button="Clear"
                 data-title-close-and-apply="Apply Your Selection"
+                data-filter-page-id="test-filters"
+                data-favourites-page-id="test-favs"
             ></div>
+
+            <div class="saveAndLoad"></div>
+
             <p class="tableFilterSortMoreEntries paginationTop">
                 <span class="line">
                     <strong>Select Page:</strong> <span class="pagination"></span>
@@ -236,6 +242,7 @@ $html = create_test();
                     <span class="total-row-number">0</span>.
                 </span>
             </p>
+
 
             <div class="tableFilterSortCommonContentHolder" data-title="Common Info"></div>
             <table class="tableFilterSortTable">
@@ -315,8 +322,20 @@ $html = create_test();
             var TableFilterSortTableList = []
             TableFilterSortTableList.push('.tableFilterSortHolder');
         </script>
-        <script src="../../javascript/TableFilterSort.js?x=<?php echo rand(0,9999999999) ?>"></script>
+        <script src="../../javascript/jquery.simplemodal-1.4.5?x=<?php echo rand(0,9999999999) ?>"></script>
+        <script src="../../javascript/js.cookies.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/awesomplete.js?x=<?php echo rand(0,9999999999) ?>"></script>
+        <script src="../../javascript/TableFilterSort.js?x=<?php echo rand(0,9999999999) ?>"></script>
+        <script>
+            var html = jQuery('.tableFilterSortHolder').first().clone();
+            var firstRow = html.find('table tbody tr').get(0).outerHTML;
+            html.find('table tbody').remove();
+            html.find('table').append('\n\n<tbody>\n        ' + firstRow + '\n</tbody>'+'\n\n\n                ');
+            html = html.html();
+            html = html.split('<').join('&lt;')
+            html = html.split('>').join('&gt;')
+            document.write('<h2>Template Example</h2><pre>' + html + '</pre>');
+        </script>
 
 </html>
 

@@ -278,3 +278,29 @@ span[data-filter].dl {text-decoration: underline;}
 input[type="checkbox"] {
     vertical-align: middle;
 }
+
+
+#simplemodal-overlay {background-color: #000!important;}
+
+.simplemodal-close {
+    cursor: pointer;
+    position: absolute;
+    top: 17px;
+    right: 21px;
+    padding: 5px;
+    color: #aaa;
+    font-size: 20px;
+}
+
+.simplemodal-close:hover {
+    color: #000;
+}
+
+.simplemodal-container {
+    border-radius: 3px!important;
+}
+
+.simplemodal-wrap {
+    overflow: hidden!important;
+    box-sizing: border-box;
+}

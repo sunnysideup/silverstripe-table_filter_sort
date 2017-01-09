@@ -32,7 +32,7 @@ class TableFilterSortTag extends DataObject {
     );
 
     private static $belongs_many_many = array(
-        'TableFilterSortTagFavourites' => 'TableFilterSortTagFavourite'
+        'TableFilterSortServerSavers' => 'TableFilterSortServerSaver'
     );
 
     private static $default_sort = array(
@@ -52,16 +52,9 @@ class TableFilterSortTag extends DataObject {
     );
 
     private static $indexes = array(
-        'Title' => 'unique("Title, ClassName")'
+        'Title' => 'unique("Title")'
     );
 
-    /**
-     * to prevent racing conditions ...
-     *
-     * @var array
-     */
-    private static $_cache = array();
-    
     /**
      * see README.md for usage ...
      *
@@ -71,32 +64,22 @@ class TableFilterSortTag extends DataObject {
      */
     public static function find_or_create($title, $addToObject)
     {
-        $title = trim($title);
-        $titleToLower = strtolower(($title));
-        $className = get_called_class();
-        $key = $className.'_'.$titleToLower;
-        if (isset(self::$_cache[$key])) {
-            if ($showDBAlterationMessage) {
-                DB::alteration_message('Found '.$className.' with Title = <strong>'.$title.'</strong>');
-            }
-            return self::$_cache[$key];
-        }
+        $title = strtolower(trim($title));
         if (! $title) {
-            return $className::create();
+            return TableFilterSortTag::create();
         }
-        $obj = $className::get()
-            ->where('LOWER("Title") =\''.Convert::raw2sql($titleToLower).'\'');
+        $filter = array('Title' => $title);
+        $obj = TableFilterSortTag::get()->filter($filter);
         if ($obj->count() == 0) {
-            $obj = $className::create();
+            $obj = TableFilterSortTag::create($filter);
         } else {
             $obj = $obj->first();
         }
         $obj->Title = $title;
-
         $obj->write();
-        $this->TableFilterSortFavourites()->add($addToObject->ID);
 
-        self::$_cache[$key] = $obj;
+        $obj->TableFilterSortServerSavers()->add($addToObject->ID);
+
         return $obj;
     }
 

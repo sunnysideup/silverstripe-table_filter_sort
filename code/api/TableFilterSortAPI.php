@@ -26,6 +26,7 @@ class TableFilterSortAPI extends Object
             $min = '.min';
         }
         // Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
+        Requirements::javascript('table_filter_sort/javascript/js.cookies'.$min.'.js');
         Requirements::javascript('table_filter_sort/javascript/awesomplete'.$min.'.js');
         Requirements::javascript('table_filter_sort/javascript/TableFilterSort'.$min.'.js');
         Requirements::themedCSS('awesomplete'.$min, 'table_filter_sort');
