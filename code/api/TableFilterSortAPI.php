@@ -19,14 +19,16 @@ class TableFilterSortAPI extends Object
 
     /**
      *
-     * @param  string $tableSelector e.g. #MyTableHolder
-     * @param  array $blockArray files not to include (both CSS and JS)
-     * @param  string $jqueryLocation if you like to include jQuery then add link here...
+     * @param  string $tableSelector      e.g. #MyTableHolder
+     * @param  array $blockArray          files not to include (both CSS and JS)
+     * @param  string $jqueryLocation     if you like to include jQuery then add link here...
+     * @param  boolean $includeInPage     if you like to include jQuery then add link here...
      */
     public static function include_requirements(
         $tableSelector = '.tableFilterSortHolder',
         $blockArray = array(),
-        $jqueryLocation = ''
+        $jqueryLocation = '',
+        $includeInPage = true
     ) {
         //this must come first
         if($tableSelector) {
@@ -48,7 +50,7 @@ class TableFilterSortAPI extends Object
         }
         $js = array_diff($js, $blockArray);
         $css = array_diff($css, $blockArray);
-        if(Director::isDev() && 11 == 22) {
+        if(Director::isDev()) {
             foreach($css as $link) {
                 Requirements::themedCSS($link, 'table_filter_sort');
             }
@@ -66,11 +68,13 @@ class TableFilterSortAPI extends Object
                     'table_filter_sort/css/'.$link
                 );
                 $hasBeenIncluded = false;
-                foreach($testFiles as $testFile) {
-                    $testFile = $base . $testFile.'.css';
-                    if(file_exists($testFile)) {
-                        $allCss .= file_get_contents($testFile);
-                        break;
+                if($includeInPage) {
+                    foreach($testFiles as $testFile) {
+                        $testFile = $base . $testFile.'.css';
+                        if(file_exists($testFile)) {
+                            $allCss .= file_get_contents($testFile);
+                            break;
+                        }
                     }
                 }
                 if( ! $hasBeenIncluded) {
@@ -83,7 +87,7 @@ class TableFilterSortAPI extends Object
             foreach($js as $link) {
                 $link = str_replace('.js', '.min.js', $link);
                 $testFile = $base . $link;
-                if(file_exists($testFile)) {
+                if($includeInPage && file_exists($testFile)) {
                     $allJS .= file_get_contents($testFile);
                 } else {
                     Requirements::javascript($link);

@@ -227,6 +227,20 @@ jQuery(document).ready(
              */
             favouritesStore: [],
 
+
+
+            /**
+             *
+             *
+             * CALLBACKS
+             *
+             *
+             */
+            startRowFX1: null,
+            startRowFX2: null,
+            endRowFX1: null, 
+            endRowFX2: null,
+
             /**
              *
              *
@@ -1578,6 +1592,9 @@ jQuery(document).ready(
             startRowManipulation: function()
             {
                 var myob = TableFilterSort;
+                if(typeof myob.startRowFX1 === 'function') {
+                    myob.startRowFX1(myob);
+                }
                 myob.resetObjects();
                 //show the table as loading
                 myob.myTableHolder
@@ -1591,11 +1608,17 @@ jQuery(document).ready(
                         jQuery(el).addClass(myob.hideClass).removeClass(myob.showClass);
                     }
                 );
+                if(typeof myob.startRowFX2 === 'function') {
+                    myob.startRowFX2(myob);
+                }
             },
 
             endRowManipulation: function()
             {
                 var myob = TableFilterSort;
+                if(typeof myob.endRowFX1 === 'function') {
+                    myob.endRowFX1(myob);
+                }
                 //crucial!
                 myob.resetObjects();
                 //get basic numbers
@@ -1697,6 +1720,9 @@ jQuery(document).ready(
                     history.pushState(null, null, myob.currentURL());
                 }
                 myob.resetObjects();
+                if(typeof myob.endRowFX2 === 'function') {
+                    myob.endRowFX2(myob);
+                }
             },
 
             currentURL: function ()
