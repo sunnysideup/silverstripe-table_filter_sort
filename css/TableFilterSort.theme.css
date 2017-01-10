@@ -78,18 +78,22 @@ ul li {
 }
 
 .tableFilterSortFilterFormHolder .filterColumn {
-    width: calc(20% - 2.3em - 10px);
+    width: calc(20% - 30px);
     float: left;
-    oveflow: auto;
-    margin: 1em;
+    margin: 20px 20px 20px 0;
     border-left: 1px solid #ccc;
     border-top: 1px solid #ccc;
-    padding: 0 0 0 10px;
+    padding: 10px 0 0 10px;
 }
 
 .tableFilterSortFilterFormHolder label.groupLabel {
   font-weight: bold;
   padding-bottom: 10px;
+  display: block
+}
+
+.tableFilterSortFilterFormHolder .filterColumn:nth-child(5n) {
+  margin-right: 0px;
 }
 
 .tableFilterSortFilterFormHolder .filterColumn:nth-child(5n+1) {
@@ -102,9 +106,24 @@ ul li {
   padding: 0;
   margin: 0;
 }
-
-.tableFilterSortFilterFormHolder .filterColumn.tagFilter .awesomplete {
+.tableFilterSortFilterFormHolder .filterColumn.tagFilter div.awesomplete {
+    display: block;
+}
+.tableFilterSortFilterFormHolder .filterColumn input.awesomplete,
+.tableFilterSortFilterFormHolder .filterColumn input.keyword {
   display: block;
+  padding: 5px;
+  background: #ccc;
+  border: 1px solid #fff;
+  margin: 0 0 5px 0;
+  border-radius: 5px;
+  width: calc(100% - 10px);
+  outline: none;
+}
+
+.tableFilterSortFilterFormHolder .filterColumn input.keyword {
+    background-color: #fff;
+    border: 1px solid #ccc;
 }
 
 .tableFilterSortFilterFormHolder .filterColumn.tagFilter .awesomplete > ul {
@@ -136,9 +155,7 @@ ul li {
 
 .tableFilterSortFilterFormHolder .applyFilter {
     clear: left;
-    width: 100%;
-    padding-top: 40px;
-    margin-top: 40px;
+    padding-top: 20px;
 }
 
 .tableFilterSortCurrentSearchHolder ul li span {
@@ -257,3 +274,33 @@ tr.hide, tr.no-match {
 }
 
 span[data-filter].dl {text-decoration: underline;}
+
+input[type="checkbox"] {
+    vertical-align: middle;
+}
+
+
+#simplemodal-overlay {background-color: #000!important;}
+
+.simplemodal-close {
+    cursor: pointer;
+    position: absolute;
+    top: 17px;
+    right: 21px;
+    padding: 5px;
+    color: #aaa;
+    font-size: 20px;
+}
+
+.simplemodal-close:hover {
+    color: #000;
+}
+
+.simplemodal-container {
+    border-radius: 3px!important;
+}
+
+.simplemodal-wrap {
+    overflow: hidden!important;
+    box-sizing: border-box;
+}
