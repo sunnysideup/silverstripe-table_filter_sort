@@ -1,0 +1,9 @@
+---
+Name: 'TableFilterSortRoutes'
+After: framework
+---
+Director:
+  rules:
+    'tfs/favourites//$Action/$ID/$OtherID/$Version': TableFilterSortServerSaver_Controller_Favourites
+    'tfs/filters//$Action/$ID/$OtherID/$Version': TableFilterSortServerSaver_Controller_Filters
+    'tfs/test//$Action/$ID/$OtherID/$Version': TableFilterSortServerSaver_Controller
