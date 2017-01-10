@@ -238,7 +238,7 @@ jQuery(document).ready(
              */
             startRowFX1: null,
             startRowFX2: null,
-            endRowFX1: null, 
+            endRowFX1: null,
             endRowFX2: null,
 
             /**
