@@ -170,7 +170,7 @@ function create_test()
             <td><span data-filter="Price">$'.(rand(0,99999)/100).'</span></td>
             <td><span data-filter="Rating">'.rand(1,5).' Stars</span></td>
             <td>
-                <a href="#" class="tableFilterSortMoreDetails" data-rel="Row_'.$i.'_Details">more</a>
+                <a href="#" class="more" data-rel="Row_'.$i.'_Details">more</a>
                 <div style="display: none;" id="Row_'.$i.'_Details">
                     <h6>Tags</h6>
                     <ul>
@@ -222,22 +222,22 @@ $html = create_test();
                 <thead>
                     <tr>
                         <th scope="col">
-                            <a href="#" class="sortable" data-filter="SKU" data-sort-direction="asc" data-sort-type="number">SKU</a>
+                            <a href="#" class="sortable" data-sort-field="SKU" data-sort-direction="asc" data-sort-type="number">SKU</a>
                         </th>
                         <th scope="col">Type</th>
                         <th scope="col">Producer</th>
                         <th scope="col">Colour</th>
                         <th scope="col">
-                            <a href="#" class="sortable" data-filter="Size" data-sort-direction="asc" data-sort-type="text">Size</a>
+                            <a href="#" class="sortable" data-sort-field="Size" data-sort-direction="asc" data-sort-type="string">Size</a>
                         </th>
                         <th scope="col">
-                            <a href="#" class="sortable" data-filter="Weight" data-sort-direction="asc" data-sort-type="number">Weight</a>
+                            <a href="#" class="sortable" data-sort-field="Weight" data-sort-direction="asc" data-sort-type="number">Weight</a>
                         </th>
                         <th scope="col">
-                            <a href="#" class="sortable" data-filter="Price" data-sort-direction="asc" data-sort-type="number" data-sort-default="true">Price</a>
+                            <a href="#" class="sortable" data-sort-field="Price" data-sort-direction="asc" data-sort-type="number" data-sort-default="true">Price</a>
                         </th>
                         <th scope="col">
-                            <a href="#" class="sortable" data-filter="Rating" data-sort-direction="desc" data-sort-type="number">Rating</a>
+                            <a href="#" class="sortable" data-sort-field="Rating" data-sort-direction="desc" data-sort-type="number">Rating</a>
                         </th>
                         <th scope="col">Description</th>
                     </tr>
