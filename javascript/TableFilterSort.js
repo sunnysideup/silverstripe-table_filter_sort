@@ -1243,7 +1243,7 @@ jQuery(document).ready(
                 var myob = TableFilterSort;
                 var cleanCategory = category.replace(/\W/g, '');
                 var cleanValue = valueIndex.toString();
-                var valueID = ('TFS_' + cleanCategory + '_' + cleanValue).replace(/[^a-zA-Z0-9]+/g, '');
+                var valueID = ('TFS_' + cleanCategory + '_' + cleanValue).replace(/[^a-zA-Z0-9]+/g, '_');
                 if(myob.myFilterFormHolder.find('input#'+valueID).length === 0){
                     var startString = '<li class="' + type + 'Field">';
                     var endString = '</li>';
