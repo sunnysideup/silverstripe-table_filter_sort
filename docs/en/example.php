@@ -26,6 +26,9 @@ function create_test()
     );
     $veg = array(
         'Artichoke',
+        'Artichoke Large',
+        'ArtichokeLarge',
+        'ArtichokeTest',
         'Arugula',
         'Asparagus',
         'Aubergine (UK) = Eggplant (US)',
