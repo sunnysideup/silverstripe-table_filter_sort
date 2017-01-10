@@ -11,3 +11,6 @@ tr.hide, tr.no-match {display: none!important;}
 .loading * {display: none!important;}
 
 table { table-layout: fixed }
+
+.fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder {position: fixed; top: 0; z-index: 10;}
+.fixed-header.tableFilterSortFilterInUse table thead {position: fixed;  }

@@ -99,10 +99,10 @@ jQuery(document).ready(
             myTable: null,
 
             /**
-             * selector for the both the fake and real table header
+             * selector for the table header
              * @var jQuery Object
              */
-            myTableHeaders: null,
+            myTableHead: null,
 
             /**
              * selector for the tbody
@@ -551,7 +551,7 @@ jQuery(document).ready(
                 myob.myTableHolder = myTableHolder;
                 myob.myFilterFormHolder = myob.myTableHolder.find(myob.filterFormHolderSelector).first();
                 myob.myTable = myob.myTableHolder.find(myob.tableSelector).first();
-                myob.myTableHeaders = myob.myTableHolder.find("table thead");
+                myob.myTableHead = myob.myTableHolder.find("table thead");
                 myob.myTableBody = myob.myTable.find(" > tbody");
 
                 myob.favouritesParentPageID = myob.myFilterFormHolder.attr("data-favourites-page-id");
@@ -869,7 +869,7 @@ jQuery(document).ready(
                         var myEl = jQuery(this);
                         myob.showFromRow = 0;
                         myob.startRowManipulation();
-                        myob.myTableHeaders.find(myob.sortLinkSelector)
+                        myob.myTableHead.find(myob.sortLinkSelector)
                             .removeClass(myob.sortAscClass)
                             .removeClass(myob.sortDescClass);
                         window.setTimeout(
@@ -906,7 +906,7 @@ jQuery(document).ready(
                                 arr.sort(myob.sortMultiDimensionalArray);
 
                                 //show direction
-                                var sortLinkSelection = myob.myTableHeaders
+                                var sortLinkSelection = myob.myTableHead
                                     .find(myob.sortLinkSelector + '[data-sort-field="'+myob.currentSorter.category+'"]');
                                 if(myob.currentSorter.direction === "desc"){
                                     arr.reverse();
@@ -1546,42 +1546,40 @@ jQuery(document).ready(
             fixTableHeader: function()
             {
                 var myob = this;
+                var widthAndHeightSet = false;
                 if(myob.hasFixedTableHeader) {
-                    jQuery(window).unbind('scroll');
-                    myob.myTableHolder.find('table.fixed-header').each(
-                        function(i, el) {
-                            jQuery(el).remove();
-                        }
-                    );
-                    jQuery('<table class="fixed-header" style="position: fixed; top: 0px; display:none;"></table>').insertAfter(myob.tableSelector);
-                    var header = myob.myTable.find("thead").clone();
-                    var fixedHeader = myob.myTableHolder.find(".fixed-header").append(header);
-
                     jQuery(window).bind(
-                        "scroll",
-                        function() {
-                            var tableOffset = myob.myTable.offset().top;
+                        "load resize scroll",
+                        function(e) {
+                            if(e.type === 'resize') {
+                                widthAndHeightSet = false;
+                            }
+                            var tableOffset = myob.myTableBody.offset().top;
                             var offset = jQuery(this).scrollTop();
-                            if (offset > tableOffset && fixedHeader.is(":hidden")) {
-                                myob.myTable.addClass('fake-header');
-                                fixedHeader.show();
-                                fixedHeader.width(myob.myTable.outerWidth());
-                                var fakeHeaders = fixedHeader.find('thead tr:first th, thead tr:first td');
-                                myob.myTable.find('thead tr:first th, thead tr:first td').each(
-                                    function(colNumber, cel) {
-                                        var width = jQuery(cel).width();
-                                        jQuery(fakeHeaders.eq(colNumber))
-                                            .width(width);
-                                    }
-                                )
+                            if (offset > tableOffset) {
+                                myob.myTableHolder.addClass('fixed-header');
+                                myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight());
                             }
                             else if (offset <= tableOffset) {
-                                myob.myTable.removeClass('fake-header');
-                                fixedHeader.hide();
+                                myob.myTableHolder.removeClass('fixed-header');
+                                if(! widthAndHeightSet ) {
+                                    widthAndHeightSet = true;
+                                    myob.myFilterFormHolder.width(myob.myTableHolder.width());
+                                    //set width of table
+                                    myob.myTable.width(myob.myTableHolder.width());
+                                    //set width of cells
+                                    myob.myTable.find('thead tr:first th, thead tr:first td').each(
+                                        function(colNumber, cell) {
+                                            var cell = jQuery(cell);
+                                            cell.width(cell.width());
+                                        }
+                                    );
+                                    //set width of filter
+
+                                }
                             }
                         }
                     );
-                    myob.myTableHeaders = myob.myTableHolder.find("table thead");
                 }
             },
 

@@ -338,7 +338,7 @@ $html = create_test();
             html = html.html();
             html = html.split('<').join('&lt;')
             html = html.split('>').join('&gt;')
-            document.write('<h2>Template Example</h2><pre>' + html + '</pre>');
+            document.write('<h2>Template Example</h2><pre style="white-space: pre-wrap;word-wrap: break-word;">' + html + '</pre>');
         </script>
 
 </html>
