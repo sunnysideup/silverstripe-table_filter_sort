@@ -1542,12 +1542,9 @@ jQuery(document).ready(
                                 myob.myTableHolder.removeClass('fixed-header');
                                 if(! widthAndHeightSet ) {
                                     if(e.type !== 'load') {
-                                        //widthAndHeightSet = true;
+                                        widthAndHeightSet = true;
                                         var tableHolderWidth = myob.myTableHolder.width();
                                         myob.myFilterFormHolder.width(tableHolderWidth);
-                                        //set width of table
-                                        myob.myTable.width(tableHolderWidth);
-                                        myob.myTableHead.width(tableHolderWidth);
                                         //set width of cells
                                         myob.myTable.find('tbody tr:first td').each(
                                             function(colNumber, cell) {

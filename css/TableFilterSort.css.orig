@@ -18,19 +18,14 @@ table { table-layout: fixed }
     z-index: 10;
 }
 
+<<<<<<< HEAD
 .fixed-header.tableFilterSortFilterInUse table thead {
     position: fixed;
     z-index: 9;
-}
+=======
+.fixed-header.tableFilterSortFilterInUse table thead {position: fixed;  display: table;}
 
-@-moz-keyframes show_on_top {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
+
 @-webkit-keyframes show_on_top {
     0% {
         opacity: 0;
@@ -49,12 +44,5 @@ table { table-layout: fixed }
     -webkit-animation-delay: 0s;
     -webkit-animation-play-state: running;
     -webkit-animation-fill-mode: forwards;
-    -moz-animation-name: show_on_top;
-    -moz-animation-duration: 1s;
-    -moz-animation-timing-function: ease;
-    -moz-animation-iteration-count: 1;
-    -moz-animation-direction: normal;
-    -moz-animation-delay: 0s;
-    -moz-animation-play-state: running;
-    -moz-animation-fill-mode: forwards;
+>>>>>>> 4dce5217b168a1dd652b252c33ca0c1479baf8f9
 }
