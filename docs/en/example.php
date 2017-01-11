@@ -168,8 +168,8 @@ function create_test()
         $html .= '
         <tr class="tfsRow hide" id="tfs'.$i.'">
             <td>
-                <a href="#" class="externalLink addFav" target="_blank" title="Add to Favourites">♥</a> /
-                <a href="#" class="more">+</a> /
+                <a href="#" class="more">+</a>
+                <a href="#" class="externalLink addFav" target="_blank" title="Add to Favourites">♥</a>
                 <span data-filter="SKU">'.($i+1).'</span><br />
                 <p style="display: none;" class="hidden">
                     Some more content goes here.
