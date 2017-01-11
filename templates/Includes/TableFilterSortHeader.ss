@@ -6,7 +6,6 @@
 </p>
 <p class="tableFilterSortMoreEntriesAlwaysShow">
     <span class="line">
-        <strong>Filtered:</strong>
         <span class="match-row-number">0</span> /
         <span class="total-row-number">0</span>.
     </span>
