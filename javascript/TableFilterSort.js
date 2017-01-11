@@ -171,7 +171,7 @@ jQuery(document).ready(
              * maximum number of checkboxes in the filter before it becomes a text filter
              * @type Int
              */
-            maximumNumberOfFilterOptions: 3,
+            maximumNumberOfFilterOptions: 30,
 
             /**
              * number of milliseconds to check if filter is in use ...
@@ -709,13 +709,13 @@ jQuery(document).ready(
                                 function(i, el) {
                                     el = jQuery(el);
                                     if(!commonContentAdded) {
-                                        if(el.html() !== ""){
+                                        if(el.html() !== "" && !el.hasClass('ignore-content')){
                                             commonContent += "<li><strong>"+category + ":</strong> <span>" + el.html() + "</span></li>";
                                             commonContentAdded = true;
                                         }
                                     }
                                     var spanParent = el.parent();
-                                    el.remove();
+                                    //el.remove();
 
                                     if(spanParent.is("li")){
                                         spanParent.hide();
@@ -849,6 +849,18 @@ jQuery(document).ready(
                     'input',
                     function(event) {
                         myob.applyFilter();
+                    }
+                );
+                myob.myFilterFormHolder.on(
+                    'click',
+                    '.clear',
+                    function(event) {
+                        event.preventDefault();
+                        myob.currentFilter = {};
+                        myob.createFilterForm();
+                        myob.applyFilter();
+                        return false;
+                        //myob.createFilterForm();
                     }
                 );
             },
@@ -1114,6 +1126,8 @@ jQuery(document).ready(
                 //create html content and add to top of page
 
                 if(myob.myFilterFormHolder.length > 0) {
+                    //clear it so that we can rebuild it ...
+                    myob.myFilterFormHolder.html("");
                     var currentFilterHTML = "";
                     var filterFormTitle = myob.myFilterFormHolder.attr("data-title");
                     if(typeof filterFormTitle === "undefined") {
@@ -1252,54 +1266,71 @@ jQuery(document).ready(
                     var endString = '</li>';
                     switch (type) {
                         case 'favourites':
+                            var checked = '';
+                            if(typeof myob.currentFilter[category] !== 'undefined') {
+                                checked = ' checked="checked"';
+                            }
                             return startString +
-                                '<input class="favourites" type="checkbox" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" />' +
+                                '<input class="favourites" type="checkbox" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" '+checked+' />' +
                                 '<label for="' + valueID + '">♥ ♥ ♥</label>' +
                                 endString;
                             break;
                         case 'keyword':
                         case 'tag':
                             var currentValueForForm = '';
-                            if(typeof myob.currentFilter[category] !== 'undefined') {
-                                if(typeof myob.currentFilter[category][0] !== 'undefined') {
-                                    currentValueForForm = myob.currentFilter[category][0];
-                                    currentValueForForm = currentValueForForm.raw2attr();
-                                }
-                            }
+                            var additionToField = '';
                             if(type === 'keyword') {
                                 extraClass = 'keyword';
+                                if(typeof myob.currentFilter[category] !== 'undefined') {
+                                    if(typeof myob.currentFilter[category][0] !== 'undefined') {
+                                        currentValueForForm = myob.currentFilter[category].valueToMatch;
+                                        currentValueForForm = currentValueForForm.raw2attr();
+                                    }
+                                }
                             } else if(type === 'tag') {
+                                if(typeof myob.currentFilter[category] !== 'undefined') {
+                                    for(var i = 0; i < myob.currentFilter[category].length; i++) {
+                                        valueIndex = myob.currentFilter[category].valueToMatch;
+                                        var html = myob.makeFieldForForm('checkbox', category, tabIndex, valueIndex);
+                                        if(html.length > 5) {
+                                            html = html.replace('<input ', '<input checked="checked" ');
+                                        }
+                                        additionToField += html;
+                                    }
+                                }
                                 extraClass = 'awesomplete';
                             }
                             return startString +
-                                    '<input class="text ' + extraClass + '" type="text" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" />' +
+                                    '<input class="text ' + extraClass + '" type="text" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" value="'+currentValueForForm+'" />' +
+                                    additionToField +
                                     endString;
                         case 'checkbox':
                             var checked = '';
                             if(typeof myob.currentFilter[category] !== 'undefined') {
-                                var arrayIndex = jQuery.inArray(valueIndex, myob.currentFilter[category]);
-                                if(arrayIndex > -1) {
-                                    checked = 'checked="checked"';
+                                for(var i = 0; i < myob.currentFilter[category].length; i++) {
+                                    if(valueIndex == myob.currentFilter[category].valueToMatch) {
+                                        checked = 'checked="checked"';
+                                    }
                                 }
                             }
                             return startString +
-                                    '<input class="checkbox" type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + valueIndex.raw2attr() + '" ' + checked + ' " tabindex="'+tabIndex+'" />' +
+                                    '<input class="checkbox" type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + valueIndex.raw2attr() + '" ' + checked + ' tabindex="'+tabIndex+'" />' +
                                     '<label for="' + valueID + '">' + valueIndex + '</label>' +
                                     endString;
 
                         case 'number':
                         case 'date':
-                            var currentValueForForm = ['', ''];
+                            var currentValueForForm = {gt: '', lt: ''};
                             if(typeof myob.currentFilter[category] !== 'undefined') {
-                                currentValueForForm = myob.currentFilter[category];
+                                currentValueForForm = myob.currentFilter[category][0];
                             }
                             var s = startString +
                                     '<span class="gt">' +
                                     ' <label for="' + valueID + '_gt">' + myob.greaterThanLabel + '</label>' +
-                                    ' <input data-dir="gt" data-label="' + myob.greaterThanLabel.raw2attr() + '" class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '" tabindex="'+tabIndex+'" value="'+currentValueForForm[0].raw2attr()+'" />' +
+                                    ' <input data-dir="gt" data-label="' + myob.greaterThanLabel.raw2attr() + '" class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '" tabindex="'+tabIndex+'" value="'+currentValueForForm['gt'].raw2attr()+'" />' +
                                     ' </span><span class="lt">' +
                                     ' <label for="' + valueID + '_lt">' + myob.lowerThanLabel + '</label>' +
-                                    ' <input data-dir="lt" data-label="' + myob.lowerThanLabel.raw2attr() + '"  class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '_lt" tabindex="'+tabIndex+'" value="'+currentValueForForm[1].raw2attr()+'" />' +
+                                    ' <input data-dir="lt" data-label="' + myob.lowerThanLabel.raw2attr() + '"  class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '_lt" tabindex="'+tabIndex+'" value="'+currentValueForForm['lt'].raw2attr()+'" />' +
                                     ' </span>' +
                                     endString;
                             if(type === 'date') {
@@ -1516,56 +1547,60 @@ jQuery(document).ready(
             {
                 var myob = this;
                 var widthAndHeightSet = false;
-                if(myob.hasFixedTableHeader) {
-                    jQuery(window).bind(
-                        "load resize scroll",
-                        function(e) {
+                jQuery(window).ready(
+                    function() {
+                        if(myob.hasFixedTableHeader) {
+                            jQuery(window).bind(
+                                "load resize scroll",
+                                function(e) {
 
-                            if(myob.myTableHolder.isOnScreen() || myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
-                                myob.myTableHolder.addClass(myob.filterInUseClass);
-                                myob.myTableHolder.removeClass(myob.filterNotInUseClass);
-                            } else {
-                                myob.myTableHolder.addClass(myob.filterNotInUseClass);
-                                myob.myTableHolder.removeClass(myob.filterInUseClass);
-                            }
-
-                            if(e.type === 'resize') {
-                                widthAndHeightSet = false;
-                            }
-                            var tableOffset = myob.myTableBody.offset().top;
-                            var offset = jQuery(this).scrollTop();
-                            if (offset > tableOffset) {
-                                myob.myTableHolder.addClass('fixed-header');
-                                myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight());
-                            }
-                            else if (offset <= tableOffset) {
-                                myob.myTableHolder.removeClass('fixed-header');
-                                if(! widthAndHeightSet ) {
-                                    if(e.type !== 'load') {
-                                        widthAndHeightSet = true;
-                                        var tableHolderWidth = myob.myTableHolder.width();
-                                        myob.myFilterFormHolder.width(tableHolderWidth);
-                                        //set width of cells
-                                        myob.myTable.find('tbody tr:first td').each(
-                                            function(colNumber, cell) {
-                                                var cell = jQuery(cell);
-                                                var myWidth = cell.width();                                                cell.width(myWidth);
-                                                jQuery('thead tr').each(
-                                                    function(i, tr) {
-                                                        jQuery(tr).children().eq(colNumber).width(myWidth);
-                                                    }
-                                                );
-
-                                            }
-                                        );
-                                    //set width of filter
+                                    if(myob.myTableHolder.isOnScreen() || myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
+                                        myob.myTableHolder.addClass(myob.filterInUseClass);
+                                        myob.myTableHolder.removeClass(myob.filterNotInUseClass);
+                                    } else {
+                                        myob.myTableHolder.addClass(myob.filterNotInUseClass);
+                                        myob.myTableHolder.removeClass(myob.filterInUseClass);
                                     }
 
+                                    if(e.type === 'resize') {
+                                        widthAndHeightSet = false;
+                                    }
+                                    var tableOffset = myob.myTableBody.offset().top;
+                                    var offset = jQuery(this).scrollTop();
+                                    if (offset > tableOffset) {
+                                        myob.myTableHolder.addClass('fixed-header');
+                                        myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight());
+                                    }
+                                    else if (offset <= tableOffset) {
+                                        myob.myTableHolder.removeClass('fixed-header');
+                                        if(! widthAndHeightSet ) {
+                                            if(e.type !== 'load') {
+                                                widthAndHeightSet = true;
+                                                var tableHolderWidth = myob.myTableHolder.width();
+                                                myob.myFilterFormHolder.width(tableHolderWidth);
+                                                //set width of cells
+                                                myob.myTable.find('tbody tr:first td, tbody tr:first th').each(
+                                                    function(colNumber, cell) {
+                                                        var cell = jQuery(cell);
+                                                        var myWidth = cell.width();                                                cell.width(myWidth);
+                                                        jQuery('thead tr').each(
+                                                            function(i, tr) {
+                                                                jQuery(tr).children().eq(colNumber).width(myWidth);
+                                                            }
+                                                        );
+
+                                                    }
+                                                );
+                                            //set width of filter
+                                            }
+
+                                        }
+                                    }
                                 }
-                            }
+                            );
                         }
-                    );
-                }
+                    }
+                );
             },
 
             //===================================================================
@@ -1861,6 +1896,8 @@ jQuery(document).ready(
                 );
                 if(html.length === 0) {
                     html = myob.noFilterSelectedText;
+                } else {
+                    html = '<div class="clear"><a href="#">✖</a></div>' + html;
                 }
                 var targetDomElement = myob.myTableHolder.find('.'+myob.currentSearchFilterClass);
                 var title = targetDomElement.attr('data-title');
