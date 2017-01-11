@@ -29,7 +29,7 @@ jQuery(document).ready(
 
         var myTableHolder = this;
 
-        var TableFilterSort = {
+        var myob = {
 
             /**
              * turn on to see what is going on in console
@@ -544,7 +544,6 @@ jQuery(document).ready(
              *
              */
             init: function(holderNumber){
-                var myob = TableFilterSort;
 
                 //get the holders
                 myob.holderNumber = holderNumber;
@@ -626,9 +625,7 @@ jQuery(document).ready(
                             //check for existing favourites
                             if(myob.debug) { console.profileEnd();console.profile('retrieveCookieData');}
                             myob.retrieveCookieData();
-                            //form in and out of focus
-                            if(myob.debug) { console.profileEnd();console.profile('showAndHideFilterForm');}
-                            myob.showAndHideFilterForm();
+
                             //fix table header
                             if(myob.debug) { console.profileEnd(); console.profile('fixTableHeader');}
                             myob.fixTableHeader();
@@ -645,7 +642,6 @@ jQuery(document).ready(
              */
             resetObjects: function()
             {
-                var myob = TableFilterSort;
                 myob.myRows = myob.myTable.find(myob.rowSelector);
             },
 
@@ -658,7 +654,6 @@ jQuery(document).ready(
              */
             filterItemCollector: function()
             {
-                var myob = TableFilterSort;
                 //for each table with specific class ...
                 var value = '';
                 var category = '';
@@ -693,7 +688,6 @@ jQuery(document).ready(
              */
             tableHideColsWhichAreAllTheSame: function()
             {
-                var myob = TableFilterSort;
                 var title = myob.myTableHolder.find('.'+ myob.commonContentHolderClass).attr("data-title");
                 if(typeof title !== "undefined") {
                     title = "<h3>"+title+"</h3>";
@@ -758,7 +752,6 @@ jQuery(document).ready(
              */
             dataDictionaryCollector: function()
             {
-                var myob = TableFilterSort;
                 Object.keys(myob.dataDictionary).forEach(
                     function(category, categoryIndex) {
                         //make sure there are options
@@ -836,7 +829,6 @@ jQuery(document).ready(
              */
             setupFilterFormListeners: function()
             {
-                var myob = TableFilterSort;
                 myob.myTableHolder.on(
                     'click',
                     '.' + myob.openAndCloseFilterFormClass,
@@ -860,7 +852,6 @@ jQuery(document).ready(
              */
             setupSortListeners: function()
             {
-                var myob = TableFilterSort;
                 myob.myTableHolder.on(
                     "click",
                     myob.sortLinkSelector,
@@ -931,7 +922,6 @@ jQuery(document).ready(
 
             paginationListeners: function()
             {
-                var myob = TableFilterSort;
                 myob.myTableHolder.on(
                     'click',
                     myob.paginationSelector+' a',
@@ -949,7 +939,6 @@ jQuery(document).ready(
              */
             toggleSlideSetup: function()
             {
-                var myob = TableFilterSort;
                 //add toggle
                 myob.myTableHolder.on(
                     'click',
@@ -975,7 +964,6 @@ jQuery(document).ready(
 
             addURLChangeListener: function()
             {
-                var myob = TableFilterSort;
                 if(myob.useBackAndForwardButtons) {
                     window.addEventListener(
                         "popstate",
@@ -993,7 +981,6 @@ jQuery(document).ready(
              */
             directFilterLinkListener: function()
             {
-                var myob = TableFilterSort;
                 myob.myTableBody.on(
                     'click',
                     'span[data-filter].' + myob.directLinkClass,
@@ -1030,7 +1017,6 @@ jQuery(document).ready(
             },
 
             favouriteLinkListener: function(){
-                var myob = TableFilterSort;
                 if(myob.myTableBody.find(myob.favouriteLinkSelector).length > 0) {
                     myob.myTableHolder.on(
                         'click',
@@ -1059,7 +1045,6 @@ jQuery(document).ready(
 
             retrieveServerDataListener: function()
             {
-                var myob = TableFilterSort;
 
                 myob.myTableHolder.on(
                     'click',
@@ -1120,7 +1105,6 @@ jQuery(document).ready(
             createFilterForm: function()
             {
                 //create html content and add to top of page
-                var myob = TableFilterSort;
 
                 if(myob.myFilterFormHolder.length > 0) {
 
@@ -1243,10 +1227,8 @@ jQuery(document).ready(
 
             makeSectionHeaderForForm: function(type, category)
             {
-                var myob = TableFilterSort;
                 var myClass = type + myob.sectionFilterClassAppendix;
                 var cleanCategory = category.replace(/\W/g, '');
-                var myob = TableFilterSort;
                 return '<div class="' + myob.filterGroupClass + ' ' + myClass + '" field-type="'+type+'" data-to-filter="' + category.raw2attr() + '">' +
                         '<label class="'+myob.groupLabelClass+'">' + myob.replaceAll(category, '-', ' ') + '</label>' +
                         '<ul>';
@@ -1254,7 +1236,6 @@ jQuery(document).ready(
 
             makeFieldForForm: function(type, category, tabIndex, valueIndex)
             {
-                var myob = TableFilterSort;
                 var cleanCategory = category.replace(/\W/g, '');
                 var cleanValue = valueIndex.toString();
                 var valueID = ('TFS_' + cleanCategory + '_' + cleanValue).replace(/[^a-zA-Z0-9]+/g, '_');
@@ -1331,7 +1312,6 @@ jQuery(document).ready(
 
             makeCheckboxSection: function(input, valueIndex)
             {
-                var myob = TableFilterSort;
                 input = jQuery(input);
                 var category = input.attr('name');
                 tabIndex = input.attr('tabindex');
@@ -1350,7 +1330,6 @@ jQuery(document).ready(
 
             runCurrentSort: function()
             {
-                var myob = TableFilterSort;
                 var currentSortLinkSelector = '.'+myob.sortDescClass+', .'+myob.sortAscClass
                 var currentSortObject = myob.myTableHolder.find(currentSortLinkSelector).first();
                 if(currentSortObject && currentSortObject.length > 0) {
@@ -1369,7 +1348,6 @@ jQuery(document).ready(
 
             applyFilter: function()
             {
-                var myob = TableFilterSort;
                 myob.showFromRow = 0;
                 myob.workOutCurrentFilter();
                 myob.startRowManipulation();
@@ -1511,7 +1489,6 @@ jQuery(document).ready(
              */
             gotoPage: function(page)
             {
-                var myob = TableFilterSort;
                 myob.showFromRow = page * myob.visibleRowCount;
                 myob.startRowManipulation();
                 myob.endRowManipulation();
@@ -1526,22 +1503,6 @@ jQuery(document).ready(
              * show the form button when it table is in view OR when it is form is open
              * do this every second
              */
-            showAndHideFilterForm: function()
-            {
-                var myob = TableFilterSort;
-                window.setInterval(
-                    function() {
-                        if(myob.myTableHolder.isOnScreen() || myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
-                            myob.myTableHolder.addClass(myob.filterInUseClass);
-                            myob.myTableHolder.removeClass(myob.filterNotInUseClass);
-                        } else {
-                            myob.myTableHolder.addClass(myob.filterNotInUseClass);
-                            myob.myTableHolder.removeClass(myob.filterInUseClass);
-                        }
-                    },
-                    myob.intervalForFilterCheck
-                );
-            },
 
             fixTableHeader: function()
             {
@@ -1551,6 +1512,15 @@ jQuery(document).ready(
                     jQuery(window).bind(
                         "load resize scroll",
                         function(e) {
+
+                            if(myob.myTableHolder.isOnScreen() || myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
+                                myob.myTableHolder.addClass(myob.filterInUseClass);
+                                myob.myTableHolder.removeClass(myob.filterNotInUseClass);
+                            } else {
+                                myob.myTableHolder.addClass(myob.filterNotInUseClass);
+                                myob.myTableHolder.removeClass(myob.filterInUseClass);
+                            }
+
                             if(e.type === 'resize') {
                                 widthAndHeightSet = false;
                             }
@@ -1589,13 +1559,12 @@ jQuery(document).ready(
 
             startRowManipulation: function()
             {
-                var myob = TableFilterSort;
                 if(typeof myob.startRowFX1 === 'function') {
                     myob.startRowFX1(myob);
                 }
                 myob.resetObjects();
                 //show the table as loading
-                myob.myTableHolder
+                myob.myTable
                     .addClass(myob.loadingClass)
                     .find(myob.moreRowEntriesSelector).hide();
                 //hide the table
@@ -1613,7 +1582,6 @@ jQuery(document).ready(
 
             endRowManipulation: function()
             {
-                var myob = TableFilterSort;
                 if(typeof myob.endRowFX1 === 'function') {
                     myob.endRowFX1(myob);
                 }
@@ -1703,17 +1671,19 @@ jQuery(document).ready(
                     var buttonHTML = '<ul>' + buttons.join('</li><li>') + '</ul>';
                     myob.myTableHolder.find(myob.saveAndLoadSelector).html(buttonHTML);
                 }
-                myob.myTableHolder.removeClass(myob.loadingClass);
-                window.setTimeout(
-                    function() {
-                        jQuery('html, body').animate(
-                            {
-                                scrollTop: myob.myTableHolder.position().top
-                            },
-                            200
-                        );
-                    }, 100
-                );
+                myob.myTable.removeClass(myob.loadingClass);
+                if( ! myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
+                    window.setTimeout(
+                        function() {
+                            jQuery('html, body').animate(
+                                {
+                                    scrollTop: myob.myTableHolder.position().top
+                                },
+                                200
+                            );
+                        }, 100
+                    );
+                }
                 if(myob.useBackAndForwardButtons) {
                     history.pushState(null, null, myob.currentURL());
                 }
@@ -1725,7 +1695,6 @@ jQuery(document).ready(
 
             currentURL: function ()
             {
-                var myob = TableFilterSort;
                 var urlObject = {};
                 urlObject.f = myob.currentFilter;
                 urlObject.s = myob.currentSorter;
@@ -1735,7 +1704,6 @@ jQuery(document).ready(
 
             makeRetrieveButtons: function(canSave, type)
             {
-                var myob = TableFilterSort;
                 var buttons = [];
                 switch(type) {
                     case 'favourites':
@@ -1762,7 +1730,6 @@ jQuery(document).ready(
             //===================================================================
 
             workOutCurrentFilter: function(){
-                var myob = TableFilterSort;
                 var html = "";
                 var categoryHolder;
                 var category = '';
@@ -1902,7 +1869,6 @@ jQuery(document).ready(
 
             retrieveCookieData: function()
             {
-                var myob = TableFilterSort;
                 myob.favouritesStore = Cookies.getJSON('favouritesStore');
                 if(typeof myob.favouritesStore === 'undefined') {
                     myob.favouritesStore = [];
@@ -1918,7 +1884,6 @@ jQuery(document).ready(
 
             findAndApplyGetVariables: function()
             {
-                var myob = TableFilterSort;
                 var qd = {};
                 location.search.substr(1).split("&").forEach(
                     function(item) {
@@ -2035,13 +2000,13 @@ jQuery(document).ready(
         };
 
         TableFilterSort = jQuery.extend(
-            TableFilterSort,
+            myob,
             options
         );
 
         this.each(
             function(i, el) {
-                TableFilterSort.init(holderNumber);
+                myob.init(holderNumber);
                 holderNumber++;
             }
         );
@@ -2049,16 +2014,16 @@ jQuery(document).ready(
         // Expose public API
         return {
             getVar: function( variableName ) {
-                if ( TableFilterSort.hasOwnProperty(variableName)) {
-                    return TableFilterSort[variableName];
+                if ( myob.hasOwnProperty(variableName)) {
+                    return myob[variableName];
                 }
             },
             setVar: function(variableName, value) {
-                TableFilterSort[variableName] = value;
+                myob[variableName] = value;
                 return this;
             },
             gotoPage: function(pageNumber) {
-                TableFilterSort.gotoPage(pageNumber);
+                myob.gotoPage(pageNumber);
                 return this;
             }
         };
