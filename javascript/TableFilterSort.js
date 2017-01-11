@@ -709,13 +709,13 @@ jQuery(document).ready(
                                 function(i, el) {
                                     el = jQuery(el);
                                     if(!commonContentAdded) {
-                                        if(el.html() !== ""){
+                                        if(el.html() !== "" && !el.hasClass('ignore-content')){
                                             commonContent += "<li><strong>"+category + ":</strong> <span>" + el.html() + "</span></li>";
                                             commonContentAdded = true;
                                         }
                                     }
                                     var spanParent = el.parent();
-                                    el.remove();
+                                    //el.remove();
 
                                     if(spanParent.is("li")){
                                         spanParent.hide();
