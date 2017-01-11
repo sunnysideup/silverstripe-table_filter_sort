@@ -321,3 +321,40 @@ input[type="checkbox"] {
 
 td:first-child a {font-size: 25px!important; text-decoration: none; display: block; float: right; clear: right;}
 .fav .addFav {color: red;}
+
+
+@-moz-keyframes show_on_top {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+@-webkit-keyframes show_on_top {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+.fixed-header.tableFilterSortFilterInUse table thead,
+.fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder{
+    -webkit-animation-name: show_on_top;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-timing-function: ease;
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-direction: normal;
+    -webkit-animation-delay: 0s;
+    -webkit-animation-play-state: running;
+    -webkit-animation-fill-mode: forwards;
+    -moz-animation-name: show_on_top;
+    -moz-animation-duration: 1s;
+    -moz-animation-timing-function: ease;
+    -moz-animation-iteration-count: 1;
+    -moz-animation-direction: normal;
+    -moz-animation-delay: 0s;
+    -moz-animation-play-state: running;
+    -moz-animation-fill-mode: forwards;
+}
