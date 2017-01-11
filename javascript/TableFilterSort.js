@@ -1516,56 +1516,60 @@ jQuery(document).ready(
             {
                 var myob = this;
                 var widthAndHeightSet = false;
-                if(myob.hasFixedTableHeader) {
-                    jQuery(window).bind(
-                        "load resize scroll",
-                        function(e) {
+                jQuery(window).ready(
+                    function() {
+                        if(myob.hasFixedTableHeader) {
+                            jQuery(window).bind(
+                                "load resize scroll",
+                                function(e) {
 
-                            if(myob.myTableHolder.isOnScreen() || myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
-                                myob.myTableHolder.addClass(myob.filterInUseClass);
-                                myob.myTableHolder.removeClass(myob.filterNotInUseClass);
-                            } else {
-                                myob.myTableHolder.addClass(myob.filterNotInUseClass);
-                                myob.myTableHolder.removeClass(myob.filterInUseClass);
-                            }
-
-                            if(e.type === 'resize') {
-                                widthAndHeightSet = false;
-                            }
-                            var tableOffset = myob.myTableBody.offset().top;
-                            var offset = jQuery(this).scrollTop();
-                            if (offset > tableOffset) {
-                                myob.myTableHolder.addClass('fixed-header');
-                                myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight());
-                            }
-                            else if (offset <= tableOffset) {
-                                myob.myTableHolder.removeClass('fixed-header');
-                                if(! widthAndHeightSet ) {
-                                    if(e.type !== 'load') {
-                                        widthAndHeightSet = true;
-                                        var tableHolderWidth = myob.myTableHolder.width();
-                                        myob.myFilterFormHolder.width(tableHolderWidth);
-                                        //set width of cells
-                                        myob.myTable.find('tbody tr:first td, tbody tr:first th').each(
-                                            function(colNumber, cell) {
-                                                var cell = jQuery(cell);
-                                                var myWidth = cell.width();                                                cell.width(myWidth);
-                                                jQuery('thead tr').each(
-                                                    function(i, tr) {
-                                                        jQuery(tr).children().eq(colNumber).width(myWidth);
-                                                    }
-                                                );
-
-                                            }
-                                        );
-                                    //set width of filter
+                                    if(myob.myTableHolder.isOnScreen() || myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
+                                        myob.myTableHolder.addClass(myob.filterInUseClass);
+                                        myob.myTableHolder.removeClass(myob.filterNotInUseClass);
+                                    } else {
+                                        myob.myTableHolder.addClass(myob.filterNotInUseClass);
+                                        myob.myTableHolder.removeClass(myob.filterInUseClass);
                                     }
 
+                                    if(e.type === 'resize') {
+                                        widthAndHeightSet = false;
+                                    }
+                                    var tableOffset = myob.myTableBody.offset().top;
+                                    var offset = jQuery(this).scrollTop();
+                                    if (offset > tableOffset) {
+                                        myob.myTableHolder.addClass('fixed-header');
+                                        myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight());
+                                    }
+                                    else if (offset <= tableOffset) {
+                                        myob.myTableHolder.removeClass('fixed-header');
+                                        if(! widthAndHeightSet ) {
+                                            if(e.type !== 'load') {
+                                                widthAndHeightSet = true;
+                                                var tableHolderWidth = myob.myTableHolder.width();
+                                                myob.myFilterFormHolder.width(tableHolderWidth);
+                                                //set width of cells
+                                                myob.myTable.find('tbody tr:first td, tbody tr:first th').each(
+                                                    function(colNumber, cell) {
+                                                        var cell = jQuery(cell);
+                                                        var myWidth = cell.width();                                                cell.width(myWidth);
+                                                        jQuery('thead tr').each(
+                                                            function(i, tr) {
+                                                                jQuery(tr).children().eq(colNumber).width(myWidth);
+                                                            }
+                                                        );
+
+                                                    }
+                                                );
+                                            //set width of filter
+                                            }
+
+                                        }
+                                    }
                                 }
-                            }
+                            );
                         }
-                    );
-                }
+                    }
+                );
             },
 
             //===================================================================
