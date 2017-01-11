@@ -18,8 +18,10 @@ table { table-layout: fixed }
     z-index: 10;
 }
 
-.fixed-header.tableFilterSortFilterInUse table thead {position: fixed;  display: table;}
-
+.fixed-header.tableFilterSortFilterInUse table thead {
+    position: fixed;
+    z-index: 9;
+}
 
 @-webkit-keyframes show_on_top {
     0% {
