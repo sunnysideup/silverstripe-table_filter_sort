@@ -23,6 +23,20 @@ h3 {
   padding-top: 0;
 }
 
+.fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder {
+  box-sizing: border-box;
+  background-color: #aaa;
+  border: 1px solid #fff;
+}
+
+.fixed-header.tableFilterSortFilterInUse table thead th{
+    border-top: none;
+}
+
+.tableFilterSortTable {
+  border-collapse: collapse;
+}
+
 table {
   width: 100%;
   margin-left: auto;
@@ -30,11 +44,11 @@ table {
 }
 
 table th, table td {
-  width: 12.5%;
+  box-sizing: border-box;
   border: 1px solid #fff;
   background-color: #ddd;
   text-align: left;
-  padding: 1em;
+  padding: 10px;
   vertical-align: top;
 }
 
@@ -69,12 +83,13 @@ ul li {
 .tableFilterSortFilterFormHolder { zoom: 1; } /* IE < 8 */
 
 .tableFilterSortFilterFormHolder {
-  background-color: #ddd;
-  padding: 10px;
   position: relative;
-  border: 3px solid #fff;
-  border-radius: 10px;
+  background-color: #ddd;
   border: 1px solid #ccc;
+}
+
+.tableFilterSortFilterFormHolder form{
+  padding: 10px;
 }
 
 .tableFilterSortFilterFormHolder .filterColumn {

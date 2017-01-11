@@ -1534,11 +1534,15 @@ jQuery(document).ready(
                                 myob.myTableHolder.removeClass('fixed-header');
                                 if(! widthAndHeightSet ) {
                                     widthAndHeightSet = true;
-                                    myob.myFilterFormHolder.width(myob.myTableHolder.width());
+                                    var tableHolderWidth = myob.myTableHolder.width();
+                                    console.debug(tableHolderWidth);
+                                    myob.myFilterFormHolder.width(tableHolderWidth);
+                                    console.debug(myob.myFilterFormHolder.width());
                                     //set width of table
-                                    myob.myTable.width(myob.myTableHolder.width());
+                                    myob.myTable.width(tableHolderWidth);
+                                    myob.myTableHead.width(tableHolderWidth);
                                     //set width of cells
-                                    myob.myTable.find('thead tr:first th, thead tr:first td').each(
+                                    myob.myTable.find('thead tr:first th, thead tr:first td, tbody tr:first td').each(
                                         function(colNumber, cell) {
                                             var cell = jQuery(cell);
                                             cell.width(cell.width());
