@@ -224,6 +224,9 @@ $html = create_test();
         </header>
 
         <div class="tableFilterSortHolder">
+
+            <div class="saveAndLoad"></div>
+
             <div class="tableFilterSortFilterFormHolder"
                 data-title="Filter Table Below"
                 data-title-clear-button="Clear"
@@ -232,7 +235,6 @@ $html = create_test();
                 data-favourites-page-id="test-favs"
             ></div>
 
-            <div class="saveAndLoad"></div>
 
             <p class="tableFilterSortMoreEntries paginationTop">
                 <span class="line">

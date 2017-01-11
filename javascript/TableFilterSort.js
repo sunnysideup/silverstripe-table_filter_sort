@@ -851,6 +851,26 @@ jQuery(document).ready(
                         myob.applyFilter();
                     }
                 );
+                myob.myFilterFormHolder.on(
+                    'click',
+                    '.clear',
+                    function(event) {
+                        myob.currentFilter = {};
+                        myob.myFilterFormHolder.find('input').each(
+                            function(i, el) {
+                                var myEl = jQuery(el);
+                                var type = myEl.attr('type');
+                                if('type' === 'checkbox') {
+                                    myEl.prop('checked', false);
+                                } else {
+                                    myEl.val('');
+                                }
+                            }
+                        );
+                        myob.applyFilter();
+                        //myob.createFilterForm();
+                    }
+                );
             },
 
 
@@ -1865,6 +1885,8 @@ jQuery(document).ready(
                 );
                 if(html.length === 0) {
                     html = myob.noFilterSelectedText;
+                } else {
+                    html = '<div class="clear"><a href="#">✖</a></div>' + html;
                 }
                 var targetDomElement = myob.myTableHolder.find('.'+myob.currentSearchFilterClass);
                 var title = targetDomElement.attr('data-title');
