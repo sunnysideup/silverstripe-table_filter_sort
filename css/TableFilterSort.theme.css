@@ -44,7 +44,6 @@ table {
 }
 
 table th, table td {
-  box-sizing: border-box;
   border: 1px solid #fff;
   background-color: #ddd;
   text-align: left;

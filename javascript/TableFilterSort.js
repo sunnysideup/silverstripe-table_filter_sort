@@ -1107,7 +1107,7 @@ jQuery(document).ready(
                 //create html content and add to top of page
 
                 if(myob.myFilterFormHolder.length > 0) {
-
+                    var currentFilterHTML = "";
                     var filterFormTitle = myob.myFilterFormHolder.attr("data-title");
                     if(typeof filterFormTitle === "undefined") {
                         filterFormTitle = myob.filterTitle;
@@ -1533,22 +1533,28 @@ jQuery(document).ready(
                             else if (offset <= tableOffset) {
                                 myob.myTableHolder.removeClass('fixed-header');
                                 if(! widthAndHeightSet ) {
-                                    widthAndHeightSet = true;
-                                    var tableHolderWidth = myob.myTableHolder.width();
-                                    console.debug(tableHolderWidth);
-                                    myob.myFilterFormHolder.width(tableHolderWidth);
-                                    console.debug(myob.myFilterFormHolder.width());
-                                    //set width of table
-                                    myob.myTable.width(tableHolderWidth);
-                                    myob.myTableHead.width(tableHolderWidth);
-                                    //set width of cells
-                                    myob.myTable.find('thead tr:first th, thead tr:first td, tbody tr:first td').each(
-                                        function(colNumber, cell) {
-                                            var cell = jQuery(cell);
-                                            cell.width(cell.width());
-                                        }
-                                    );
+                                    if(e.type !== 'load') {
+                                        //widthAndHeightSet = true;
+                                        var tableHolderWidth = myob.myTableHolder.width();
+                                        myob.myFilterFormHolder.width(tableHolderWidth);
+                                        //set width of table
+                                        myob.myTable.width(tableHolderWidth);
+                                        myob.myTableHead.width(tableHolderWidth);
+                                        //set width of cells
+                                        myob.myTable.find('tbody tr:first td').each(
+                                            function(colNumber, cell) {
+                                                var cell = jQuery(cell);
+                                                var myWidth = cell.width();                                                cell.width(myWidth);
+                                                jQuery('thead tr').each(
+                                                    function(i, tr) {
+                                                        jQuery(tr).children().eq(colNumber).width(myWidth);
+                                                    }
+                                                );
+
+                                            }
+                                        );
                                     //set width of filter
+                                    }
 
                                 }
                             }
