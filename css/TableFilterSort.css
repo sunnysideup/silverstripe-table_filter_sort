@@ -21,6 +21,7 @@ table { table-layout: fixed }
 .fixed-header.tableFilterSortFilterInUse table thead {
     position: fixed;
     z-index: 9;
+    display: table;
 }
 
 @-moz-keyframes show_on_top {

@@ -1546,7 +1546,7 @@ jQuery(document).ready(
                                         var tableHolderWidth = myob.myTableHolder.width();
                                         myob.myFilterFormHolder.width(tableHolderWidth);
                                         //set width of cells
-                                        myob.myTable.find('tbody tr:first td').each(
+                                        myob.myTable.find('tbody tr:first td, tbody tr:first th').each(
                                             function(colNumber, cell) {
                                                 var cell = jQuery(cell);
                                                 var myWidth = cell.width();                                                cell.width(myWidth);
