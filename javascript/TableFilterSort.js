@@ -171,7 +171,7 @@ jQuery(document).ready(
              * maximum number of checkboxes in the filter before it becomes a text filter
              * @type Int
              */
-            maximumNumberOfFilterOptions: 3,
+            maximumNumberOfFilterOptions: 30,
 
             /**
              * number of milliseconds to check if filter is in use ...
