@@ -592,8 +592,8 @@ jQuery(document).ready(
                             if(myob.debug) { console.profileEnd();console.profile('paginationListeners');}
                             myob.paginationListeners();
                             //allow things to slide up and down
-                            if(myob.debug) { console.profile('toggleSlideSetup');}
-                            myob.toggleSlideSetup();
+                            if(myob.debug) { console.profile('setupMoreDetailsListener');}
+                            myob.setupMoreDetailsListener();
                             //listen for forward and back buttons
                             if(myob.debug) { console.profile('addURLChangeListener');}
                             myob.addURLChangeListener();
@@ -829,7 +829,7 @@ jQuery(document).ready(
              */
             setupFilterFormListeners: function()
             {
-                myob.myTableHolder.on(
+                myob.myFilterFormHolder.on(
                     'click',
                     '.' + myob.openAndCloseFilterFormClass,
                     function(event) {
@@ -842,6 +842,13 @@ jQuery(document).ready(
                             myob.applyFilter();
                         }
                         return false;
+                    }
+                );
+                myob.myFilterFormHolder.on(
+                    'change',
+                    'input',
+                    function(event) {
+                        myob.applyFilter();
                     }
                 );
             },
@@ -937,7 +944,7 @@ jQuery(document).ready(
             /**
              * set up toggle slides ...
              */
-            toggleSlideSetup: function()
+            setupMoreDetailsListener: function()
             {
                 //add toggle
                 myob.myTableHolder.on(
@@ -1211,6 +1218,7 @@ jQuery(document).ready(
                                     if (index > -1) {
                                         this._list.splice(index, 1);
                                     }
+                                    myob.applyFilter();
                                 }
                             }
                         );
@@ -1869,19 +1877,34 @@ jQuery(document).ready(
 
             retrieveCookieData: function()
             {
+                myob.myTableBody.find('tr.'+myob.favouriteClass).each(
+                    function(i, el) {
+                        jQuery(el).removeClass(myob.favouriteClass);
+                    }
+                );
                 myob.favouritesStore = Cookies.getJSON('favouritesStore');
                 if(typeof myob.favouritesStore === 'undefined') {
                     myob.favouritesStore = [];
-                }
-                for (var fav in myob.favouritesStore) {
-                    if (myob.favouritesStore.hasOwnProperty(fav)) {
-                        var id = myob.favouritesStore[fav];
-                        myob.myTableBody.find('#' + id).toggleClass(myob.favouriteClass);
+                } else {
+                    for (var fav in myob.favouritesStore) {
+                        if (myob.favouritesStore.hasOwnProperty(fav)) {
+                            var id = myob.favouritesStore[fav];
+                            myob.myTableBody.find('#' + id).toggleClass(myob.favouriteClass);
+                        }
                     }
                 }
 
             },
 
+            /**
+             * URL:
+             * f[*]=AND|OR
+             * f[Key1]=keywordToInclude,KeywordToInclude2|KeywordToExclude|AND
+             * f[Key2]=keywordToInclude,KeywordToInclude2|KeywordToExclude|AND
+             * s[Key3]=ASC
+             *
+             * @return {[type]} [description]
+             */
             findAndApplyGetVariables: function()
             {
                 var qd = {};

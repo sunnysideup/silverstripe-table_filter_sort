@@ -303,6 +303,7 @@ $html = create_test();
                     <?php echo $html ?>
                 </tbody>
             </table>
+            <p class="message warning no-matches-message">No entries match your filter</p>
             <p class="tableFilterSortMoreEntries">
                 <span class="line">
                     <strong>Filtered:</strong>
