@@ -12,14 +12,16 @@ tr.hide, tr.no-match {display: none!important;}
 
 table { table-layout: fixed }
 
-.fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder {
+.fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder,
+.fixed-header.tableFilterSortFilterInUse table thead {
     position:
     fixed; top: 0;
+    opacity: 0;
+}
+.fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder {
     z-index: 10;
 }
-
 .fixed-header.tableFilterSortFilterInUse table thead {
-    position: fixed;
     z-index: 9;
     display: table;
 }
@@ -47,7 +49,7 @@ table { table-layout: fixed }
     -webkit-animation-timing-function: ease;
     -webkit-animation-iteration-count: 1;
     -webkit-animation-direction: normal;
-    -webkit-animation-delay: 0s;
+    -webkit-animation-delay: 0.5s;
     -webkit-animation-play-state: running;
     -webkit-animation-fill-mode: forwards;
     -moz-animation-name: show_on_top;
@@ -55,7 +57,7 @@ table { table-layout: fixed }
     -moz-animation-timing-function: ease;
     -moz-animation-iteration-count: 1;
     -moz-animation-direction: normal;
-    -moz-animation-delay: 0s;
+    -moz-animation-delay: 0.5s;
     -moz-animation-play-state: running;
     -moz-animation-fill-mode: forwards;
 }

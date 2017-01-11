@@ -855,19 +855,11 @@ jQuery(document).ready(
                     'click',
                     '.clear',
                     function(event) {
+                        event.preventDefault();
                         myob.currentFilter = {};
-                        myob.myFilterFormHolder.find('input').each(
-                            function(i, el) {
-                                var myEl = jQuery(el);
-                                var type = myEl.attr('type');
-                                if('type' === 'checkbox') {
-                                    myEl.prop('checked', false);
-                                } else {
-                                    myEl.val('');
-                                }
-                            }
-                        );
+                        myob.createFilterForm();
                         myob.applyFilter();
+                        return false;
                         //myob.createFilterForm();
                     }
                 );
@@ -1134,6 +1126,8 @@ jQuery(document).ready(
                 //create html content and add to top of page
 
                 if(myob.myFilterFormHolder.length > 0) {
+                    //clear it so that we can rebuild it ...
+                    myob.myFilterFormHolder.html("");
                     var currentFilterHTML = "";
                     var filterFormTitle = myob.myFilterFormHolder.attr("data-title");
                     if(typeof filterFormTitle === "undefined") {
@@ -1272,54 +1266,71 @@ jQuery(document).ready(
                     var endString = '</li>';
                     switch (type) {
                         case 'favourites':
+                            var checked = '';
+                            if(typeof myob.currentFilter[category] !== 'undefined') {
+                                checked = ' checked="checked"';
+                            }
                             return startString +
-                                '<input class="favourites" type="checkbox" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" />' +
+                                '<input class="favourites" type="checkbox" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" '+checked+' />' +
                                 '<label for="' + valueID + '">♥ ♥ ♥</label>' +
                                 endString;
                             break;
                         case 'keyword':
                         case 'tag':
                             var currentValueForForm = '';
-                            if(typeof myob.currentFilter[category] !== 'undefined') {
-                                if(typeof myob.currentFilter[category][0] !== 'undefined') {
-                                    currentValueForForm = myob.currentFilter[category][0];
-                                    currentValueForForm = currentValueForForm.raw2attr();
-                                }
-                            }
+                            var additionToField = '';
                             if(type === 'keyword') {
                                 extraClass = 'keyword';
+                                if(typeof myob.currentFilter[category] !== 'undefined') {
+                                    if(typeof myob.currentFilter[category][0] !== 'undefined') {
+                                        currentValueForForm = myob.currentFilter[category].valueToMatch;
+                                        currentValueForForm = currentValueForForm.raw2attr();
+                                    }
+                                }
                             } else if(type === 'tag') {
+                                if(typeof myob.currentFilter[category] !== 'undefined') {
+                                    for(var i = 0; i < myob.currentFilter[category].length; i++) {
+                                        valueIndex = myob.currentFilter[category].valueToMatch;
+                                        var html = myob.makeFieldForForm('checkbox', category, tabIndex, valueIndex);
+                                        if(html.length > 5) {
+                                            html = html.replace('<input ', '<input checked="checked" ');
+                                        }
+                                        additionToField += html;
+                                    }
+                                }
                                 extraClass = 'awesomplete';
                             }
                             return startString +
-                                    '<input class="text ' + extraClass + '" type="text" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" />' +
+                                    '<input class="text ' + extraClass + '" type="text" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" value="'+currentValueForForm+'" />' +
+                                    additionToField +
                                     endString;
                         case 'checkbox':
                             var checked = '';
                             if(typeof myob.currentFilter[category] !== 'undefined') {
-                                var arrayIndex = jQuery.inArray(valueIndex, myob.currentFilter[category]);
-                                if(arrayIndex > -1) {
-                                    checked = 'checked="checked"';
+                                for(var i = 0; i < myob.currentFilter[category].length; i++) {
+                                    if(valueIndex == myob.currentFilter[category].valueToMatch) {
+                                        checked = 'checked="checked"';
+                                    }
                                 }
                             }
                             return startString +
-                                    '<input class="checkbox" type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + valueIndex.raw2attr() + '" ' + checked + ' " tabindex="'+tabIndex+'" />' +
+                                    '<input class="checkbox" type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + valueIndex.raw2attr() + '" ' + checked + ' tabindex="'+tabIndex+'" />' +
                                     '<label for="' + valueID + '">' + valueIndex + '</label>' +
                                     endString;
 
                         case 'number':
                         case 'date':
-                            var currentValueForForm = ['', ''];
+                            var currentValueForForm = {gt: '', lt: ''};
                             if(typeof myob.currentFilter[category] !== 'undefined') {
-                                currentValueForForm = myob.currentFilter[category];
+                                currentValueForForm = myob.currentFilter[category][0];
                             }
                             var s = startString +
                                     '<span class="gt">' +
                                     ' <label for="' + valueID + '_gt">' + myob.greaterThanLabel + '</label>' +
-                                    ' <input data-dir="gt" data-label="' + myob.greaterThanLabel.raw2attr() + '" class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '" tabindex="'+tabIndex+'" value="'+currentValueForForm[0].raw2attr()+'" />' +
+                                    ' <input data-dir="gt" data-label="' + myob.greaterThanLabel.raw2attr() + '" class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '" tabindex="'+tabIndex+'" value="'+currentValueForForm['gt'].raw2attr()+'" />' +
                                     ' </span><span class="lt">' +
                                     ' <label for="' + valueID + '_lt">' + myob.lowerThanLabel + '</label>' +
-                                    ' <input data-dir="lt" data-label="' + myob.lowerThanLabel.raw2attr() + '"  class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '_lt" tabindex="'+tabIndex+'" value="'+currentValueForForm[1].raw2attr()+'" />' +
+                                    ' <input data-dir="lt" data-label="' + myob.lowerThanLabel.raw2attr() + '"  class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '_lt" tabindex="'+tabIndex+'" value="'+currentValueForForm['lt'].raw2attr()+'" />' +
                                     ' </span>' +
                                     endString;
                             if(type === 'date') {
