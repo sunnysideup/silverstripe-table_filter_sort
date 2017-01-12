@@ -8,7 +8,7 @@ span[data-filter].dl {
 tr.hide, tr.no-match {display: none!important;}
 
 .loading  {height: 5000px!important;}
-.loading * {display: none!important;}
+.loading * {display: none;}
 
 table { table-layout: fixed }
 
