@@ -855,7 +855,6 @@ jQuery(document).ready(
                     'click',
                     '.clear',
                     function(event) {
-                        myob.currentFilter = {};
                         myob.myFilterFormHolder.find('input').each(
                             function(i, el) {
                                 var myEl = jQuery(el);
@@ -867,6 +866,7 @@ jQuery(document).ready(
                                 }
                             }
                         );
+                        myob.currentFilter = {};
                         myob.applyFilter();
                         //myob.createFilterForm();
                     }
