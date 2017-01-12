@@ -10,13 +10,16 @@ tr.hide, tr.no-match {display: none!important;}
 .loading  {height: 5000px!important;}
 .loading * {display: none;}
 
+.opened {
+    visibility: visible;
+}
+
 table { table-layout: fixed }
 
 .fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder,
 .fixed-header.tableFilterSortFilterInUse table thead {
-    position:
-    fixed; top: 0;
-    opacity: 0;
+    position: fixed;
+    top: 0;
 }
 .fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder {
     z-index: 10;
@@ -25,3 +28,5 @@ table { table-layout: fixed }
     z-index: 9;
     display: table;
 }
+
+

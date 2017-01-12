@@ -715,7 +715,7 @@ jQuery(document).ready(
                                         }
                                     }
                                     var spanParent = el.parent();
-                                    //el.remove();
+                                    el.remove();
 
                                     if(spanParent.is("li")){
                                         spanParent.hide();
@@ -1582,9 +1582,11 @@ jQuery(document).ready(
                                                 myob.myTable.find('tbody tr:first td, tbody tr:first th').each(
                                                     function(colNumber, cell) {
                                                         var cell = jQuery(cell);
-                                                        var myWidth = cell.width();                                                cell.width(myWidth);
-                                                        jQuery('thead tr').each(
+                                                        var myWidth = cell.width();
+                                                        cell.css('min-width', myWidth);
+                                                        jQuery('thead:first tr').each(
                                                             function(i, tr) {
+                                                                console.debug(jQuery(tr).children().eq(colNumber));
                                                                 jQuery(tr).children().eq(colNumber).width(myWidth);
                                                             }
                                                         );
