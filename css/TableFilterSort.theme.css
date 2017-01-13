@@ -36,10 +36,8 @@ h3 {
 .tableFilterSortTable, .tableFilterSortTable thead, .tableFilterSortTable tbody  {
   border-collapse: collapse;;
 }
-/** just adding 1 PX to header cells to make it perfect! */
-.fixed-header .tableFilterSortTable thead th{
-    padding-left: 11px;
-}
+
+
 table {
   width: 100%;
   margin-left: auto;
@@ -56,11 +54,15 @@ table th, table td {
 
 table th {
   background-color: crimson;
+  color: #fff;
 }
 
-table th a, table th {
+table th a, th span.dl  {
   color: white;
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px dotted #fff;
+}
+table td a, td span.dl  {
+  border-bottom: 1px dotted #000;
 }
 
 ul {
@@ -195,7 +197,7 @@ ul li {
   display: none;
 }
 
-.sortable, .clear {
+.sortable, .clear a {
   text-decoration: none;
 }
 
@@ -281,7 +283,6 @@ tr.hide, tr.no-match {
   display: block;
 }
 
-span[data-filter].dl,  {text-decoration: underline;}
 
 input[type="checkbox"] {
     vertical-align: middle;
@@ -385,5 +386,19 @@ td:first-child a {font-size: 25px!important; text-decoration: none; display: blo
 
     .tableFilterSortFilterFormHolder .filterColumn:nth-child(5n+1) {
       clear: left;
+    }
+}
+
+/** just adding 1 PX to header cells to make it perfect! */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    /* CSS Statements that only apply on webkit-based browsers (Chrome, Safari, etc.) */
+    .fixed-header .tableFilterSortTable thead th{
+        padding-left: 11px;
+    }
+}
+
+@-moz-document url-prefix() {
+    .fixed-header .tableFilterSortTable thead {
+        margin-left: -1px;
     }
 }

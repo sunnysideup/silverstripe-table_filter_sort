@@ -872,7 +872,7 @@ jQuery(document).ready(
                 );
                 myob.myFilterFormHolder.on(
                     'click',
-                    '.clear',
+                    '.clear a',
                     function(event) {
                         event.preventDefault();
                         myob.currentFilter = {};
@@ -1596,16 +1596,15 @@ jQuery(document).ready(
                                         function(colNumber, cell) {
                                             var cell = jQuery(cell);
                                             var myWidth = cell.width();
-                                            console.debug(myWidth);
                                             cell.css('min-width', myWidth);
                                             jQuery('thead:first tr').each(
                                                 function(i, tr) {
                                                     jQuery(tr).children().eq(colNumber).width(myWidth);
                                                 }
                                             );
-                                            myob.myTableHolder.addClass('fixed-header');
                                         }
                                     );
+                                    myob.myTableHolder.addClass('fixed-header');
 
                                 },
                                 myob.millisecondsBetweenActions * 5

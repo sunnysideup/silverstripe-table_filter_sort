@@ -4,7 +4,7 @@
 span[data-filter].dl {
     cursor: pointer;
 }
-
+td, th {word-wrap:break-word;}
 tr.hide, tr.no-match {display: none!important;}
 
 .loading  {height: 5000px!important;}
