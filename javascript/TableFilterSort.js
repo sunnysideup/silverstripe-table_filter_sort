@@ -206,7 +206,7 @@ jQuery(document).ready(
              *
              * @type {Boolean}
              */
-            millisecondsBetweenActions: 50,
+            millisecondsBetweenActions: 10,
 
             /**
              * @type array
@@ -823,14 +823,6 @@ jQuery(document).ready(
 
             fixTableHeaderListener: function() {
                 var widthAndHeightSet = false;
-                if(myob.hasFixedTableHeader) {
-                    jQuery(window).on(
-                        "load resize scroll",
-                        function(e) {
-                            myob.myTableHolder.removeClass('fixed-header');
-                        }
-                    );
-                }
                 if(myob.hasFixedTableHeader) {
                     jQuery(window).on(
                         "load resize scroll",
@@ -1569,31 +1561,40 @@ jQuery(document).ready(
                     //show if it is in use / not in use ...
                     myob.myTableHolder.addClass(myob.filterInUseClass);
                     myob.myTableHolder.removeClass(myob.filterNotInUseClass);
-
                     if(myob.hasFixedTableHeader) {
-
+                        var relativeMove = myob.myFilterFormHolder.outerHeight() + myob.myTableHead.outerHeight();
+                        var pushDownDiv = myob.myTableHolder.find('#tfspushdowndiv');
+                        if(pushDownDiv.length === 0) {
+                            jQuery('<div style="width: 100%; height: '+relativeMove+'px; padding: 0; margin: 0; display: none;" id="tfspushdowndiv"></div>').
+                            insertBefore(myob.myTable);
+                        } else {
+                            pushDownDiv.height(relativeMove);
+                            pushDownDiv.css('display', 'none');
+                        }
                         //get basic data about scroll situation...
                         var tableOffset = myob.myTableBody.offset().top;
                         var offset = jQuery(window).scrollTop();
 
+                        var showFixedHeader = offset > tableOffset ? true: false;
                         //reset everything!
                         myob.myTableHolder.removeClass('fixed-header');
-                        var showFixedHeader = offset > tableOffset ? true: false;
+                        //immediately move table down...
                         //remove everything to recalculate ...
                         myob.myFilterFormHolder.css("width", "");
                         //set width of cells
-                        myob.myTable.find('thead:first tr th, tbody tr:first td, tbody tr:first th')
-                        .css({"width": "", "min-width": ""});
+                        myob.myTable
+                            .find('thead:first tr th, tbody tr:first td, tbody tr:first th')
+                            .css({"width": "", "min-width": ""});
+
                         //end reset
                         if(showFixedHeader === true) {
                             var tableHolderWidth = myob.myTableHolder.width();
-
                             myob.myFilterFormHolder.width(tableHolderWidth);
                             window.setTimeout(
                                 function() {
                                     //set width of cells
                                     //we DO NOT SET WIDTH ON TABLE AS THIS SCREWS THINGS MAJORLY!!!!!!
-                                    myob.myTable.find('tbody tr.show:first td, tbody tr.show:first th').each(
+                                    myob.myTableBody.find('tr.show:first th, tr.show:first td').each(
                                         function(colNumber, cell) {
                                             var cell = jQuery(cell);
                                             var myWidth = cell.width();
@@ -1605,14 +1606,13 @@ jQuery(document).ready(
                                             );
                                         }
                                     );
+                                    pushDownDiv.css('display', 'block');
                                     myob.myTableHolder.addClass('fixed-header');
 
                                 },
                                 myob.millisecondsBetweenActions
                             );
                             myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight());
-                        } else {
-                            myob.myTableHolder.removeClass('fixed-header');
                         }
                     }
                 } else {
