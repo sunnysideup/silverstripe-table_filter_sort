@@ -827,9 +827,17 @@ jQuery(document).ready(
                     jQuery(window).on(
                         "load resize scroll",
                         function(e) {
+                            myob.myTableHolder.removeClass('fixed-header');
+                        }
+                    );
+                }
+                if(myob.hasFixedTableHeader) {
+                    jQuery(window).on(
+                        "load resize scroll",
+                        function(e) {
                             myob.fixTableHeader();
                         },
-                        500
+                        myob.millisecondsBetweenActions * 5
                     );
                 }
             },
@@ -1569,6 +1577,7 @@ jQuery(document).ready(
                         var offset = jQuery(window).scrollTop();
 
                         //reset everything!
+                        myob.myTableHolder.removeClass('fixed-header');
                         var showFixedHeader = offset > tableOffset ? true: false;
                         //remove everything to recalculate ...
                         myob.myFilterFormHolder.css("width", "");
@@ -1583,7 +1592,7 @@ jQuery(document).ready(
                                 function() {
                                     //set width of cells
                                     //we DO NOT SET WIDTH ON TABLE AS THIS SCREWS THINGS MAJORLY!!!!!!
-                                    myob.myTable.find('tbody tr:first td, tbody tr:first th').each(
+                                    myob.myTable.find('tbody tr.show:first td, tbody tr.show:first th').each(
                                         function(colNumber, cell) {
                                             var cell = jQuery(cell);
                                             var myWidth = cell.width();
@@ -1594,14 +1603,13 @@ jQuery(document).ready(
                                                     jQuery(tr).children().eq(colNumber).width(myWidth);
                                                 }
                                             );
-
+                                            myob.myTableHolder.addClass('fixed-header');
                                         }
                                     );
 
                                 },
-                                myob.millisecondsBetweenActions
+                                myob.millisecondsBetweenActions * 5
                             );
-                            myob.myTableHolder.addClass('fixed-header');
                             myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight());
                         } else {
                             myob.myTableHolder.removeClass('fixed-header');

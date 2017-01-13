@@ -33,10 +33,13 @@ h3 {
     border-top: none;
 }
 
-.tableFilterSortTable {
-  border-collapse: collapse;
+.tableFilterSortTable, .tableFilterSortTable thead, .tableFilterSortTable tbody  {
+  border-collapse: collapse;;
 }
-
+/** just adding 1 PX to header cells to make it perfect! */
+.fixed-header .tableFilterSortTable thead th{
+    padding-left: 11px;
+}
 table {
   width: 100%;
   margin-left: auto;
@@ -192,7 +195,7 @@ ul li {
   display: none;
 }
 
-.sortable {
+.sortable, .clear {
   text-decoration: none;
 }
 
@@ -278,7 +281,7 @@ tr.hide, tr.no-match {
   display: block;
 }
 
-span[data-filter].dl {text-decoration: underline;}
+span[data-filter].dl,  {text-decoration: underline;}
 
 input[type="checkbox"] {
     vertical-align: middle;
@@ -329,6 +332,10 @@ td:first-child a {font-size: 25px!important; text-decoration: none; display: blo
     100% {
         opacity: 1;
     }
+}
+.fixed-header.tableFilterSortFilterInUse table thead,
+.fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder{
+    opacity: 0;
 }
 .fixed-header.tableFilterSortFilterInUse table thead,
 .fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder{
