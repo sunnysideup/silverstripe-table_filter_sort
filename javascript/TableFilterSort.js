@@ -270,7 +270,7 @@ jQuery(document).ready(
              *
              * @type string
              */
-            currentFilterText: 'Current Filter',
+            currentFilterText: '',
 
             /**
              *
