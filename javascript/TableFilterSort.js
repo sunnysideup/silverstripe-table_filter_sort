@@ -206,7 +206,7 @@ jQuery(document).ready(
              *
              * @type {Boolean}
              */
-            millisecondsBetweenActions: 10,
+            millisecondsBetweenActions: 50,
 
             /**
              * @type array
@@ -1599,7 +1599,7 @@ jQuery(document).ready(
                                     );
 
                                 },
-                                300
+                                myob.millisecondsBetweenActions
                             );
                             myob.myTableHolder.addClass('fixed-header');
                             myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight());
@@ -1628,15 +1628,15 @@ jQuery(document).ready(
                 //show the table as loading
                 myob.myTable.addClass(myob.loadingClass);
 
-                //myob.myTable.find(myob.moreRowEntriesSelector).hide();
+                myob.myTable.find(myob.moreRowEntriesSelector).hide();
                 //hide the table
-                //myob.myTable.hide();
+                myob.myTable.hide();
                 //hide all the rows
-                // myob.myRows.each(
-                //     function(i, el) {
-                //         jQuery(el).addClass(myob.hideClass).removeClass(myob.showClass);
-                //     }
-                // );
+                myob.myRows.each(
+                    function(i, el) {
+                        jQuery(el).addClass(myob.hideClass).removeClass(myob.showClass);
+                    }
+                );
                 if(typeof myob.startRowFX2 === 'function') {
                     myob.startRowFX2(myob);
                 }
@@ -1743,7 +1743,8 @@ jQuery(document).ready(
                                 },
                                 200
                             );
-                        }, 100
+                        },
+                        myob.millisecondsBetweenActions
                     );
                 }
                 if(myob.useBackAndForwardButtons) {
