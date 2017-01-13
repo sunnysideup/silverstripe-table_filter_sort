@@ -837,7 +837,7 @@ jQuery(document).ready(
                         function(e) {
                             myob.fixTableHeader();
                         },
-                        myob.millisecondsBetweenActions * 5
+                        myob.millisecondsBetweenActions
                     );
                 }
             },
@@ -1587,6 +1587,7 @@ jQuery(document).ready(
                         //end reset
                         if(showFixedHeader === true) {
                             var tableHolderWidth = myob.myTableHolder.width();
+
                             myob.myFilterFormHolder.width(tableHolderWidth);
                             window.setTimeout(
                                 function() {
@@ -1607,7 +1608,7 @@ jQuery(document).ready(
                                     myob.myTableHolder.addClass('fixed-header');
 
                                 },
-                                myob.millisecondsBetweenActions * 5
+                                myob.millisecondsBetweenActions
                             );
                             myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight());
                         } else {
