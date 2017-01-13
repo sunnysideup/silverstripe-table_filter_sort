@@ -61,7 +61,7 @@ table th a, th span.dl  {
   color: white;
   border-bottom: 1px dotted #fff;
 }
-table td a, td span.dl  {
+td span.dl  {
   border-bottom: 1px dotted #000;
 }
 
