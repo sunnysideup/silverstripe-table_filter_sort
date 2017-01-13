@@ -93,8 +93,6 @@ ul li {
 }
 
 .tableFilterSortFilterFormHolder .filterColumn {
-    width: calc(20% - 30px);
-    float: left;
     margin: 20px 20px 20px 0;
     border-left: 1px solid #ccc;
     border-top: 1px solid #ccc;
@@ -107,13 +105,6 @@ ul li {
   display: block
 }
 
-.tableFilterSortFilterFormHolder .filterColumn:nth-child(5n) {
-  margin-right: 0px;
-}
-
-.tableFilterSortFilterFormHolder .filterColumn:nth-child(5n+1) {
-  clear: left;
-}
 
 .tableFilterSortFilterFormHolder .filterColumn ul,
 .tableFilterSortFilterFormHolder .filterColumn ul li {
@@ -357,4 +348,35 @@ td:first-child a {font-size: 25px!important; text-decoration: none; display: blo
     -moz-animation-delay: 0s;
     -moz-animation-play-state: running;
     -moz-animation-fill-mode: forwards;
+}
+
+
+@media screen and (min-width: 550px) and (max-width: 949px) {
+    .tableFilterSortFilterFormHolder .filterColumn {
+        width: calc(33% - 30px);
+        float: left;
+    }
+
+    .tableFilterSortFilterFormHolder .filterColumn:nth-child(3n) {
+      margin-right: 0px;
+    }
+
+    .tableFilterSortFilterFormHolder .filterColumn:nth-child(3n+1) {
+      clear: left;
+    }
+}
+
+@media screen and (min-width: 950px) {
+    .tableFilterSortFilterFormHolder .filterColumn {
+        width: calc(20% - 30px);
+        float: left;
+    }
+
+    .tableFilterSortFilterFormHolder .filterColumn:nth-child(5n) {
+      margin-right: 0px;
+    }
+
+    .tableFilterSortFilterFormHolder .filterColumn:nth-child(5n+1) {
+      clear: left;
+    }
 }

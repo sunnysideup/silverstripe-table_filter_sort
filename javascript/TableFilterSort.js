@@ -15,7 +15,6 @@ jQuery(document).ready(
                 TableFilterSortTableList[i] = jQuery(TableFilterSortTableList[i]).tableFilterSort();
             }
         }
-
 });
 
 
@@ -583,6 +582,9 @@ jQuery(document).ready(
 
                             //LISTENERS ...
                             //set up filter form listener
+                            if(myob.debug) { console.profileEnd();console.profile('fixTableHeaderListener');}
+                            myob.fixTableHeaderListener();
+                            //set up filter form listener
                             if(myob.debug) { console.profileEnd();console.profile('setupFilterFormListeners');}
                             myob.setupFilterFormListeners();
                             //set up sort listener
@@ -626,9 +628,6 @@ jQuery(document).ready(
                             if(myob.debug) { console.profileEnd();console.profile('retrieveCookieData');}
                             myob.retrieveCookieData();
 
-                            //fix table header
-                            if(myob.debug) { console.profileEnd(); console.profile('fixTableHeader');}
-                            myob.fixTableHeader();
                             if(myob.debug) { console.profileEnd();}
 
                         },
@@ -822,6 +821,18 @@ jQuery(document).ready(
             // LISTENERS
             //===================================================================
 
+            fixTableHeaderListener: function() {
+                var widthAndHeightSet = false;
+                if(myob.hasFixedTableHeader) {
+                    jQuery(window).on(
+                        "load resize scroll",
+                        function(e) {
+                            myob.fixTableHeader();
+                        },
+                        500
+                    );
+                }
+            },
 
 
             /**
@@ -1543,65 +1554,65 @@ jQuery(document).ready(
              * do this every second
              */
 
+
             fixTableHeader: function()
             {
-                var myob = this;
-                var widthAndHeightSet = false;
-                jQuery(window).ready(
-                    function() {
-                        if(myob.hasFixedTableHeader) {
-                            jQuery(window).bind(
-                                "load resize scroll",
-                                function(e) {
+                if(myob.myTableHolder.isOnScreen() || myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
+                    //show if it is in use / not in use ...
+                    myob.myTableHolder.addClass(myob.filterInUseClass);
+                    myob.myTableHolder.removeClass(myob.filterNotInUseClass);
 
-                                    if(myob.myTableHolder.isOnScreen() || myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
-                                        myob.myTableHolder.addClass(myob.filterInUseClass);
-                                        myob.myTableHolder.removeClass(myob.filterNotInUseClass);
-                                    } else {
-                                        myob.myTableHolder.addClass(myob.filterNotInUseClass);
-                                        myob.myTableHolder.removeClass(myob.filterInUseClass);
-                                    }
+                    if(myob.hasFixedTableHeader) {
 
-                                    if(e.type === 'resize') {
-                                        widthAndHeightSet = false;
-                                    }
-                                    var tableOffset = myob.myTableBody.offset().top;
-                                    var offset = jQuery(this).scrollTop();
-                                    if (offset > tableOffset) {
-                                        myob.myTableHolder.addClass('fixed-header');
-                                        myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight());
-                                    }
-                                    else if (offset <= tableOffset) {
-                                        myob.myTableHolder.removeClass('fixed-header');
-                                        if(! widthAndHeightSet ) {
-                                            if(e.type !== 'load') {
-                                                widthAndHeightSet = true;
-                                                var tableHolderWidth = myob.myTableHolder.width();
-                                                myob.myFilterFormHolder.width(tableHolderWidth);
-                                                //set width of cells
-                                                myob.myTable.find('tbody tr:first td, tbody tr:first th').each(
-                                                    function(colNumber, cell) {
-                                                        var cell = jQuery(cell);
-                                                        var myWidth = cell.width();
-                                                        cell.css('min-width', myWidth);
-                                                        jQuery('thead:first tr').each(
-                                                            function(i, tr) {
-                                                                jQuery(tr).children().eq(colNumber).width(myWidth);
-                                                            }
-                                                        );
+                        //get basic data about scroll situation...
+                        var tableOffset = myob.myTableBody.offset().top;
+                        var offset = jQuery(window).scrollTop();
 
-                                                    }
-                                                );
-                                            //set width of filter
-                                            }
+                        //reset everything!
+                        var showFixedHeader = offset > tableOffset ? true: false;
+                        //remove everything to recalculate ...
+                        myob.myFilterFormHolder.css("width", "");
+                        //set width of cells
+                        myob.myTable.find('thead:first tr th, tbody tr:first td, tbody tr:first th')
+                        .css({"width": "", "min-width": ""});
+                        //end reset
+                        if(showFixedHeader === true) {
+                            var tableHolderWidth = myob.myTableHolder.width();
+                            myob.myFilterFormHolder.width(tableHolderWidth);
+                            window.setTimeout(
+                                function() {
+                                    //set width of cells
+                                    //we DO NOT SET WIDTH ON TABLE AS THIS SCREWS THINGS MAJORLY!!!!!!
+                                    myob.myTable.find('tbody tr:first td, tbody tr:first th').each(
+                                        function(colNumber, cell) {
+                                            var cell = jQuery(cell);
+                                            var myWidth = cell.width();
+                                            console.debug(myWidth);
+                                            cell.css('min-width', myWidth);
+                                            jQuery('thead:first tr').each(
+                                                function(i, tr) {
+                                                    jQuery(tr).children().eq(colNumber).width(myWidth);
+                                                }
+                                            );
 
                                         }
-                                    }
-                                }
+                                    );
+
+                                },
+                                300
                             );
+                            myob.myTableHolder.addClass('fixed-header');
+                            myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight());
+                        } else {
+                            myob.myTableHolder.removeClass('fixed-header');
                         }
                     }
-                );
+                } else {
+                    myob.myTableHolder.addClass(myob.filterNotInUseClass);
+                    myob.myTableHolder.removeClass(myob.filterInUseClass);
+                }
+
+
             },
 
             //===================================================================
@@ -1615,17 +1626,17 @@ jQuery(document).ready(
                 }
                 myob.resetObjects();
                 //show the table as loading
-                myob.myTable
-                    .addClass(myob.loadingClass)
-                    .find(myob.moreRowEntriesSelector).hide();
+                myob.myTable.addClass(myob.loadingClass);
+
+                //myob.myTable.find(myob.moreRowEntriesSelector).hide();
                 //hide the table
-                myob.myTable.hide();
+                //myob.myTable.hide();
                 //hide all the rows
-                myob.myRows.each(
-                    function(i, el) {
-                        jQuery(el).addClass(myob.hideClass).removeClass(myob.showClass);
-                    }
-                );
+                // myob.myRows.each(
+                //     function(i, el) {
+                //         jQuery(el).addClass(myob.hideClass).removeClass(myob.showClass);
+                //     }
+                // );
                 if(typeof myob.startRowFX2 === 'function') {
                     myob.startRowFX2(myob);
                 }
@@ -1742,6 +1753,8 @@ jQuery(document).ready(
                 if(typeof myob.endRowFX2 === 'function') {
                     myob.endRowFX2(myob);
                 }
+                //fix rows again ..
+                myob.fixTableHeader();
             },
 
             currentURL: function ()
@@ -2212,3 +2225,35 @@ jQuery.fn.isOnScreen = function(){
     bounds.bottom = bounds.top + this.outerHeight();
     return ((bounds.top <= viewport.bottom) && (bounds.bottom >= viewport.top));
 };
+
+
+/*!
+ * jquery.unevent.js 0.2
+ * https://github.com/yckart/jquery.unevent.js
+ *
+ * Copyright (c) 2013 Yannick Albert (http://yckart.com)
+ * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php).
+ * 2013/07/26
+**/
+;(function ($) {
+    var on = $.fn.on, timer;
+    $.fn.on = function () {
+        var args = Array.apply(null, arguments);
+        var last = args[args.length - 1];
+
+        if (isNaN(last) || (last === 1 && args.pop())) return on.apply(this, args);
+
+        var delay = args.pop();
+        var fn = args.pop();
+
+        args.push(function () {
+            var self = this, params = arguments;
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                fn.apply(self, params);
+            }, delay);
+        });
+
+        return on.apply(this, args);
+    };
+}(this.jQuery));
