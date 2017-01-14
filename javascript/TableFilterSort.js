@@ -568,7 +568,6 @@ jQuery(document).ready(
                     myob.myTableHolder.addClass(myob.loadingClass);
                     window.setTimeout(
                         function() {
-
                             //COLLECT ...
                             //collect filter items
                             if(myob.debug) { console.profileEnd();console.profile('filterItemCollector');}
@@ -579,6 +578,14 @@ jQuery(document).ready(
                             //finalise data dictionary
                             if(myob.debug) { console.profileEnd();console.profile('dataDictionaryCollector');}
                             myob.dataDictionaryCollector();
+
+                            //LOAD DATA FROM SERVER
+                            //finalise data dictionary
+                            if(myob.debug) { console.profileEnd();console.profile('findAndApplyGetVariables');}
+                            myob.findAndApplyGetVariables();
+                            //check for existing favourites
+                            if(myob.debug) { console.profileEnd();console.profile('retrieveLocalCookie');}
+                            myob.retrieveLocalCookie();
 
                             //LISTENERS ...
                             //set up filter form listener
@@ -624,9 +631,6 @@ jQuery(document).ready(
                             myob.runCurrentSort();
 
                             //ADD SCROLL AND OTHER STUFF ...
-                            //check for existing favourites
-                            if(myob.debug) { console.profileEnd();console.profile('retrieveCookieData');}
-                            myob.retrieveCookieData();
 
                             if(myob.debug) { console.profileEnd();}
 
@@ -1073,6 +1077,14 @@ jQuery(document).ready(
                 }
             },
 
+            /**
+             * opens modal with data ...
+             * data options are
+             * - favourites
+             * - filter
+             * data is sent as the data get parameter, separated by &
+             * @return {[type]} [description]
+             */
             retrieveServerDataListener: function()
             {
 
@@ -1096,14 +1108,19 @@ jQuery(document).ready(
                         }
                         if(isSave) {
                             if(isFilters){
-                                data = {f: myob.currentFilter, s: myob.currentSorter};
+                                data = {
+                                    f: myob.currentFilter,
+                                    e: myob.currentFilterExcludes,
+                                    o: myob.currentFilterOr,
+                                    s: myob.currentSorter
+                                };
                             } else {
                                 data = {f: myob.favouritesStore};
                             }
                         }
                         parentPageID = parentPageID.split('/').join('--');
-                        dataAsString = JSON.stringify(data);
-                        fullURL = url + encodeURI(parentPageID) + '/?data='+encodeURI(dataAsString);
+                        dataAsString = jQuery.param(data);
+                        fullURL = url + encodeURIComponent(parentPageID) + '/?data='+dataAsString;
                         jQuery.modal('<iframe src="' + fullURL + '" height="450" width="830" style="border:0">', {
                             closeHTML:"",
                             containerCss:{
@@ -1565,7 +1582,7 @@ jQuery(document).ready(
                         var relativeMove = myob.myFilterFormHolder.outerHeight() + myob.myTableHead.outerHeight();
                         var pushDownDiv = myob.myTableHolder.find('#tfspushdowndiv');
                         if(pushDownDiv.length === 0) {
-                            jQuery('<div style="width: 100%; height: '+relativeMove+'px; padding: 0; margin: 0; display: none;" id="tfspushdowndiv"></div>').
+                            jQuery('<div style="height: '+relativeMove+'px;display: none;" id="tfspushdowndiv"></div>').
                             insertBefore(myob.myTable);
                         } else {
                             pushDownDiv.height(relativeMove);
@@ -1775,6 +1792,12 @@ jQuery(document).ready(
                 return myob.baseURL + '?' + urlpart
             },
 
+            /**
+             * makes the favourites or filters buttons
+             * @param  {boolean} canSave can the data be saved?
+             * @param  {string}  type    favourites | filters
+             * @return {string}          html
+             */
             makeRetrieveButtons: function(canSave, type)
             {
                 var buttons = [];
@@ -1792,9 +1815,7 @@ jQuery(document).ready(
                     buttons.push('<a href="'+url+'save/" class="save '+type+'">Save ' + title + '</a>');
                 }
                 buttons.push('<a href="'+url+'index/" class="load '+type+'">Load ' + title + '</a>');
-
                 return buttonHTML = '<li>' + buttons.join(' | ') + '</li>';
-
             },
 
 
@@ -1942,17 +1963,20 @@ jQuery(document).ready(
             // SERVER, URL, AND COOKIE INTERACTIONS
             //===================================================================
 
-            retrieveCookieData: function()
+            retrieveLocalCookie: function()
             {
-                myob.myTableBody.find('tr.'+myob.favouriteClass).each(
-                    function(i, el) {
-                        jQuery(el).removeClass(myob.favouriteClass);
-                    }
-                );
+                //get favourites data
                 myob.favouritesStore = Cookies.getJSON('favouritesStore');
                 if(typeof myob.favouritesStore === 'undefined') {
                     myob.favouritesStore = [];
                 } else {
+                    //remove all favourites
+                    myob.myTableBody.find('tr.'+myob.favouriteClass).each(
+                        function(i, el) {
+                            jQuery(el).removeClass(myob.favouriteClass);
+                        }
+                    );
+                    //add all favourites
                     for (var fav in myob.favouritesStore) {
                         if (myob.favouritesStore.hasOwnProperty(fav)) {
                             var id = myob.favouritesStore[fav];
@@ -1964,30 +1988,37 @@ jQuery(document).ready(
             },
 
             /**
-             * URL:
-             * f[*]=AND|OR
-             * f[Key1]=keywordToInclude,KeywordToInclude2|KeywordToExclude|AND
-             * f[Key2]=keywordToInclude,KeywordToInclude2|KeywordToExclude|AND
-             * s[Key3]=ASC
-             *
-             * @return {[type]} [description]
+             * get data from the server and apply it to the current object ...
+             * only 'load' works right now, but other variables can be applied
+             * in the future...
              */
             findAndApplyGetVariables: function()
             {
                 var qd = {};
-                location.search.substr(1).split("&").forEach(
-                    function(item) {
-                        var s = item.split("="),
-                            k = s[0],
-                            v = s[1] && decodeURIComponent(s[1]);
-                        //(k in qd) ? qd[k].push(v) : qd[k] = [v]
-                        (qd[k] = qd[k] || []).push(v) //short-circuit
+                if(typeof location.search !== 'undefined' && location.search && location.search.length > 0) {
+                    location.search.substr(1).split("&").forEach(
+                        function(item) {
+                            var s = item.split("="),
+                                k = s[0],
+                                v = s[1] && decodeURIComponent(s[1]);
+                            //(k in qd) ? qd[k].push(v) : qd[k] = [v]
+                            (qd[k] = qd[k] || []).push(v) //short-circuit
+                        }
+                    );
+                    if(typeof qd.load !== 'undefined') {
+                        var url = myob.filtersURL + '/load/' + qd.load + '/';
+                        jQuery.getJSON(
+                            url,
+                            function( data ) {
+                                jQuery.each(
+                                    data,
+                                    function( key, val ) {
+                                        myob[key] = val;
+                                    }
+                                );
+                            }
+                        );
                     }
-                );
-                if(typeof qd.tfs !== 'undefined') {
-                    var json = JSON.parse(qd['tfs']);
-                    myob.currentFilter = json.f;
-                    myob.currentSorter = json.s;
                 }
             },
 
