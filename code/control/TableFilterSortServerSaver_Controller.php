@@ -1,12 +1,12 @@
 <?php
 
-abstract class TableFilterSortServerSaver_Controller extends Controller
+class TableFilterSortServerSaver_Controller extends Controller
 {
 
     /**
      * Default URL handlers - (Action)/(ID)/(OtherID).
      */
-    private static $url_segment = 'test';
+    private static $url_segment = 'tfs';
 
     /**
      * Default URL handlers - (Action)/(ID)/(OtherID).
@@ -21,12 +21,15 @@ abstract class TableFilterSortServerSaver_Controller extends Controller
      */
     private static $allowed_actions = array(
         'index' => true,
+        'find' => true,
+        'start' => true,
         'save' => true,
         'AddForm' => true,
         'dosave' => true,
-        'retrieve' => true
+        'load' => true
     );
 
+    protected $parentPageID = null;
 
     /**
      * @param string $action
@@ -38,6 +41,8 @@ abstract class TableFilterSortServerSaver_Controller extends Controller
         return self::create_link($action);
     }
 
+
+
     /**
      * returns ABSOLUTE link to the shopping cart controller.
      * @param null | array | string $actionAndOtherLinkVariables
@@ -47,56 +52,109 @@ abstract class TableFilterSortServerSaver_Controller extends Controller
     {
         return Controller::join_links(
             Director::baseURL(),
-            'tfs',
             Config::inst()->get(get_called_class(), 'url_segment'),
             $actionAndOtherLinkVariables
         );
     }
 
-    function index()
+    function init()
+    {
+        parent::init();
+        $this->parentPageID = Convert::raw2sql($this->request->param('ID'));
+        Requirements::javascript(FRAMEWORK_DIR . '/thirdparty/jquery/jquery.js');
+        TableFilterSortAPI::include_requirements();
+        Requirements::customScript('
+            jQuery(document).ready(
+                function() {
+                    jQuery(\'body\').on(
+                        \'click\',
+                        \'a.load\',
+                        function(event) {
+                            event.preventDefault();
+                            var baseURL = window.top.location.protocol + "//" + window.top.location.host + window.top.location.pathname;
+                            var url = baseURL + "?load=" + jQuery(this).attr("href");
+                            window.top.location.href = url;
+                            return false;
+                        }
+                    )
+                }
+            )
+        ');
+    }
+
+    function index($request)
+    {
+        $postData = $request->postVars();
+        if($postData) {
+            //just in case ...
+            Session::clear('TableFilterSortPostData');
+            if(isset($postData['ParentPageID'])) {
+                $this->parentPageID = $postData['ParentPageID'];
+                return Director::absoluteURL($this->Link('find/'.$this->parentPageID));
+            }
+        }
+        return '404';
+    }
+
+    function find($request)
     {
         return $this->renderWith($this->class);
     }
 
+    function start($request) {
+        $postData = $request->postVars();
+        if($postData) {
+            Session::set('TableFilterSortPostData', $postData);
+            return Director::absoluteURL($this->Link('save'));
+        }
+        return '404';
+    }
+
     function save($request)
     {
-        Session::set('ParentPageID', Convert::raw2sql($request->param('ID')));
-        Session::set('RequestData', Convert::raw2sql($request->getVar('data')));
-
-        return $this->renderWith($this->class);
+        if(session::get('TableFilterSortPostData')) {
+            return $this->renderWith($this->class);
+        }
+        return 'NO DATA TO BE SAVED ...';
     }
 
     function dosave($data, $form)
     {
         $title = Convert::raw2sql($data['Title']);
-        $ParentPageID = Session::get('ParentPageID');
-        if($title && $ParentPageID && $data) {
-            $dataToSave = Session::get('RequestData');
-            $obj = TableFilterSortServerSaver::find_or_create($title, $ParentPageID);
-            $obj->Data = $dataToSave;
-            $tags = array();
-            foreach($data['TagsTempField'] as $tag) {
-                $tag = trim($tag);
-                if($tag) {
-                    $tagObject = TableFilterSortTag::find_or_create($tag, $obj);
+        if($title) {
+            $dataToSave = $this->dataToSave();
+            if($dataToSave) {
+                $obj = TableFilterSortServerSaver::find_or_create($title, $this->parentPageID);
+                $obj->Data = json_encode($dataToSave);
+                $obj->Description = Convert::raw2sql($data["Description"]);
+                $obj->write();
+                $tags = array();
+                foreach($data['TagsTempField'] as $tag) {
+                    $tag = trim($tag);
+                    if($tag) {
+                        $tagObject = TableFilterSortTag::find_or_create($tag, $obj);
+                    }
                 }
+                Session::clear('TableFilterSortPostData');
+                //$form->setMessage('Saved successfully', 'good');
+            } else {
+                $form->setMessage('An Error Occurred', 'bad');
             }
-            Session::clear('ParentPageID');
-            Session::clear('RequestData');
-            $form->setMessage('Saved successfully', 'good');
         } else {
-            $form->setMessage('An Error Occurred', 'bad');
+            $form->setMessage('Please provide title', 'bad');
         }
 
         return $this->renderWith($this->class);
 
     }
 
-    function retrieve($request)
+    function load($request)
     {
-        $this->addHeader('Content-Type', 'application/json');
-        $id = intval($request->param('ID'));
-        $obj = TableFilterSortServerSaver::get()->byID($id);
+        $this->getResponse()->addHeader('Content-Type', 'application/json');
+        $urlSegment = Convert::raw2sql($request->param('ID'));
+        $obj = TableFilterSortServerSaver::get()
+            ->filter(array('URLSegment' => $urlSegment))
+            ->first();
         if($obj) {
             return json_encode(
                 array(
@@ -114,37 +172,57 @@ abstract class TableFilterSortServerSaver_Controller extends Controller
      */
     function MyList()
     {
-        $parentPageID = intval($this->request->param('ID'));
-        if(! $parentPageID) {
-            $parentPageID = Session::get('ParentPageID');
-        }
-
-        return TableFilterSortServerSaver::get()->filter(array('ParentPageID' => $parentPageID));
+        return TableFilterSortServerSaver::get()->filter(array('ParentPageID' => $this->parentPageID));
     }
 
 
     function AddForm()
     {
         if(
-            Session::get('ParentPageID') && Session::get('RequestData')
+            $this->dataToSave()
         ) {
             $singleton = Injector::inst()->get('TableFilterSortServerSaver');
             $fieldLabels = $singleton->FieldLabels();
             $fieldList = FieldList::create(
                 TextField::create('Title', $fieldLabels['Title'])
+                    ->setMaxLength(50)
+                    ->setAttribute('placeholder',  $fieldLabels['Title']),
+                TextareaField::create('Description', $fieldLabels['Description'])
+                    ->setAttribute('placeholder',  $fieldLabels['Description'])
             );
             for($i = 1; $i < 8; $i++) {
-                $fieldList->push(TextField::create('TagsTempField['.$i.']', $fieldLabels['Tags']. ' #'.$i));
+                $title = $fieldLabels['Tags']. ' #'.$i;
+                $fieldList->push(
+                    TextField::create('TagsTempField['.$i.']', $title)
+                        ->setAttribute('placeholder',  $title)
+                );
             }
             $actionTitle = _t('TableFilterSortServerSaver_Controller.SAVE','Save');
             $actionList = FieldList::create(
                 FormAction::create('dosave', $actionTitle)
             );
-            $requireFields = RequiredFields::create(array('Title', 'TagsTempField'));
+            $requireFields = RequiredFields::create(array('Title', 'Description'));
             return Form::create($this, 'AddForm', $fieldList, $actionList, $requireFields);
         }
     }
 
+    /**
+     * returns an array with three values:
+     * ParentPageID
+     * Data
+     *
+     * @return null | array
+     */
+    protected function dataToSave()
+    {
+        $data = session::get('TableFilterSortPostData');
+        if($data) {
+            if(isset($data["ParentPageID"])) {
+                $this->parentPageID = $data["ParentPageID"];
+                return $data;
+            }
+        }
+    }
 
 
 }

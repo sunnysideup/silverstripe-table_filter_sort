@@ -6,7 +6,10 @@
                 <a href="#" class="sortable" data-sort-field="Title" data-sort-direction="asc" data-sort-type="string">Title</a>
             </th>
             <th scope="col">
-                <a href="#" class="sortable" data-sort-field="Tags" data-sort-direction="asc" data-sort-type="strig">Tags</a>
+                Description
+            </th>
+            <th scope="col">
+                Tags
             </th>
         </tr>
     </thead>
@@ -17,10 +20,11 @@
     <% loop MyList %>
 <tr class="tfsRow hide" id="tfs$ID">
 <td>
-    <a href="$RetrieveLink">
+    <a href="$URLSegment" class="load">
         <span data-filter="Title">$Title</span>
     </a>
 </td>
+<td>$Description</td>
 <td><% loop Tags %><span data-filter="Tags">$Title</span><% end_loop %></td>
 </tr>
     <% end_loop %>

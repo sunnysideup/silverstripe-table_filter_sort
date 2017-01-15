@@ -3,32 +3,24 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-
   <title>$Title</title>
-  <style>
-  body{
-      background-color:"#fff";
-      height:450px;
-      padding:0;
-      width:100%;
-  }
-  </style>
 </head>
 
 <body>
+    <a class="simplemodal-close" href="javascript:parent.closeIFrame();">Close</a>
 
 <% if $AddForm %>
 
     $AddForm
 
 <% else %>
-
+    <div class="tableFilterSortHolder">
     <% include TableFilterSortHeader %>
 
     <% include TableFilterSortTable %>
 
     <% include TableFilterSortFooter %>
-
+    </div>
 <% end_if %>
 
 </body>

@@ -28,7 +28,9 @@ class TableFilterSortServerSaver extends DataObject {
 
 
     private static $db = array(
+        'URLSegment' => 'Varchar(50)',
         'Title' => 'Varchar(50)',
+        'Description' => 'Varchar(200)',
         'ParentPageID' => 'Varchar(200)',
         'Data' => 'Text'
     );
@@ -47,14 +49,17 @@ class TableFilterSortServerSaver extends DataObject {
     );
 
     private static $summary_fields = array(
+        'Created' => 'Created',
         'Title' => 'Title',
+        'Description' => 'Description',
         'ParentPageID' => 'Show in'
     );
 
     private static $field_labels = array(
         'Title' => 'Title',
+        'Description' => 'Description',
         'ParentPageID' => 'Show in',
-        'Tags' => 'Tags'
+        'Tags' => 'Tag'
     );
 
     private static $indexes = array(
@@ -93,5 +98,35 @@ class TableFilterSortServerSaver extends DataObject {
         return $obj;
     }
 
+    /**
+     * Event handler called before writing to the database.
+     */
+    public function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+        if(!$this->Title) {
+            $this->Title = rand(0,99999999999999999);
+        }
+        $iteration = 2;
+        $originalName = $this->Title;
+        while($this->titleExists()){
+            $this->Title = $originalName . ' '.$iteration;
+            $iteration++;
+
+        }
+        $this->URLSegment = urlencode(
+            strtolower(
+                str_replace(' ', "-", trim($this->Title))
+            )
+        );
+    }
+
+    protected function titleExists()
+    {
+        return TableFilterSortServerSaver::get()
+            ->filter(array('Title' => $this->Title, 'ParentPageID' => $this->ParentPageID))
+            ->exclude(array('ID' => $this->ID))
+            ->count() ? true : false;
+    }
 
 }

@@ -46,13 +46,7 @@ jQuery(document).ready(
              * url before the ?
              * @type {String}
              */
-            favouritesURL: '/tfs/favourites/',
-
-            /**
-             * url before the ?
-             * @type {String}
-             */
-            filtersURL: '/tfs/filters/',
+            serverConnectionURL: '/tfs/',
 
             /**
              * the code for all pages that share the same filters
@@ -552,11 +546,11 @@ jQuery(document).ready(
                 myob.myTableHead = myob.myTableHolder.find("table thead");
                 myob.myTableBody = myob.myTable.find(" > tbody");
 
-                myob.favouritesParentPageID = myob.myFilterFormHolder.attr("data-favourites-page-id");
+                myob.favouritesParentPageID = myob.myFilterFormHolder.attr("data-favourites-parent-page-id");
                 if(typeof myob.favouritesParentPageID === 'string' && myob.favouritesParentPageID.length > 0) {
                     myob.hasFavourites = true;
                 }
-                myob.filtersParentPageID = myob.myFilterFormHolder.attr("data-filter-page-id");
+                myob.filtersParentPageID = myob.myFilterFormHolder.attr("data-filters-parent-page-id");
                 if(typeof myob.filtersParentPageID === 'string' && myob.filtersParentPageID.length > 0) {
                     myob.hasFilterSaving = true;
                 }
@@ -580,12 +574,12 @@ jQuery(document).ready(
                             myob.dataDictionaryCollector();
 
                             //LOAD DATA FROM SERVER
+                            //check for existing favourites
+                            if(myob.debug) { console.profileEnd();console.profile('retrieveLocalCookie');}
+                            myob.retrieveLocalCookie();                            //
                             //finalise data dictionary
                             if(myob.debug) { console.profileEnd();console.profile('findAndApplyGetVariables');}
                             myob.findAndApplyGetVariables();
-                            //check for existing favourites
-                            if(myob.debug) { console.profileEnd();console.profile('retrieveLocalCookie');}
-                            myob.retrieveLocalCookie();
 
                             //LISTENERS ...
                             //set up filter form listener
@@ -996,6 +990,10 @@ jQuery(document).ready(
                 );
             },
 
+            /**
+             * if the user goes back then
+             * apply the selection provided ...
+             */
             addURLChangeListener: function()
             {
                 if(myob.useBackAndForwardButtons) {
@@ -1095,45 +1093,43 @@ jQuery(document).ready(
                         event.preventDefault();
                         var myEl = jQuery(this);
                         var url = myEl.attr('href');
-                        var isFilters = false;
-                        var isSave = false;
-                        var parentPageID = myob.favouritesParentPageID;
+                        var parentPageID = myEl.attr('data-parent-page-id');
+                        variables = myEl.attr('data-variables');
+                        variables = variables.split(',');
                         var data = {};
-                        if(myEl.hasClass('save')) {
-                            isSave = true;
+                        for(var i = 0; i  < variables.length; i++) {
+                            data[variables[i]] = myob[variables[i]];
                         }
-                        if(myEl.hasClass('filters')) {
-                            isFilters = true;
-                            var parentPageID = myob.filtersParentPageID;
-                        }
-                        if(isSave) {
-                            if(isFilters){
-                                data = {
-                                    f: myob.currentFilter,
-                                    e: myob.currentFilterExcludes,
-                                    o: myob.currentFilterOr,
-                                    s: myob.currentSorter
-                                };
-                            } else {
-                                data = {f: myob.favouritesStore};
+                        data.ParentPageID = parentPageID;
+                        jQuery.post(
+                            url,
+                            data,
+                            function(returnedURL) {
+                                alert(returnedURL);
+                                jQuery.modal(
+                                    '<iframe src="'+returnedURL+'" height="450" width="830" style="border:0" id="tfs-pop" name="tfs-pop-up">',
+                                    {
+                                        closeHTML:"close",
+                                        containerCss:{
+                                            backgroundColor:"#fff",
+                                            borderColor:"#fff",
+                                            padding:0,
+                                            height:Math.round(jQuery(window).height() * 0.85),
+                                            width: Math.round(jQuery(window).width() * 0.85)
+
+                                        },
+                                        overlayClose:true
+                                    }
+                                );
+                                return false;
                             }
-                        }
-                        parentPageID = parentPageID.split('/').join('--');
-                        dataAsString = jQuery.param(data);
-                        fullURL = url + encodeURIComponent(parentPageID) + '/?data='+dataAsString;
-                        jQuery.modal('<iframe src="' + fullURL + '" height="450" width="830" style="border:0">', {
-                            closeHTML:"",
-                            containerCss:{
-                                backgroundColor:"#fff",
-                                borderColor:"#fff",
-                                height:450,
-                                padding:0,
-                                width:830
-                            },
-                            overlayClose:true
-                        });
-                        // myEl.attr('href', fullURL);
-                        myEl.modal();
+                        ).fail(
+                            function() {
+                                alert('ERROR!');
+                            }
+                        );
+
+
                         return false;
                     }
                 );
@@ -1801,20 +1797,23 @@ jQuery(document).ready(
             makeRetrieveButtons: function(canSave, type)
             {
                 var buttons = [];
+                var url = myob.serverConnectionURL;
                 switch(type) {
                     case 'favourites':
-                        var url = myob.favouritesURL;
                         var title = myob.favouritesCategoryTitle;
+                        var parentPageID = myob.favouritesParentPageID;
+                        var variables = 'favouritesStore';
                         break;
                     case 'filters':
-                        var url = myob.filtersURL;
                         var title = myob.filtersTitle;
+                        var parentPageID = myob.filtersParentPageID;
+                        var variables = 'currentFilter,currentFilterExcludes,currentFilterOr,currentSorter';
                         break;
                 }
                 if(canSave) {
-                    buttons.push('<a href="'+url+'save/" class="save '+type+'">Save ' + title + '</a>');
+                    buttons.push('<a href="'+url+'start/" class="save '+type+'" data-parent-page-id="'+parentPageID+'" data-variables="'+variables+'">Save ' + title + '</a>');
                 }
-                buttons.push('<a href="'+url+'index/" class="load '+type+'">Load ' + title + '</a>');
+                buttons.push('<a href="'+url+'index/" class="load '+type+'" data-parent-page-id="'+parentPageID+'" data-variables="'+variables+'">Load ' + title + '</a>');
                 return buttonHTML = '<li>' + buttons.join(' | ') + '</li>';
             },
 
@@ -1976,15 +1975,20 @@ jQuery(document).ready(
                             jQuery(el).removeClass(myob.favouriteClass);
                         }
                     );
-                    //add all favourites
-                    for (var fav in myob.favouritesStore) {
-                        if (myob.favouritesStore.hasOwnProperty(fav)) {
-                            var id = myob.favouritesStore[fav];
-                            myob.myTableBody.find('#' + id).toggleClass(myob.favouriteClass);
-                        }
+                }
+                myob.addFavouritesToHTML();
+
+            },
+
+            addFavouritesToHTML: function()
+            {
+                //add all favourites
+                for (var fav in myob.favouritesStore) {
+                    if (myob.favouritesStore.hasOwnProperty(fav)) {
+                        var id = myob.favouritesStore[fav];
+                        myob.myTableBody.find('#' + id).toggleClass(myob.favouriteClass);
                     }
                 }
-
             },
 
             /**
@@ -2006,16 +2010,19 @@ jQuery(document).ready(
                         }
                     );
                     if(typeof qd.load !== 'undefined') {
-                        var url = myob.filtersURL + '/load/' + qd.load + '/';
+                        var url = myob.serverConnectionURL + 'load/' + qd.load + '/';
                         jQuery.getJSON(
                             url,
-                            function( data ) {
-                                jQuery.each(
-                                    data,
-                                    function( key, val ) {
-                                        myob[key] = val;
+                            function( response ) {
+                                var data = response.Data;
+                                data = JSON.parse(data);
+                                for (var property in data) {
+                                    if (data.hasOwnProperty(property)) {
+                                        myob[property] = data[property];
+
                                     }
-                                );
+                                }
+                                myob.addFavouritesToHTML();
                             }
                         );
                     }

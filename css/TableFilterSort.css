@@ -1,15 +1,43 @@
-.sort-asc:after {content: " △";}
-.sort-desc:after {content: " ▽";}
-.no-matches-message { display: none; }
-span[data-filter].dl {
+/* sort */
+.sort-asc:after {
+    content: " △";
+}
+
+.sort-desc:after {
+    content: " ▽";
+}
+
+/* no matches */
+.no-matches-message {
+    display: none;
+}
+
+/* direct links */
+span.dl {
     cursor: pointer;
 }
-td, th {word-wrap:break-word;}
-tr.hide, tr.no-match {display: none!important;}
 
-.loading  {height: 5000px!important;}
-.loading *,
-.loading .tableFilterSortMoreEntries {
+/* table */
+table {
+    table-layout: fixed;
+}
+/* table word-wrap */
+td, th {
+    word-wrap: break-word;
+}
+
+
+/* hidden data */
+tr.hide, tr.no-match {
+    display: none!important;
+}
+
+/* loading we give it plenty of height ... */
+.loading {
+    height: 5000px!important;
+}
+
+.loading table {
     display: none;
 }
 
@@ -17,17 +45,25 @@ tr.hide, tr.no-match {display: none!important;}
     visibility: visible;
 }
 
-table { table-layout: fixed; }
-
+/* fixed header */
 .fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder,
 .fixed-header.tableFilterSortFilterInUse table thead {
     position: fixed;
     top: 0;
 }
-.fixed-header.tableFilterSortFilterInUse #tfspushdowndiv {display: block; padding: 0; margin: 0; width: 100%; border: none;}
+
+.fixed-header.tableFilterSortFilterInUse #tfspushdowndiv {
+    display: block;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    border: none;
+}
+
 .fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder {
     z-index: 10;
 }
+
 .fixed-header.tableFilterSortFilterInUse table thead {
     z-index: 9;
     display: table;

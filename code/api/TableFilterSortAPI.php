@@ -48,8 +48,10 @@ class TableFilterSortAPI extends Object
         if($jqueryLocation) {
             array_unshift($js, $jqueryLocation);
         }
-        $js = array_diff($js, $blockArray);
-        $css = array_diff($css, $blockArray);
+        if(is_array($blockArray) && count($blockArray)) {
+            $js = array_diff($js, $blockArray);
+            $css = array_diff($css, $blockArray);
+        }
         if(Director::isDev()) {
             foreach($css as $link) {
                 Requirements::themedCSS($link, 'table_filter_sort');

@@ -231,8 +231,8 @@ $html = create_test();
                 data-title="Filter Table Below"
                 data-title-clear-button="Clear"
                 data-title-close-and-apply="Apply Your Selection"
-                data-filter-page-id="test-filters"
-                data-favourites-page-id="test-favs"
+                data-filters-parent-page-id="test-filters"
+                data-favourites-parent-page-id="test-favs"
             ></div>
 
 
