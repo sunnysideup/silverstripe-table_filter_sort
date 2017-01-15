@@ -7,11 +7,11 @@
 </head>
 
 <body>
-    <a class="simplemodal-close" href="javascript:parent.closeIFrame();">Close</a>
-
 <% if $AddForm %>
 
     $AddForm
+
+<% else_if $ShareLink  %>
 
 <% else %>
     <div class="tableFilterSortHolder">

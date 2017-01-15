@@ -15,7 +15,8 @@ jQuery(document).ready(
                 TableFilterSortTableList[i] = jQuery(TableFilterSortTableList[i]).tableFilterSort();
             }
         }
-});
+    }
+);
 
 
 
@@ -47,6 +48,14 @@ jQuery(document).ready(
              * @type {String}
              */
             serverConnectionURL: '/tfs/',
+
+            /**
+             * list of server data to apply ...
+             * e.g.
+             * currentFilter: true
+             * @type {Object}
+             */
+            serverDataToApply: {},
 
             /**
              * the code for all pages that share the same filters
@@ -574,12 +583,15 @@ jQuery(document).ready(
                             myob.dataDictionaryCollector();
 
                             //LOAD DATA FROM SERVER
-                            //check for existing favourites
+                            //check for data in local cookie
                             if(myob.debug) { console.profileEnd();console.profile('retrieveLocalCookie');}
                             myob.retrieveLocalCookie();                            //
-                            //finalise data dictionary
-                            if(myob.debug) { console.profileEnd();console.profile('findAndApplyGetVariables');}
-                            myob.findAndApplyGetVariables();
+                            //check for data on server
+                            if(myob.debug) { console.profileEnd();console.profile('retrieveDataFromServer');}
+                            myob.retrieveDataFromServer();
+                            //process data from cookie and server
+                            if(myob.debug) { console.profileEnd();console.profile('processRetrievedData');}
+                            myob.processRetrievedData();
 
                             //LISTENERS ...
                             //set up filter form listener
@@ -601,8 +613,8 @@ jQuery(document).ready(
                             if(myob.debug) { console.profile('addURLChangeListener');}
                             myob.addURLChangeListener();
                             //listen to favourite links, if any
-                            if(myob.debug) { console.profileEnd();console.profile('retrieveServerDataListener');}
-                            myob.retrieveServerDataListener();
+                            if(myob.debug) { console.profileEnd();console.profile('openServerModalWindow');}
+                            myob.openServerModalWindow();
                             //listen to favourite links, if any
                             if(myob.debug) { console.profileEnd();console.profile('favouriteLinkListener');}
                             myob.favouriteLinkListener();
@@ -996,14 +1008,13 @@ jQuery(document).ready(
              */
             addURLChangeListener: function()
             {
-                if(myob.useBackAndForwardButtons) {
-                    window.addEventListener(
-                        "popstate",
-                        function(e) {
-                            myob.findAndApplyGetVariables();
-                        }
-                    );
-                }
+                window.addEventListener(
+                    "popstate",
+                    function(e) {
+                        myob.retrieveDataFromServer();
+                        myob.processRetrievedData();
+                    }
+                );
             },
 
 
@@ -1083,16 +1094,16 @@ jQuery(document).ready(
              * data is sent as the data get parameter, separated by &
              * @return {[type]} [description]
              */
-            retrieveServerDataListener: function()
+            openServerModalWindow: function()
             {
-
                 myob.myTableHolder.on(
                     'click',
                     myob.saveAndLoadSelector + ' a',
                     function(event){
                         event.preventDefault();
+                        myob.myTable.removeClass(myob.loadingClass);
                         var myEl = jQuery(this);
-                        var url = myEl.attr('href');
+                        var url = myEl.attr('data-url');
                         var parentPageID = myEl.attr('data-parent-page-id');
                         variables = myEl.attr('data-variables');
                         variables = variables.split(',');
@@ -1106,7 +1117,7 @@ jQuery(document).ready(
                             data,
                             function(returnedURL) {
                                 jQuery.modal(
-                                    '<iframe src="'+returnedURL+'" height="450" width="830" style="border:0" id="tfs-pop" name="tfs-pop-up">',
+                                    '<iframe src="'+returnedURL+'" height="450" width="830" style="border:0" id="tfs-pop-up-i-frame" name="tfs-pop-up-i-frame">',
                                     {
                                         closeHTML:"close",
                                         containerCss:{
@@ -1117,7 +1128,13 @@ jQuery(document).ready(
                                             width: Math.round(jQuery(window).width() * 0.85)
 
                                         },
-                                        overlayClose:true
+                                        overlayClose:true,
+                                        onClose: function() {
+                                            jQuery.modal.close();
+                                            myob.retrieveDataFromServer();
+                                            myob.processRetrievedData();
+
+                                        }
                                     }
                                 );
                                 return false;
@@ -1125,10 +1142,9 @@ jQuery(document).ready(
                         ).fail(
                             function() {
                                 alert('ERROR!');
+                                myob.myTable.removeClass(myob.loadingClass);
                             }
                         );
-
-
                         return false;
                     }
                 );
@@ -1810,9 +1826,9 @@ jQuery(document).ready(
                         break;
                 }
                 if(canSave) {
-                    buttons.push('<a href="'+url+'start/" class="save '+type+'" data-parent-page-id="'+parentPageID+'" data-variables="'+variables+'">Save ' + title + '</a>');
+                    buttons.push('<a href="#" data-url="'+url+'start/" class="save '+type+'" data-parent-page-id="'+parentPageID+'" data-variables="'+variables+'">Save ' + title + '</a>');
                 }
-                buttons.push('<a href="'+url+'index/" class="load '+type+'" data-parent-page-id="'+parentPageID+'" data-variables="'+variables+'">Load ' + title + '</a>');
+                buttons.push('<a href="#" + data-url="'+url+'index/" class="load '+type+'" data-parent-page-id="'+parentPageID+'" data-variables="'+variables+'">Load ' + title + '</a>');
                 return buttonHTML = '<li>' + buttons.join(' | ') + '</li>';
             },
 
@@ -1967,26 +1983,6 @@ jQuery(document).ready(
                 myob.favouritesStore = Cookies.getJSON('favouritesStore');
                 if(typeof myob.favouritesStore === 'undefined') {
                     myob.favouritesStore = [];
-                } else {
-                    //remove all favourites
-                    myob.myTableBody.find('tr.'+myob.favouriteClass).each(
-                        function(i, el) {
-                            jQuery(el).removeClass(myob.favouriteClass);
-                        }
-                    );
-                }
-                myob.addFavouritesToHTML();
-
-            },
-
-            addFavouritesToHTML: function()
-            {
-                //add all favourites
-                for (var fav in myob.favouritesStore) {
-                    if (myob.favouritesStore.hasOwnProperty(fav)) {
-                        var id = myob.favouritesStore[fav];
-                        myob.myTableBody.find('#' + id).toggleClass(myob.favouriteClass);
-                    }
                 }
             },
 
@@ -1995,7 +1991,7 @@ jQuery(document).ready(
              * only 'load' works right now, but other variables can be applied
              * in the future...
              */
-            findAndApplyGetVariables: function()
+            retrieveDataFromServer: function()
             {
                 var qd = {};
                 if(typeof location.search !== 'undefined' && location.search && location.search.length > 0) {
@@ -2009,6 +2005,7 @@ jQuery(document).ready(
                         }
                     );
                     if(typeof qd.load !== 'undefined') {
+                        myob.myTable.addClass(myob.loadingClass);
                         var url = myob.serverConnectionURL + 'load/' + qd.load + '/';
                         jQuery.getJSON(
                             url,
@@ -2018,14 +2015,45 @@ jQuery(document).ready(
                                 for (var property in data) {
                                     if (data.hasOwnProperty(property)) {
                                         myob[property] = data[property];
-
+                                        myob.serverDataToApply[property] = true;
                                     }
                                 }
-                                myob.addFavouritesToHTML();
+                                myob.serverDataToApply = true;
+                                myob.myTable.removeClass(myob.loadingClass);
+                            }
+                        ).fail(
+                            function(){
+                                myob.myTable.removeClass(myob.loadingClass);
                             }
                         );
                     }
                 }
+            },
+
+            processRetrievedData: function()
+            {
+                if(typeof myob.serverDataToApply['favouritesStore'] !== 'undefined') {
+                    //remove all favourites
+                    myob.myTableBody.find('tr.'+myob.favouriteClass).each(
+                        function(i, el) {
+                            jQuery(el).removeClass(myob.favouriteClass);
+                        }
+                    );
+                    //add all favourites
+                    for (var fav in myob.favouritesStore) {
+                        if (myob.favouritesStore.hasOwnProperty(fav)) {
+                            var id = myob.favouritesStore[fav];
+                            myob.myTableBody.find('#' + id).toggleClass(myob.favouriteClass);
+                        }
+                    }
+                    delete myob.serverDataToApply['favouritesStore']
+                }
+                if(typeof myob.serverDataToApply['currentFilter'] !== 'undefined') {
+                    delete myob.serverDataToApply['favouritesStore'];
+                    myob.createFilterForm();
+                    myob.applyFilter();
+                }
+                myob.myTableHolder.removeClass(myob.loadingClass);
             },
 
             //===================================================================
