@@ -2018,7 +2018,6 @@ jQuery(document).ready(
                                         myob.serverDataToApply[property] = true;
                                     }
                                 }
-                                myob.serverDataToApply = true;
                                 myob.myTable.removeClass(myob.loadingClass);
                             }
                         ).fail(

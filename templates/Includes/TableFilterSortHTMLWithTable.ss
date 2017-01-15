@@ -6,7 +6,7 @@
   <title>$Title</title>
 </head>
 
-<body>
+<body id="tfs-modal-pop-up">
 <% if $AddForm %>
 
     $AddForm
