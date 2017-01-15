@@ -1105,7 +1105,6 @@ jQuery(document).ready(
                             url,
                             data,
                             function(returnedURL) {
-                                alert(returnedURL);
                                 jQuery.modal(
                                     '<iframe src="'+returnedURL+'" height="450" width="830" style="border:0" id="tfs-pop" name="tfs-pop-up">',
                                     {
