@@ -229,8 +229,6 @@ jQuery(document).ready(
              */
             favouritesStore: [],
 
-
-
             /**
              *
              *
@@ -1078,7 +1076,9 @@ jQuery(document).ready(
                                         myob.favouritesStore.splice(index, 1);
                                     }
                                 }
-                                Cookies.set('favouritesStore', myob.favouritesStore, {path: myob.baseURL, expires: 180});
+                                if(typeof Cookies !== 'undefined') {
+                                    Cookies.set('favouritesStore', myob.favouritesStore, {path: myob.baseURL, expires: 180});
+                                }
                             }
                             return false;
                         }
@@ -1259,28 +1259,20 @@ jQuery(document).ready(
                             {
                                 list: myob.dataDictionary[category]['Options'],
                                 autoFirst: true,
-                                // filter: function(text, input) {
-                                //     return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
-                                // },
+                                filter: function(text, input) {
+                                    return Awesomplete.FILTER_CONTAINS(text, input) && Awesomplete.blackList.indexOf(text.value) === -1;;
+                                },
                                 replace: function(text) {
                                     // var before = this.input.value.match(/^.+,\s*|/)[0];
                                     // this.input.value = before + text + ', ';
                                     myob.makeCheckboxSection(this.input, text.value);
                                     this.input.value = '';
-                                    var index = this._list.indexOf(text.value);
-                                    if (index > -1) {
-                                        this._list.splice(index, 1);
-                                    }
+                                    Awesomplete.blackList.push(text.value);
                                     myob.applyFilter();
                                 }
                             }
                         );
-                        // jQueryInput.on(
-                        //     'awesomplete-selectcomplete',
-                        //     function() {
-                        //         //myob.makeCheckboxSection(this, jQuery(this).val());
-                        //     }
-                        // )
+                        Awesomplete.blackList = [];
                     }
                 }
             },
@@ -1319,7 +1311,7 @@ jQuery(document).ready(
                             var currentValueForForm = '';
                             var additionToField = '';
                             if(type === 'keyword') {
-                                extraClass = 'keyword';
+                                var extraClass = 'keyword';
                                 if(typeof myob.currentFilter[category] !== 'undefined') {
                                     if(typeof myob.currentFilter[category][0] !== 'undefined') {
                                         currentValueForForm = myob.currentFilter[category].valueToMatch;
@@ -1337,7 +1329,7 @@ jQuery(document).ready(
                                         additionToField += html;
                                     }
                                 }
-                                extraClass = 'awesomplete';
+                                var extraClass = 'awesomplete';
                             }
                             return startString +
                                     '<input class="text ' + extraClass + '" type="text" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" value="'+currentValueForForm+'" />' +
@@ -1980,9 +1972,11 @@ jQuery(document).ready(
             retrieveLocalCookie: function()
             {
                 //get favourites data
-                myob.favouritesStore = Cookies.getJSON('favouritesStore');
-                if(typeof myob.favouritesStore === 'undefined') {
-                    myob.favouritesStore = [];
+                if(typeof Cookies !== 'undefined') {
+                    myob.favouritesStore = Cookies.getJSON('favouritesStore');
+                    if(typeof myob.favouritesStore === 'undefined') {
+                        myob.favouritesStore = [];
+                    }
                 }
             },
 
@@ -2153,7 +2147,7 @@ jQuery(document).ready(
 
         };
 
-        TableFilterSort = jQuery.extend(
+        myob = jQuery.extend(
             myob,
             options
         );
@@ -2329,4 +2323,4 @@ jQuery.fn.isOnScreen = function(){
 
         return on.apply(this, args);
     };
-}(this.jQuery));
+}(jQuery));
