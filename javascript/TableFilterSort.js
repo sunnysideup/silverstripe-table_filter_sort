@@ -1263,8 +1263,6 @@ jQuery(document).ready(
                                     return Awesomplete.FILTER_CONTAINS(text, input) && Awesomplete.blackList.indexOf(text.value) === -1;;
                                 },
                                 replace: function(text) {
-                                    // var before = this.input.value.match(/^.+,\s*|/)[0];
-                                    // this.input.value = before + text + ', ';
                                     myob.makeCheckboxSection(this.input, text.value);
                                     this.input.value = '';
                                     Awesomplete.blackList.push(text.value);
