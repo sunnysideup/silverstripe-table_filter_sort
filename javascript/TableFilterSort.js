@@ -398,18 +398,17 @@ jQuery(document).ready(
             paginationSelector: ".pagination",
 
             /**
-             * class for an element that holds the pagination
-             * @var string
-             */
-            saveAndLoadSelector: ".saveAndLoad",
-
-            /**
              *
              *
              * Classes
              *
              *
              */
+             /**
+              * class for an element that holds the pagination
+              * @var string
+              */
+             saveAndLoadClass: "saveAndLoad",
 
             /**
              * loading class when things are being calculated
@@ -591,7 +590,6 @@ jQuery(document).ready(
                             myob.retrieveDataFromServer();
                             //process data from cookie and server
                             if(myob.debug) { console.profileEnd();console.profile('processRetrievedData');}
-                            myob.processRetrievedData();
 
                             //LISTENERS ...
                             //set up filter form listener
@@ -627,18 +625,20 @@ jQuery(document).ready(
                             if(myob.debug) { console.profileEnd();console.profile('createFilterForm');}
                             myob.createFilterForm();
 
-                            if(myob.debug) { console.profileEnd();}
+                            //show defaults
+                            if(myob.debug) {console.profileEnd(); console.profile('workOutCurrentFilter');}
+                            myob.workOutCurrentFilter();
+
+                            //show defaults
+                            if(myob.debug) {console.profileEnd(); console.profile('runCurrentSort');}
+                            myob.runCurrentSort();
+
+                            if(myob.debug) {console.profileEnd();}
 
                             //we are now ready!
                             myob.myTableHolder.removeClass(myob.loadingClass);
 
-                            //show defaults
-                            if(myob.debug) { console.profile('runCurrentSort');}
-                            myob.runCurrentSort();
-
                             //ADD SCROLL AND OTHER STUFF ...
-
-                            if(myob.debug) { console.profileEnd();}
 
                         },
                         myob.millisecondsBetweenActions
@@ -1012,7 +1012,6 @@ jQuery(document).ready(
                     "popstate",
                     function(e) {
                         myob.retrieveDataFromServer();
-                        myob.processRetrievedData();
                     }
                 );
             },
@@ -1066,7 +1065,8 @@ jQuery(document).ready(
                         myob.favouriteLinkSelector,
                         function(event){
                             event.preventDefault();
-                            var rowHolder = jQuery(this).closest('tr');
+                            var cellHolder = jQuery(this).closest('td')
+                            var rowHolder = cellHolder.closest('tr');
                             rowHolder.toggleClass(myob.favouriteClass);
                             var id = rowHolder.attr('id');
                             if(id && typeof id !== 'undefined' && id !== '') {
@@ -1098,7 +1098,7 @@ jQuery(document).ready(
             {
                 myob.myTableHolder.on(
                     'click',
-                    myob.saveAndLoadSelector + ' a',
+                    myob.saveAndLoadClass + ' a',
                     function(event){
                         event.preventDefault();
                         myob.myTable.removeClass(myob.loadingClass);
@@ -1132,8 +1132,6 @@ jQuery(document).ready(
                                         onClose: function() {
                                             jQuery.modal.close();
                                             myob.retrieveDataFromServer();
-                                            myob.processRetrievedData();
-
                                         }
                                     }
                                 );
@@ -1311,7 +1309,7 @@ jQuery(document).ready(
                             }
                             return startString +
                                 '<input class="favourites" type="checkbox" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" '+checked+' />' +
-                                '<label for="' + valueID + '">♥ ♥ ♥</label>' +
+                                '<label for="' + valueID + '">❤ ❤ ❤</label>' +
                                 endString;
                             break;
                         case 'keyword':
@@ -1758,17 +1756,7 @@ jQuery(document).ready(
                 myob.myTableHolder.find(myob.visibleRowCountSelector).text(actualVisibleRowCount);
                 myob.myTableHolder.find(myob.paginationSelector).html(pageHTML);
                 myob.myTable.show();
-                var buttons = [];
-                if(myob.hasFavourites) {
-                    buttons.push(myob.makeRetrieveButtons(myob.favouritesStore.length > 0, 'favourites'))
-                }
-                if(myob.hasFilterSaving) {
-                    buttons.push(myob.makeRetrieveButtons(myob.currentFilter.length > 0, 'filters'))
-                }
-                if(buttons.length > 0) {
-                    var buttonHTML = '<ul>' + buttons.join('</li><li>') + '</ul>';
-                    myob.myTableHolder.find(myob.saveAndLoadSelector).html(buttonHTML);
-                }
+
                 myob.myTable.removeClass(myob.loadingClass);
                 if( ! myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
                     window.setTimeout(
@@ -1809,7 +1797,7 @@ jQuery(document).ready(
              * @param  {string}  type    favourites | filters
              * @return {string}          html
              */
-            makeRetrieveButtons: function(canSave, type)
+            makeRetrieveButtons: function(canSave, canLoad, type)
             {
                 var buttons = [];
                 var url = myob.serverConnectionURL;
@@ -1826,10 +1814,18 @@ jQuery(document).ready(
                         break;
                 }
                 if(canSave) {
-                    buttons.push('<a href="#" data-url="'+url+'start/" class="save '+type+'" data-parent-page-id="'+parentPageID+'" data-variables="'+variables+'">Save ' + title + '</a>');
+                    buttons.push(
+                        '<li class="save '+type+' '+myob.saveAndLoadClass+'">' +
+                        '<a href="#" data-url="'+url+'start/" data-parent-page-id="'+parentPageID+'" data-variables="'+variables+'">Save</a>'+
+                        '</li>'
+                    );
                 }
-                buttons.push('<a href="#" + data-url="'+url+'index/" class="load '+type+'" data-parent-page-id="'+parentPageID+'" data-variables="'+variables+'">Load ' + title + '</a>');
-                return buttonHTML = '<li>' + buttons.join(' | ') + '</li>';
+                buttons.push(
+                    '<li class="load '+type+' '+myob.saveAndLoadClass+'">' +
+                    '<a href="#" data-url="'+url+'index/" data-parent-page-id="'+parentPageID+'" data-variables="'+variables+'">Find</a>'+
+                    '</li>'
+                );
+                return buttonHTML = '<li>' + buttons.join('</li><li>') + '</li>';
             },
 
 
@@ -1952,10 +1948,19 @@ jQuery(document).ready(
                         }
                     //funny indenting to stay ....
                 );
-                if(html.length === 0) {
-                    html = myob.noFilterSelectedText;
+                var hasFilter = Object.keys(myob.currentFilter).length > 0 ? true : false;
+                var buttons = [];
+                if(myob.hasFilterSaving) {
+                    buttons.push(myob.makeRetrieveButtons(hasFilter, true, 'filters'))
+                }
+                if(hasFilter === true) {
+                    buttons.push('<li class="clear"><a href="#">✖</a></li>');
                 } else {
-                    html = '<div class="clear"><a href="#">✖</a></div>' + html;
+                    html = myob.noFilterSelectedText;
+                }
+                if(buttons.length > 0) {
+                    var buttonHTML = '<ul>' + buttons.join('') + '</ul>';
+                    html =  buttonHTML + html;
                 }
                 var targetDomElement = myob.myTableHolder.find('.'+myob.currentSearchFilterClass);
                 var title = targetDomElement.attr('data-title');
@@ -2019,6 +2024,7 @@ jQuery(document).ready(
                                     }
                                 }
                                 myob.myTable.removeClass(myob.loadingClass);
+                                myob.processRetrievedData();
                             }
                         ).fail(
                             function(){
@@ -2031,13 +2037,9 @@ jQuery(document).ready(
 
             processRetrievedData: function()
             {
-                if(typeof myob.serverDataToApply['favouritesStore'] !== 'undefined') {
+                if(typeof myob.serverDataToApply['favouritesStore'] !== 'undefined' && myob.serverDataToApply['favouritesStore'] === true) {
                     //remove all favourites
-                    myob.myTableBody.find('tr.'+myob.favouriteClass).each(
-                        function(i, el) {
-                            jQuery(el).removeClass(myob.favouriteClass);
-                        }
-                    );
+                    myob.myTableBody.find('tr.'+myob.favouriteClass).removeClass(myob.favouriteClass);
                     //add all favourites
                     for (var fav in myob.favouritesStore) {
                         if (myob.favouritesStore.hasOwnProperty(fav)) {
@@ -2047,10 +2049,10 @@ jQuery(document).ready(
                     }
                     delete myob.serverDataToApply['favouritesStore']
                 }
-                if(typeof myob.serverDataToApply['currentFilter'] !== 'undefined') {
-                    delete myob.serverDataToApply['favouritesStore'];
+                if(typeof myob.serverDataToApply['currentFilter'] !== 'undefined' && typeof myob.serverDataToApply['currentFilter'] === true) {
                     myob.createFilterForm();
                     myob.applyFilter();
+                    delete myob.serverDataToApply['favouritesStore'];
                 }
                 myob.myTableHolder.removeClass(myob.loadingClass);
             },
