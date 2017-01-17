@@ -190,7 +190,9 @@ ul li {
  */
 
 .tableFilterSortCurrentSearchHolder ul li span:last-child:after {
-  content: ""
+  content: "";
+  padding-right: 0;
+  padding-left: 0;
 }
 
 .tableFilterSortMoreEntries, .tableFilterSortMoreEntriesAlwaysShow {
