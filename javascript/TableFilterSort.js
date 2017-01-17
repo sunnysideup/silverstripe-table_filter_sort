@@ -611,8 +611,8 @@ jQuery(document).ready(
                             if(myob.debug) { console.profile('addURLChangeListener');}
                             myob.addURLChangeListener();
                             //listen to favourite links, if any
-                            if(myob.debug) { console.profileEnd();console.profile('openServerModalWindow');}
-                            myob.openServerModalWindow();
+                            if(myob.debug) { console.profileEnd();console.profile('openServerModalWindowListener');}
+                            myob.openServerModalWindowListener();
                             //listen to favourite links, if any
                             if(myob.debug) { console.profileEnd();console.profile('favouriteLinkListener');}
                             myob.favouriteLinkListener();
@@ -1094,11 +1094,11 @@ jQuery(document).ready(
              * data is sent as the data get parameter, separated by &
              * @return {[type]} [description]
              */
-            openServerModalWindow: function()
+            openServerModalWindowListener: function()
             {
                 myob.myTableHolder.on(
                     'click',
-                    myob.saveAndLoadClass + ' a',
+                    '.' + myob.saveAndLoadClass + ' a',
                     function(event){
                         event.preventDefault();
                         myob.myTable.removeClass(myob.loadingClass);
@@ -1820,12 +1820,16 @@ jQuery(document).ready(
                         '</li>'
                     );
                 }
-                buttons.push(
-                    '<li class="load '+type+' '+myob.saveAndLoadClass+'">' +
-                    '<a href="#" data-url="'+url+'index/" data-parent-page-id="'+parentPageID+'" data-variables="'+variables+'">Find</a>'+
-                    '</li>'
-                );
-                return buttonHTML = '<li>' + buttons.join('</li><li>') + '</li>';
+                if(canLoad) {
+                    buttons.push(
+                        '<li class="load '+type+' '+myob.saveAndLoadClass+'">' +
+                        '<a href="#" data-url="'+url+'index/" data-parent-page-id="'+parentPageID+'" data-variables="'+variables+'">Find</a>'+
+                        '</li>'
+                    );
+                }
+                if(buttons.length > 0) {
+                    return buttonHTML = '<li>' + buttons.join('</li><li>') + '</li>';
+                }
             },
 
 
