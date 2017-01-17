@@ -174,17 +174,20 @@ ul li {
  * we use a hack word-break here
  * to avoid issues with encoding
  * when compressing files
+ * i.e. adding content: "\00a0|\00a0"; was giving us a lot of grief...
  */
 .tableFilterSortCurrentSearchHolder ul li span {
   display: inline-block;
   word-wrap: break-word;
 }
-
 .tableFilterSortCurrentSearchHolder ul li span:after {
   content: "|";
   padding-left: 0.5em;
   padding-right: 0.5em;
 }
+/**
+ *end word-break hack
+ */
 
 .tableFilterSortCurrentSearchHolder ul li span:last-child:after {
   content: ""
