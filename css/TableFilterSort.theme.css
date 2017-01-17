@@ -169,12 +169,21 @@ ul li {
     padding-top: 20px;
 }
 
+
+/**
+ * we use a hack word-break here
+ * to avoid issues with encoding
+ * when compressing files
+ */
 .tableFilterSortCurrentSearchHolder ul li span {
   display: inline-block;
+  word-wrap: break-word;
 }
 
 .tableFilterSortCurrentSearchHolder ul li span:after {
-  content: "\00a0|\00a0";
+  content: "|";
+  padding-left: 0.5em;
+  padding-right: 0.5em;
 }
 
 .tableFilterSortCurrentSearchHolder ul li span:last-child:after {
