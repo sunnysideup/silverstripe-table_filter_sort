@@ -329,6 +329,7 @@ $html = create_test();
             var TableFilterSortTableList = []
             TableFilterSortTableList.push('.tableFilterSortHolder');
         </script>
+        <script src="../../javascript/jsurl.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/jquery.simplemodal-1.4.5?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/js.cookies.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/awesomplete.js?x=<?php echo rand(0,9999999999) ?>"></script>

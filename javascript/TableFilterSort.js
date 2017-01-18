@@ -51,11 +51,16 @@ jQuery(document).ready(
 
             /**
              * list of server data to apply ...
+             * by default we apply everything on load!
              * e.g.
-             * currentFilter: true
+             * cfinc: true
              * @type {Object}
              */
-            serverDataToApply: {},
+            serverDataToApply: {
+                'cfinc': true,
+                'csort': true,
+                'myfavs': true
+            },
 
             /**
              * the code for all pages that share the same filters
@@ -136,13 +141,13 @@ jQuery(document).ready(
 
             /**
              * variables that determine the filter and sort
-             *  - currentFilter: details of current filter
-             *  - currentFilterOr: which categories are OR instead of AND
-             *  - currentFilterExcludes: which category VALUES are to be EXCLUDED
-             *  - currentSorter: details on currentSort
+             *  - cfinc: details of current filter
+             *  - cforcat: which categories are OR instead of AND
+             *  - cfex: which category VALUES are to be EXCLUDED
+             *  - csort: details on currentSort
              * @type {array}
              */
-            filterAndSortVariables: ["currentFilter","currentFilterOr","currentFilterExcludes","currentSorter"],
+            filterAndSortVariables: ["cfinc","cforcat","cfex","csort"],
 
             /**
              * list of current filters by category
@@ -150,7 +155,7 @@ jQuery(document).ready(
              * "Size" => [S,M,L]
              * @var {object}
              */
-            currentFilter: {},
+            cfinc: {},
 
             /**
              * current filter categories that are OR rather than AND
@@ -158,7 +163,7 @@ jQuery(document).ready(
              * in relation to other filters like Size and Style
              * @var {array}
              */
-            currentFilterOr: [],
+            cforcat: [],
 
             /**
              * current category filter values that are to be excluded
@@ -166,7 +171,7 @@ jQuery(document).ready(
              * when the user
              * @var {object}
              */
-            currentFilterExcludes: {},
+            cfex: {},
 
             /**
              * has two variables:
@@ -174,7 +179,7 @@ jQuery(document).ready(
              * "Field" => 'MyField'
              * @var array
              */
-            currentSorter: {},
+            csort: {},
 
             /**
              * starting point for showing rows
@@ -228,6 +233,12 @@ jQuery(document).ready(
              *
              * @type {Boolean}
              */
+            hasFavouritesSaving: false,
+
+            /**
+             *
+             * @type {Boolean}
+             */
             hasFilterSaving: false,
 
             /**
@@ -252,7 +263,7 @@ jQuery(document).ready(
              * list of favourites
              * @type {Array}
              */
-            favouritesStore: [],
+            myfavs: [],
 
 
 
@@ -298,7 +309,7 @@ jQuery(document).ready(
              *
              * @type string
              */
-            currentFilterText: '',
+            cfincText: '',
 
             /**
              *
@@ -581,7 +592,7 @@ jQuery(document).ready(
 
                 myob.favouritesParentPageID = myob.myFilterFormHolder.attr("data-favourites-parent-page-id");
                 if(typeof myob.favouritesParentPageID === 'string' && myob.favouritesParentPageID.length > 0) {
-                    myob.hasFavourites = true;
+                    myob.hasFavouritesSaving = true;
                 }
                 myob.filtersParentPageID = myob.myFilterFormHolder.attr("data-filters-parent-page-id");
                 if(typeof myob.filtersParentPageID === 'string' && myob.filtersParentPageID.length > 0) {
@@ -605,17 +616,9 @@ jQuery(document).ready(
                             //finalise data dictionary
                             if(myob.debug) { console.profileEnd();console.profile('dataDictionaryCollector');}
                             myob.dataDictionaryCollector();
-
-                            //LOAD DATA FROM SERVER
-                            //check for data in local cookie
-                            if(myob.debug) { console.profileEnd();console.profile('retrieveLocalCookie');}
-                            myob.retrieveLocalCookie();                            //
-                            //check for data on server
-                            if(myob.debug) { console.profileEnd();console.profile('retrieveDataFromServer');}
-                            myob.retrieveDataFromServer();
-                            //we need to process this here one more time ... in case of the cookie data
-                            if(myob.debug) { console.profileEnd();console.profile('processRetrievedData');}
-                            myob.processRetrievedData();
+                            //find defaultSort
+                            if(myob.debug) { console.profileEnd();console.profile('findDefaultSort');}
+                            myob.findDefaultSort();
 
                             //LISTENERS ...
                             //set up filter form listener
@@ -646,11 +649,26 @@ jQuery(document).ready(
                             if(myob.debug) { console.profileEnd();console.profile('directFilterLinkListener');}
                             myob.directFilterLinkListener();
 
-                            //FILTER FORM
-                            //create filter form
-                            if(myob.debug) { console.profileEnd();console.profile('createFilterForm');}
-                            myob.createFilterForm();
+                            //LOAD DATA FROM SERVER
+                            //check for data in local cookie
+                            if(myob.debug) { console.profileEnd();console.profile('retrieveLocalCookie');}
+                            myob.retrieveLocalCookie();
+                            //check for data in local cookie
+                            if(myob.debug) { console.profileEnd();console.profile('retrieveDataFromURL');}
+                            myob.retrieveDataFromURL();
+                            //check for data on server
+                            if(myob.debug) { console.profileEnd();console.profile('retrieveDataFromServer');}
+                            myob.retrieveDataFromServer();
+                            //we need to process this here one more time ... in case of the cookie data
+                            // if(myob.debug) { console.profileEnd();console.profile('processRetrievedData');}
+                            // myob.processRetrievedData();
 
+                            //FILTER FORM
+                            // //create filter form
+                            // if(myob.debug) { console.profileEnd();console.profile('createFilterForm');}
+                            // myob.createFilterForm();
+
+                            //RUN SORT / FILTER
                             //show defaults
                             if(myob.debug) {console.profileEnd(); console.profile('workOutCurrentFilter');}
                             myob.workOutCurrentFilter();
@@ -853,6 +871,27 @@ jQuery(document).ready(
                 );
             },
 
+            findDefaultSort: function()
+            {
+                var currentSortLinkSelector = '.'+myob.sortDescClass+', .'+myob.sortAscClass
+                var currentSortObject = myob.myTableHead.find(currentSortLinkSelector).first();
+                if(currentSortObject && currentSortObject.length > 0) {
+                    //an ascending or descending has been set ...
+                } else {
+                    currentSortObject = myob.myTableHead.find(myob.sortLinkSelector+"[data-sort-default=true]").first();
+                    if(currentSortObject && currentSortObject.length > 0) {
+                        //a default one has been set
+                    } else {
+                        //get first one
+                        currentSortObject = myob.myTableHead.find(myob.sortLinkSelector).first();
+                    }
+                }
+                if(currentSortObject && currentSortObject.length > 0) {
+                    myob.csort.sdir = currentSortObject.attr('data-sort-direction');
+                    myob.csort.scat = currentSortObject.attr('data-sort-field');
+                }
+            },
+
             //===================================================================
             // LISTENERS
             //===================================================================
@@ -904,7 +943,7 @@ jQuery(document).ready(
                     '.clear a',
                     function(event) {
                         event.preventDefault();
-                        myob.currentFilter = {};
+                        myob.cfinc = {};
                         myob.createFilterForm();
                         myob.applyFilter();
                         return false;
@@ -932,19 +971,19 @@ jQuery(document).ready(
                             .removeClass(myob.sortDescClass);
                         window.setTimeout(
                             function() {
-                                myob.currentSorter.category = myEl.attr("data-sort-field");
-                                myob.currentSorter.direction = myEl.attr("data-sort-direction");
-                                myob.currentSorter.sortType = myEl.attr("data-sort-type");
+                                myob.csort.scat = myEl.attr("data-sort-field");
+                                myob.csort.sdir = myEl.attr("data-sort-direction");
+                                var type = myEl.attr("data-sort-type");
 
-                                if(typeof myob.currentSorter.sortType === 'undefined') {
-                                    myob.currentSorter.sortType = myob.dataDictionary[myob.currentSorter.category]['DataType'];
+                                if(typeof type === 'undefined') {
+                                    type = myob.dataDictionary[myob.csort.category]['DataType'];
                                 }
                                 var arr = [];
                                 myob.myRows.each(
                                     function(i, el) {
                                         var row = jQuery(el);
-                                        var dataValue = row.find('[data-filter="' + myob.currentSorter.category + '"]').text();
-                                        if(myob.currentSorter.sortType === "number") {
+                                        var dataValue = row.find('[data-filter="' + myob.csort.scat + '"]').text();
+                                        if(type === "number") {
                                             dataValue = dataValue.replace(/[^\d.-]/g, '');
                                             dataValue = parseFloat(dataValue);
                                         }
@@ -965,8 +1004,8 @@ jQuery(document).ready(
 
                                 //show direction
                                 var sortLinkSelection = myob.myTableHead
-                                    .find(myob.sortLinkSelector + '[data-sort-field="'+myob.currentSorter.category+'"]');
-                                if(myob.currentSorter.direction === "desc"){
+                                    .find(myob.sortLinkSelector + '[data-sort-field="'+myob.csort.scat+'"]');
+                                if(myob.csort.sdir === "desc"){
                                     arr.reverse();
                                     sortLinkSelection.attr("data-sort-direction", "asc").addClass(myob.sortDescClass);
                                 }
@@ -1038,6 +1077,7 @@ jQuery(document).ready(
                 window.addEventListener(
                     "popstate",
                     function(e) {
+                        myob.retrieveDataFromURL();
                         myob.retrieveDataFromServer();
                     }
                 );
@@ -1111,41 +1151,45 @@ jQuery(document).ready(
             },
 
             favouriteLinkListener: function(){
-                if(myob.myTableBody.find(myob.favouriteLinkSelector).length > 0) {
+                myob.hasFavourites = myob.myTableBody.find(myob.favouriteLinkSelector).length > 0;
+                if(myob.hasFavourites) {
                     myob.myTableHolder.on(
                         'click',
                         myob.favouriteLinkSelector,
                         function(event){
                             event.preventDefault();
-                            var cellHolder = jQuery(this).closest('td')
+                            var cellHolder = jQuery(this).closest('td, th')
                             var rowHolder = cellHolder.closest('tr');
                             rowHolder.toggleClass(myob.favouriteClass);
                             var id = rowHolder.attr('id');
                             if(id && typeof id !== 'undefined' && id !== '') {
                                 if(rowHolder.hasClass(myob.favouriteClass)) {
-                                    myob.favouritesStore.push(id);
-                                    var html = '<div id="favouritefader">'+myob.makeRetrieveButtons(true, false, 'favourites')+'</div>';
-                                    cellHolder.append(html).addClass('hasFader');
-                                    window.setTimeout(
-                                        function() {
-                                            jQuery('#favouritefader').fadeOut(
-                                                500,
-                                                function() {
-                                                    jQuery('#favouritefader').remove();
-                                                    cellHolder.removeClass('hasFader');
-                                                }
-                                            );
-                                        },
-                                        2000
-                                    );
+                                    myob.myfavs.push(id);
+                                    if(myob.hasFavouritesSaving) {
+                                        var html = '<ul id="favouriteFader">'+myob.makeRetrieveButtons(true, false, 'favourites')+'</ul>';
+                                        cellHolder.append(html).addClass('hasFader');
+                                        window.setTimeout(
+                                            function() {
+                                                jQuery('#favouriteFader').fadeOut(
+                                                    500,
+                                                    function() {
+                                                        jQuery('#favouriteFader').remove();
+                                                        cellHolder.removeClass('hasFader');
+                                                    }
+                                                );
+                                            },
+                                            4500
+                                        );
+                                    }
                                 } else {
-                                    var index = myob.favouritesStore.indexOf(id);
+                                    var index = myob.myfavs.indexOf(id);
                                     if (index > -1) {
-                                        myob.favouritesStore.splice(index, 1);
+                                        myob.myfavs.splice(index, 1);
                                     }
                                 }
                                 if(typeof Cookies !== 'undefined') {
-                                    Cookies.set('favouritesStore', myob.favouritesStore, {path: myob.baseURL, expires: 180});
+                                    Cookies.set('myfavs', myob.myfavs, {path: myob.baseURL, expires: 180});
+                                    Cookies.set('lastFilter', myob.currentURL(), {path: myob.baseURL, expires: 180});
                                 }
                             }
                             return false;
@@ -1198,7 +1242,7 @@ jQuery(document).ready(
                                             height: height
 
                                         },
-                                        opacity: 0.85,
+                                        opacity: 85,
                                         overlayClose:true,
                                         onClose: function() {
                                             jQuery.modal.close();
@@ -1236,7 +1280,7 @@ jQuery(document).ready(
                 if(myob.myFilterFormHolder.length > 0) {
                     //clear it so that we can rebuild it ...
                     myob.myFilterFormHolder.html("");
-                    var currentFilterHTML = "";
+                    var cfincHTML = "";
                     var filterFormTitle = myob.myFilterFormHolder.attr("data-title");
                     if(typeof filterFormTitle === "undefined") {
                         filterFormTitle = myob.filterTitle;
@@ -1263,7 +1307,6 @@ jQuery(document).ready(
                                         'checkbox',
                                         category
                                     );
-                                    count = 0;
                                     for(count = 0; count < optionCount; count++) {
                                         var valueIndex = myob.dataDictionary[category]['Options'][count];
                                         content += myob.makeFieldForForm('checkbox', category, tabIndex, valueIndex);
@@ -1290,7 +1333,9 @@ jQuery(document).ready(
                              myob.favouritesCategoryTitle
                         );
                         content += myob.makeFieldForForm('favourites', myob.favouritesCategoryTitle, tabIndex, 0);
-                        content += myob.makeRetrieveButtons(true, true, 'favourites');
+                        if(myob.hasFavouritesSaving) {
+                            content += myob.makeRetrieveButtons(true, true, 'favourites');
+                        }
                         content += myob.makeSectionFooterForForm();
                         tabIndex++;
                     }
@@ -1360,7 +1405,7 @@ jQuery(document).ready(
             makeFieldForForm: function(type, category, tabIndex, valueIndex)
             {
                 var cleanCategory = category.replace(/\W/g, '');
-                var cleanValue = valueIndex.toString();
+                var cleanValue = valueIndex.toString().toLowerCase();
                 var valueID = ('TFS_' + cleanCategory + '_' + cleanValue).replace(/[^a-zA-Z0-9]+/g, '_');
                 if(myob.myFilterFormHolder.find('input#'+valueID).length === 0){
                     var startString = '<li class="' + type + 'Field">';
@@ -1368,7 +1413,7 @@ jQuery(document).ready(
                     switch (type) {
                         case 'favourites':
                             var checked = '';
-                            if(typeof myob.currentFilter[category] !== 'undefined') {
+                            if(typeof myob.cfinc[category] !== 'undefined') {
                                 checked = ' checked="checked"';
                             }
                             return startString +
@@ -1382,16 +1427,16 @@ jQuery(document).ready(
                             var additionToField = '';
                             if(type === 'keyword') {
                                 var extraClass = 'keyword';
-                                if(typeof myob.currentFilter[category] !== 'undefined') {
-                                    if(typeof myob.currentFilter[category][0] !== 'undefined') {
-                                        currentValueForForm = myob.currentFilter[category].valueToMatch;
+                                if(typeof myob.cfinc[category] !== 'undefined') {
+                                    if(typeof myob.cfinc[category][0] !== 'undefined') {
+                                        currentValueForForm = myob.cfinc[category].vtm;
                                         currentValueForForm = currentValueForForm.raw2attr();
                                     }
                                 }
                             } else if(type === 'tag') {
-                                if(typeof myob.currentFilter[category] !== 'undefined') {
-                                    for(var i = 0; i < myob.currentFilter[category].length; i++) {
-                                        valueIndex = myob.currentFilter[category].valueToMatch;
+                                if(typeof myob.cfinc[category] !== 'undefined') {
+                                    for(var i = 0; i < myob.cfinc[category].length; i++) {
+                                        valueIndex = myob.cfinc[category].vtm;
                                         var html = myob.makeFieldForForm('checkbox', category, tabIndex, valueIndex);
                                         if(html.length > 5) {
                                             html = html.replace('<input ', '<input checked="checked" ');
@@ -1407,10 +1452,11 @@ jQuery(document).ready(
                                     endString;
                         case 'checkbox':
                             var checked = '';
-                            if(typeof myob.currentFilter[category] !== 'undefined') {
-                                for(var i = 0; i < myob.currentFilter[category].length; i++) {
-                                    if(valueIndex == myob.currentFilter[category].valueToMatch) {
+                            if(typeof myob.cfinc[category] !== 'undefined') {
+                                for(var i = 0; i < myob.cfinc[category].length; i++) {
+                                    if(cleanValue.trim() === myob.cfinc[category][i].vtm.trim()) {
                                         checked = 'checked="checked"';
+                                        break;
                                     }
                                 }
                             }
@@ -1422,8 +1468,8 @@ jQuery(document).ready(
                         case 'number':
                         case 'date':
                             var currentValueForForm = {gt: '', lt: ''};
-                            if(typeof myob.currentFilter[category] !== 'undefined') {
-                                currentValueForForm = myob.currentFilter[category][0];
+                            if(typeof myob.cfinc[category] !== 'undefined') {
+                                currentValueForForm = myob.cfinc[category][0];
                             }
                             var s = startString +
                                     '<span class="gt">' +
@@ -1470,17 +1516,7 @@ jQuery(document).ready(
 
             runCurrentSort: function()
             {
-                var currentSortLinkSelector = '.'+myob.sortDescClass+', .'+myob.sortAscClass
-                var currentSortObject = myob.myTableHolder.find(currentSortLinkSelector).first();
-                if(currentSortObject && currentSortObject.length > 0) {
-                    //an ascending or descending has been set ...
-                } else {
-                    currentSortObject = myob.myTableHolder.find(myob.sortLinkSelector+"[data-sort-default=true]").first();
-                }
-                if(currentSortObject && currentSortObject.length > 0) {
-                } else {
-                    currentSortObject = myob.myTableHolder.find(myob.sortLinkSelector).first();
-                }
+                var currentSortObject = myob.myTableHead.find(myob.sortLinkSelector+'['+myob.csort.scat+']').first();
                 if(currentSortObject && currentSortObject.length > 0) {
                     currentSortObject.click();
                 }
@@ -1493,7 +1529,7 @@ jQuery(document).ready(
                 myob.startRowManipulation();
                 window.setTimeout(
                     function() {
-                        if(myob.debug) {console.debug("==============");console.debug(myob.currentFilter);}
+                        if(myob.debug) {console.debug("==============");console.debug(myob.cfinc);}
                         myob.myRows.each(
                             function(i, el) {
                                 var row = jQuery(el);
@@ -1504,7 +1540,7 @@ jQuery(document).ready(
                                 var stillLookingForCategory = true;
 
                                 //check for each category
-                                Object.keys(myob.currentFilter).forEach(
+                                Object.keys(myob.cfinc).forEach(
                                     function(categoryToMatch, categoryToMatchIndex) {
                                         if(stillLookingForCategory) {
                                             //lets not assume there is anything
@@ -1512,21 +1548,21 @@ jQuery(document).ready(
 
                                             //values selected in category
                                             var stillLookingForValue = true;
-                                            for(var j = 0; j < myob.currentFilter[categoryToMatch].length; j++) {
-                                                var searchObject = myob.currentFilter[categoryToMatch][j];
+                                            for(var j = 0; j < myob.cfinc[categoryToMatch].length; j++) {
+                                                var searchObject = myob.cfinc[categoryToMatch][j];
                                                 //what is the value .. if it matches, the row is OK and we can go to next category ...
                                                 if(stillLookingForValue) {
                                                     if(categoryToMatch === myob.favouritesCategoryTitle) {
                                                         var rowID = row.attr('id');
                                                         if(typeof rowID !== 'undefined' && rowID.length > 0) {
-                                                            if(myob.favouritesStore.indexOf(rowID) > -1) {
+                                                            if(myob.myfavs.indexOf(rowID) > -1) {
                                                                 rowMatchesForFilterGroup = true;
                                                             }
                                                         }
                                                     } else if(categoryToMatch === myob.keywordsCategoryTitle) {
-                                                        var valueToMatch = searchObject['valueToMatch'];
+                                                        var vtm = searchObject['vtm'];
                                                         var rowText = row.text().toLowerCase();
-                                                        var keywords = valueToMatch.split(' ');
+                                                        var keywords = vtm.split(' ');
                                                         var matches = true;
                                                         for(var i = 0; i < keywords.length; i++) {
                                                             var keyword = keywords[i].trim();
@@ -1548,9 +1584,9 @@ jQuery(document).ready(
                                                                         //to do ....
                                                                         break;
                                                                     case 'number':
-                                                                        if(typeof searchObject['valueToMatch'] !== 'undefined'){
-                                                                            var valueToMatch = searchObject['valueToMatch'];
-                                                                            if(rowValue == valueToMatch){
+                                                                        if(typeof searchObject['vtm'] !== 'undefined'){
+                                                                            var vtm = searchObject['vtm'];
+                                                                            if(rowValue == vtm){
                                                                                 rowMatchesForFilterGroup = true;
                                                                             }
                                                                         } else {
@@ -1577,18 +1613,18 @@ jQuery(document).ready(
                                                                         }
                                                                     case 'string':
                                                                     default:
-                                                                        var valueToMatch = searchObject['valueToMatch'];
-                                                                        if(rowValue === valueToMatch){
+                                                                        var vtm = searchObject['vtm'];
+                                                                        if(rowValue === vtm){
                                                                             rowMatchesForFilterGroup = true;
                                                                         }
                                                                 }
                                                                 if(rowMatchesForFilterGroup){
-                                                                    if(myob.debug) {console.log("FILTER - MATCH: '"+valueToMatch+"' in '"+categoryToMatch+"'");}
+                                                                    if(myob.debug) {console.log("FILTER - MATCH: '"+vtm+"' in '"+categoryToMatch+"'");}
                                                                     //break out for each loop
                                                                     return false;
                                                                 }
                                                                 else {
-                                                                    if(myob.debug) {console.log("FILTER - NO MATCH: '"+valueToMatch+"' in '"+categoryToMatch+"'");}
+                                                                    if(myob.debug) {console.log("FILTER - NO MATCH: '"+vtm+"' in '"+categoryToMatch+"'");}
                                                                 }
                                                             }
                                                         );
@@ -1617,7 +1653,7 @@ jQuery(document).ready(
                             }
                         );
                         myob.endRowManipulation();
-                        if(myob.debug) {console.debug(myob.currentFilter);console.debug("==============");}
+                        if(myob.debug) {console.debug(myob.cfinc);console.debug("==============");}
                     },
                     myob.millisecondsBetweenActions
                 );
@@ -1813,11 +1849,9 @@ jQuery(document).ready(
                     myob.myTableHolder.find(myob.moreRowEntriesSelector).not('.alwaysShow').hide();
                 }
                 minRow++;
-                if(matchCount === totalRowCount) {
-                    myob.myTableHolder.find(myob.matchRowCountSelector).text(matchCount);
-                }
                 myob.myTableHolder.find(myob.minRowSelector).text(minRow);
                 myob.myTableHolder.find(myob.maxRowSelector).text(maxRow);
+                myob.myTableHolder.find(myob.matchRowCountSelector).text(matchCount);
                 myob.myTableHolder.find(myob.totalRowCountSelector).text(totalRowCount);
                 myob.myTableHolder.find(myob.visibleRowCountSelector).text(actualVisibleRowCount);
                 myob.myTableHolder.find(myob.paginationSelector).html(pageHTML);
@@ -1853,7 +1887,9 @@ jQuery(document).ready(
                 var urlObject = {};
                 for(var i =0;i < myob.filterAndSortVariables.length; i++) {
                     var varName = myob.filterAndSortVariables[i];
-                    urlObject[varName] = myob[varName];
+                    if(Object.keys(myob[varName]).length > 0 ) {
+                        urlObject[varName] = myob[varName];
+                    }
                 }
                 if(typeof JSURL !== 'undefined')  {
                     var urlpart = JSURL.stringify(urlObject);
@@ -1878,7 +1914,7 @@ jQuery(document).ready(
                     case 'favourites':
                         var title = myob.favouritesCategoryTitle;
                         var parentPageID = myob.favouritesParentPageID;
-                        var variables = 'favouritesStore';
+                        var variables = 'myfavs';
                         break;
                     case 'filters':
                         var title = myob.filtersTitle;
@@ -1915,11 +1951,11 @@ jQuery(document).ready(
                 var categoryHolder;
                 var category = '';
                 var type = '';
-                var inputVal = '';
-                var valueToMatch = '';
+                var ival = '';
+                var vtm = '';
                 var filterValueArray = [];
                 //reset
-                myob.currentFilter = {};
+                myob.cfinc = {};
                 myob.myFilterFormHolder
                     .find(' .' + myob.filterGroupClass)
                     .each(
@@ -1934,24 +1970,24 @@ jQuery(document).ready(
                             } else {
                                 var dataType = myob.dataDictionary[category]['DataType'];
                             }
-                            var inputVals = [];
+                            var ivals = [];
                             categoryHolder.find('input').each(
                                 function(i, input) {
                                     input = jQuery(input);
-                                    var inputVal = input.val();
-                                    var valueToMatch = inputVal.toLowerCase().trim();
+                                    var ival = input.val();
+                                    var vtm = ival.toLowerCase().trim();
                                     switch(fieldType) {
                                         case 'keyword':
-                                            if(valueToMatch.length > 1) {
-                                                if(typeof myob.currentFilter[category] === "undefined") {
+                                            if(vtm.length > 1) {
+                                                if(typeof myob.cfinc[category] === "undefined") {
                                                     if(myob.debug) {console.log("adding "+category);}
-                                                    myob.currentFilter[category] = [];
+                                                    myob.cfinc[category] = [];
                                                 }
                                                 if(type === 'keyword') {
-                                                    myob.currentFilter[category].push({valueToMatch: valueToMatch, inputVal: inputVal});
-                                                    inputVals.push(valueToMatch);
+                                                    myob.cfinc[category].push({vtm: vtm, ival: ival});
+                                                    ivals.push(vtm);
                                                 } else {
-                                                    var filterValueArray = valueToMatch.split(",");
+                                                    var filterValueArray = vtm.split(",");
                                                     var i = 0;
                                                     var len = filterValueArray.length;
                                                     var tempVal = '';
@@ -1959,8 +1995,8 @@ jQuery(document).ready(
                                                         innerInputVal = filterValueArray[i].trim();
                                                         innerValueToMatch = innerInputVal;
                                                         if(innerValueToMatch.length > 1) {
-                                                            myob.currentFilter[category].push({valueToMatch: innerValueToMatch, inputVal: innerInputVal});
-                                                            inputVals.push(innerValueToMatch);
+                                                            myob.cfinc[category].push({vtm: innerValueToMatch, ival: innerInputVal});
+                                                            ivals.push(innerValueToMatch);
                                                             if(myob.debug) {console.log("... adding '"+innerValueToMatch+"' to '"+category+"'");}
                                                         }
                                                     }
@@ -1970,62 +2006,62 @@ jQuery(document).ready(
                                         case 'tag':
                                         case 'checkbox':
                                             if(input.is(":checked")){
-                                                if(typeof myob.currentFilter[category] === "undefined") {
+                                                if(typeof myob.cfinc[category] === "undefined") {
                                                     if(myob.debug) {console.log("adding "+category);}
-                                                    myob.currentFilter[category] = [];
+                                                    myob.cfinc[category] = [];
                                                 }
-                                                inputVals.push(valueToMatch);
-                                                myob.currentFilter[category].push({valueToMatch: valueToMatch, inputVal: inputVal});
-                                                if(myob.debug) {console.log("... adding '"+category+"' to '"+valueToMatch+"'");}
+                                                ivals.push(vtm);
+                                                myob.cfinc[category].push({vtm: vtm, ival: ival});
+                                                if(myob.debug) {console.log("... adding '"+category+"' to '"+vtm+"'");}
                                             }
                                             break;
                                         case 'favourites':
                                             if(input.is(":checked")){
-                                                if(typeof myob.currentFilter[category] === "undefined") {
+                                                if(typeof myob.cfinc[category] === "undefined") {
                                                     if(myob.debug) {console.log("adding "+category);}
-                                                    myob.currentFilter[category] = [];
+                                                    myob.cfinc[category] = [];
                                                 }
-                                                myob.currentFilter[category].push({valueToMatch: valueToMatch, inputVal: inputVal});
-                                                inputVals.push(valueToMatch);
-                                                if(myob.debug) {console.log("... adding '"+category+"' to '"+valueToMatch+"'");}
+                                                myob.cfinc[category].push({vtm: vtm, ival: ival});
+                                                ivals.push(vtm);
+                                                if(myob.debug) {console.log("... adding '"+category+"' to '"+vtm+"'");}
                                             }
                                             break;
                                         case 'number':
                                             var val = parseFloat(input.val());
                                             if(jQuery.isNumeric(val) && val !== 0) {
-                                                if(typeof myob.currentFilter[category] === "undefined") {
+                                                if(typeof myob.cfinc[category] === "undefined") {
                                                     if(myob.debug) {console.log("adding "+category);}
-                                                    myob.currentFilter[category] = [];
+                                                    myob.cfinc[category] = [];
                                                 }
-                                                inputVals.push(input.attr('data-label') + val + ' ');
-                                                if(typeof myob.currentFilter[category][0] === 'undefined') {
-                                                    myob.currentFilter[category][0] = {};
+                                                ivals.push(input.attr('data-label') + val + ' ');
+                                                if(typeof myob.cfinc[category][0] === 'undefined') {
+                                                    myob.cfinc[category][0] = {};
                                                 }
-                                                myob.currentFilter[category][0][input.attr('data-dir')] = val;
+                                                myob.cfinc[category][0][input.attr('data-dir')] = val;
                                             }
                                             break;
                                         case 'date':
                                             var val = input.val().trim();
                                             if(val !== '0' && val !== '') {
-                                                if(typeof myob.currentFilter[category] === "undefined") {
+                                                if(typeof myob.cfinc[category] === "undefined") {
                                                     if(myob.debug) {console.log("adding "+category);}
-                                                    myob.currentFilter[category] = {};
+                                                    myob.cfinc[category] = {};
                                                 }
-                                                inputVals.push(input.attr('data-label') + val);
-                                                myob.currentFilter[category][0][input.attr('data-dir')] = val;
+                                                ivals.push(input.attr('data-label') + val);
+                                                myob.cfinc[category][0][input.attr('data-dir')] = val;
                                             }
                                             break;
                                     }
                                 }
                             );
-                            if(typeof myob.currentFilter[category] !== "undefined") {
+                            if(typeof myob.cfinc[category] !== "undefined") {
                                 var leftLabel = categoryHolder.find('label.'+myob.groupLabelClass).text();
-                                html += "<li class=\"category\"><strong>" + leftLabel + ":</strong> <span>" + inputVals.join('</span><span>') + "</span></li>";
+                                html += "<li class=\"category\"><strong>" + leftLabel + ":</strong> <span>" + ivals.join('</span><span>') + "</span></li>";
                             }
                         }
                     //funny indenting to stay ....
                 );
-                var hasFilter = Object.keys(myob.currentFilter).length > 0 ? true : false;
+                var hasFilter = Object.keys(myob.cfinc).length > 0 ? true : false;
                 var buttons = [];
                 if(hasFilter === true) {
                     buttons.push('<li class="clear"><a href="#">✖</a></li>');
@@ -2046,7 +2082,7 @@ jQuery(document).ready(
                 var targetDomElement = myob.myTableHolder.find('.'+myob.currentSearchFilterClass);
                 var title = targetDomElement.attr('data-title');
                 if(typeof title === 'undefined') {
-                    title = myob.currentFilterText;
+                    title = myob.cfincText;
                 }
                 if(title.length) {
                     title = '<h3>' + title + '</h3>';
@@ -2064,11 +2100,11 @@ jQuery(document).ready(
             {
                 //get favourites data
                 if(typeof Cookies !== 'undefined') {
-                    myob.favouritesStore = Cookies.getJSON('favouritesStore');
-                    if(typeof myob.favouritesStore === 'undefined') {
-                        myob.favouritesStore = [];
+                    myob.myfavs = Cookies.getJSON('myfavs');
+                    if(typeof myob.myfavs === 'undefined') {
+                        myob.myfavs = [];
                     } else {
-                        myob.serverDataToApply['favouritesStore'] = true;
+                        myob.serverDataToApply['myfavs'] = true;
                     }
                 }
             },
@@ -2091,8 +2127,6 @@ jQuery(document).ready(
                                 myob.serverDataToApply[property] = true;
                             }
                         }
-                        myob.myTable.removeClass(myob.loadingClass);
-                        myob.processRetrievedData();
                     }
                 }
             },
@@ -2105,6 +2139,7 @@ jQuery(document).ready(
             retrieveDataFromServer: function()
             {
                 var qd = {};
+                var hasServerConnection = false;
                 if(typeof location.search !== 'undefined' && location.search && location.search.length > 0) {
                     location.search.substr(1).split("&").forEach(
                         function(item) {
@@ -2116,6 +2151,7 @@ jQuery(document).ready(
                         }
                     );
                     if(typeof qd.load !== 'undefined') {
+                        hasServerConnection = true;
                         myob.myTable.addClass(myob.loadingClass);
                         var url = myob.serverConnectionURL + 'load/' + qd.load + '/';
                         jQuery.getJSON(
@@ -2129,36 +2165,51 @@ jQuery(document).ready(
                                         myob.serverDataToApply[property] = true;
                                     }
                                 }
-                                myob.myTable.removeClass(myob.loadingClass);
                                 myob.processRetrievedData();
+                                myob.myTable.removeClass(myob.loadingClass);
                             }
                         ).fail(
                             function(){
+                                myob.processRetrievedData();
                                 myob.myTable.removeClass(myob.loadingClass);
                             }
                         );
                     }
                 }
+                if( hasServerConnection === false) {
+                    myob.processRetrievedData();
+                }
             },
 
             processRetrievedData: function()
             {
-                if(typeof myob.serverDataToApply['favouritesStore'] !== 'undefined' && myob.serverDataToApply['favouritesStore'] === true) {
+                if(typeof myob.serverDataToApply['myfavs'] !== 'undefined' && myob.serverDataToApply['myfavs'] === true) {
                     //remove all favourites
                     myob.myTableBody.find('tr.'+myob.favouriteClass).removeClass(myob.favouriteClass);
                     //add all favourites
-                    for (var fav in myob.favouritesStore) {
-                        if (myob.favouritesStore.hasOwnProperty(fav)) {
-                            var id = myob.favouritesStore[fav];
+                    for (var fav in myob.myfavs) {
+                        if (myob.myfavs.hasOwnProperty(fav)) {
+                            var id = myob.myfavs[fav];
                             myob.myTableBody.find('#' + id).addClass(myob.favouriteClass);
                         }
                     }
-                    delete myob.serverDataToApply['favouritesStore']
+                    delete myob.serverDataToApply['myfavs']
                 }
-                if(typeof myob.serverDataToApply['currentFilter'] !== 'undefined' && typeof myob.serverDataToApply['currentFilter'] === true) {
+                if(typeof myob.serverDataToApply['cfinc'] !== 'undefined' && myob.serverDataToApply['cfinc'] === true) {
                     myob.createFilterForm();
                     myob.applyFilter();
-                    delete myob.serverDataToApply['currentFilter'];
+                    delete myob.serverDataToApply['cfinc'];
+                }
+                if(typeof myob.serverDataToApply['csort'] !== 'undefined' && myob.serverDataToApply['csort'] === true) {
+                    var category = myob.csort.scat;
+                    var direction = myob.csort.sdir;
+                    myob.myTableHead.find(myob.sortLinkSelector)
+                        .removeClass(myob.sortAscClass)
+                        .removeClass(myob.sortDescClass);
+                    myob.myTableHead.find(myob.sortLinkSelector+'[data-sort-field=\''+category+'\']')
+                        .attr('data-sort-direction', direction)
+                        .click();
+                    delete myob.serverDataToApply['csort'];
                 }
             },
 
