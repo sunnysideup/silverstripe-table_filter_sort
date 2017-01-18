@@ -64,6 +64,12 @@ table th a, th span.dl  {
 td span.dl  {
   border-bottom: 1px dotted #000;
 }
+span.dl-on {
+    color: #3498db!important;
+    border-bottom: none!important;
+    font-weight: bold;
+}
+
 
 ul {
   margin: 0;

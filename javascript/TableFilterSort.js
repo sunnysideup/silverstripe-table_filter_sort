@@ -858,7 +858,8 @@ jQuery(document).ready(
                         if(myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
                             //filter is now open
                         } else {
-                            myob.applyFilter();
+                            //filter is already applied before it is closed
+                            //myob.applyFilter();
                         }
                         return false;
                     }
@@ -1036,10 +1037,12 @@ jQuery(document).ready(
                         var filterToTriger = filterHolder
                             .find('input[value="'+ filterValue + '"].checkbox')
                             .first();
+                        var highlightIdenticals = true;
                         if(filterToTriger && filterToTriger.length > 0) {
                             if(filterToTriger.is(':checkbox')){
                                 if(filterToTriger.prop('checked') === true){
                                     filterToTriger.prop('checked', false).trigger('change');
+                                    highlightIdenticals = false;
                                 }
                                 else {
                                     filterToTriger.prop('checked', true).trigger('change');
@@ -1051,6 +1054,29 @@ jQuery(document).ready(
                                 filterValue
                             );
                         }
+                        if(highlightIdenticals) {
+                            myob.myRows
+                                .find('span.dl[data-filter="'+category+'"]').each(
+                                    function(i, el) {
+                                        var myEl = jQuery(el);
+                                        if(myEl.text().trim() === filterValue) {
+                                            myEl.addClass(myob.directLinkClass+'-on');
+                                        }
+                                    }
+                                );
+                        } else {
+                            myob.myRows
+                                .find('span.dl[data-filter="'+category+'"]').each(
+                                    function(i, el) {
+                                        var myEl = jQuery(el);
+                                        if(myEl.text().trim() === filterValue) {
+                                            myEl.removeClass(myob.directLinkClass+'-on');
+                                        }
+                                    }
+                                );
+                            }
+
+
                         myob.applyFilter();
                         return false;
                     }
@@ -1974,6 +2000,8 @@ jQuery(document).ready(
                     myob.favouritesStore = Cookies.getJSON('favouritesStore');
                     if(typeof myob.favouritesStore === 'undefined') {
                         myob.favouritesStore = [];
+                    } else {
+                        myob.serverDataToApply['favouritesStore'] = myob.favouritesStore;
                     }
                 }
             },
@@ -2034,13 +2062,13 @@ jQuery(document).ready(
                     for (var fav in myob.favouritesStore) {
                         if (myob.favouritesStore.hasOwnProperty(fav)) {
                             var id = myob.favouritesStore[fav];
-                            myob.myTableBody.find('#' + id).toggleClass(myob.favouriteClass);
+                            myob.myTableBody.find('#' + id).addClass(myob.favouriteClass);
                         }
                     }
                     delete myob.serverDataToApply['favouritesStore']
                 }
                 if(typeof myob.serverDataToApply['currentFilter'] !== 'undefined') {
-                    delete myob.serverDataToApply['favouritesStore'];
+                    delete myob.serverDataToApply['currentFilter'];
                     myob.createFilterForm();
                     myob.applyFilter();
                 }
