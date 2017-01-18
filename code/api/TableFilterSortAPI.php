@@ -4,6 +4,7 @@
 class TableFilterSortAPI extends Object
 {
     private static $js = array(
+        'table_filter_sort/javascript/jsurl.js',
         'table_filter_sort/javascript/js.cookies.js',
         'table_filter_sort/javascript/jquery.simplemodal-1.4.5.js',
         'table_filter_sort/javascript/awesomplete.js',
