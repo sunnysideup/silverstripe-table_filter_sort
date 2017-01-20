@@ -192,7 +192,7 @@ ul li {
 }
 
 .tableFilterSortCurrentSearchHolder ul li span:after {
-    content: "\00a0|\00a0";
+    content: "\\00a0|\\00a0";
 }
 
 .tableFilterSortCurrentSearchHolder ul li span:last-child:after {
