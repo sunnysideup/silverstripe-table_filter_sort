@@ -124,8 +124,8 @@ class TableFilterSortServerSaver_Controller extends Controller
 
     function save($request)
     {
-        $this->myTitle = 'Save ' . $this->parentPageID . ' ... ';
-        if(session::get('TableFilterSortPostData')) {
+        if($this->dataToSave()) {
+            $this->myTitle = 'Save ' . $this->parentPageID . ' ... ';
             return $this->renderWith($this->class);
         }
         return 'NO DATA TO BE SAVED ...';

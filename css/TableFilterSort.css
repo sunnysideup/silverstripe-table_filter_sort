@@ -51,6 +51,10 @@ tr.hide, tr.no-match {
     position: fixed;
     top: 0;
 }
+.fixed-header.tableFilterSortFilterInUse.filterIsOpen .tableFilterSortFilterFormHolder {
+    position: relative;
+}
+
 #tfspushdowndiv {display: none;}
 .fixed-header.tableFilterSortFilterInUse #tfspushdowndiv {
     display: block;

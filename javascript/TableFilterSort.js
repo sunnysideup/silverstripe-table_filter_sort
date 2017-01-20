@@ -1739,7 +1739,11 @@ jQuery(document).ready(
                     myob.myTableHolder.addClass(myob.filterInUseClass);
                     myob.myTableHolder.removeClass(myob.filterNotInUseClass);
                     if(myob.hasFixedTableHeader) {
-                        var relativeMove = myob.myFilterFormHolder.outerHeight() + myob.myTableHead.outerHeight();
+                        var addFilterForm = myob.myTableHolder.hasClass(myob.filterIsOpenClass) ? false : true;
+                        var relativeMove = myob.myTableHead.outerHeight();
+                        if(addFilterForm) {
+                            relativeMove += myob.myFilterFormHolder.outerHeight();
+                        }
                         var pushDownDiv = myob.myTableHolder.find('#tfspushdowndiv');
                         pushDownDiv.height(relativeMove);
                         //get basic data about scroll situation...
@@ -1751,12 +1755,18 @@ jQuery(document).ready(
                         //end reset
                         if(showFixedHeader === true) {
                             var tableHolderWidth = myob.myTableHolder.width();
-                            myob.myFilterFormHolder.width(tableHolderWidth);
+                            if(addFilterForm) {
+                                myob.myFilterFormHolder.width(tableHolderWidth);
+                            }
                             window.setTimeout(
                                 function() {
                                     //set width of cells
                                     myob.myTableHolder.addClass('fixed-header');
-                                    myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight());
+                                    var top = 0;
+                                    if(addFilterForm) {
+                                        top = myob.myFilterFormHolder.outerHeight();
+                                    }
+                                    myob.myTableHead.css('top', top);
                                 },
                                 myob.millisecondsBetweenActions
                             );
