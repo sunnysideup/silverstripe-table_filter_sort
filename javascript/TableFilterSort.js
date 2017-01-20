@@ -721,7 +721,6 @@ jQuery(document).ready(
                     }
                 );
                 html +=  '</colgroup>';
-                console.debug(html);
                 myob.myTable.prepend(html);
                 //add push down div ...
                 jQuery('<div id="tfspushdowndiv"></div>').

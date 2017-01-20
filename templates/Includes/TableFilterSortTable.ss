@@ -28,10 +28,10 @@
     </a>
 </td>
 <td>
-    <span data-filter="Author">$Author</span>
+    <span data-filter="Author" class="dl">$Author</span>
 </td>
 <td>$Description</td>
-<td><% if Tags %><% loop Tags %><span data-filter="Tags">$Title</span><% end_loop %><% else %><span data-filter="Tags">$Title</span><% end_if %></td>
+<td><% if Tags %><% loop Tags %><% if $Last && $First = false %> and <% end_if %><span data-filter="Tags" class="dl">$Title</span><% if Last %>.<% else %>, <% end_if %><% end_loop %><% else %><span data-filter="Tags">$Title</span><% end_if %></td>
 </tr>
     <% end_loop %>
 </tbody>

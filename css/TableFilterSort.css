@@ -68,3 +68,5 @@ tr.hide, tr.no-match {
     z-index: 9;
     display: table;
 }
+
+thead details {display: none;}

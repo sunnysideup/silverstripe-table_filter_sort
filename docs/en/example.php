@@ -234,18 +234,18 @@ $html = create_test();
             ></div>
 
 
-            <p class="tableFilterSortMoreEntries paginationTop">
+            <section class="tableFilterSortMoreEntries paginationTop">
                 <span class="line">
                     <strong>Select Page:</strong> <span class="pagination"></span>
                 </span>
-            </p>
-            <p class="tableFilterSortMoreEntriesAlwaysShow">
+            </section>
+            <section class="tableFilterSortMoreEntriesAlwaysShow">
                 <span class="line">
                     <strong>Filtered:</strong>
                     <span class="match-row-number">0</span> /
                     <span class="total-row-number">0</span>.
                 </span>
-            </p>
+            </section>
 
 
             <div class="tableFilterSortCommonContentHolder" data-title="Common Info"></div>
@@ -304,7 +304,7 @@ $html = create_test();
                 </tbody>
             </table>
             <p class="message warning no-matches-message">No entries match your filter</p>
-            <p class="tableFilterSortMoreEntries">
+            <section class="tableFilterSortMoreEntries">
                 <span class="line">
                     <strong>Filtered:</strong>
                     <span class="match-row-number">0</span> /
@@ -318,7 +318,7 @@ $html = create_test();
                 <span class="line">
                     <strong>Select Page:</strong> <span class="pagination"></span>
                 </span>
-            </p>
+            </section>
 
         </div>
 

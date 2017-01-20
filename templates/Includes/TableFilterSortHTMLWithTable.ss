@@ -8,6 +8,7 @@
 
 <body id="tfs-modal-pop-up">
     <div id="wrapper">
+        <h1>$Title</h1>
 <% if $AddForm %>
 
     $AddForm

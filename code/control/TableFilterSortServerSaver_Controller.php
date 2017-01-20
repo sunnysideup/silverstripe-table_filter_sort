@@ -85,7 +85,11 @@ class TableFilterSortServerSaver_Controller extends Controller
 
     function Title()
     {
-        return $this->request->param('Action');
+        if($this->myTitle) {
+            return $this->myTitle;
+        } else {
+            return $this->request->param('Action');
+        }
     }
 
     function index($request)
@@ -104,6 +108,8 @@ class TableFilterSortServerSaver_Controller extends Controller
 
     function find($request)
     {
+        $this->myTitle = 'Find ' . $this->parentPageID . ' ... ';
+
         return $this->renderWith($this->class);
     }
 
@@ -118,6 +124,7 @@ class TableFilterSortServerSaver_Controller extends Controller
 
     function save($request)
     {
+        $this->myTitle = 'Save ' . $this->parentPageID . ' ... ';
         if(session::get('TableFilterSortPostData')) {
             return $this->renderWith($this->class);
         }
@@ -133,6 +140,7 @@ class TableFilterSortServerSaver_Controller extends Controller
                 $obj = TableFilterSortServerSaver::find_or_create($title, $this->parentPageID);
                 $obj->Data = json_encode($dataToSave);
                 $obj->Description = Convert::raw2sql($data["Description"]);
+                $obj->Author = Convert::raw2sql($data["Author"]);
                 $obj->write();
                 $tags = array();
                 foreach($data['TagsTempField'] as $tag) {

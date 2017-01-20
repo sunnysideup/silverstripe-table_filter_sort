@@ -175,6 +175,7 @@ ul li {
     float: right;
     text-align: right;
     color: #555;
+    min-height: 37px;
 }
 .tableFilterSortOpenFilterForm.top {position: absolute;}
 .tableFilterSortFilterFormHolder .tableFilterSortCurrentSearchHolder  h3 {
@@ -426,12 +427,18 @@ table tbody tr .hasFader #favouriteFader li {
     float: left;
 }
 
-.filterIsOpen .clear,  .filterIsOpen .saveAndLoad.load  {
+.filterIsOpen .clear,
+.filterIsOpen .saveAndLoad.load  {
     display: none;
 }
 .saveAndLoad.save {display: none;}
-.filterIsOpen .saveAndLoad.save {display: list-item;;}
-.favouritesFilter li {display: list-item!important;}
+.filterIsOpen .saveAndLoad.save,
+table .saveAndLoad.save,
+.favouritesFilter li
+{
+        display: list-item!important;
+}
+
 @-moz-keyframes show_on_top {
     0% {
         opacity: 0;
@@ -521,7 +528,7 @@ table tbody tr .hasFader #favouriteFader li {
     }
 }
 
-
+#tfs-modal-pop-up h1 {background-color: }
 #tfs-modal-pop-up {background-color: #eee; position: absolute; padding: 0; margin: 0; overflow: auto; width: 100%; height: 100%;}
 #tfs-modal-pop-up #wrapper {padding: 1em;}
 #tfs-modal-pop-up fieldset {outline: none; border: none;}
@@ -534,6 +541,8 @@ table tbody tr .hasFader #favouriteFader li {
     border-radius: 5px;
     padding: 10px;
 }
+#tfs-modal-pop-up .field.textarea {width: 100%;}
+#tfs-modal-pop-up .field.textarea textarea {width: 90%; height: 2em;}
 @media screen and (min-width: 550px)  {
     #tfs-modal-pop-up .field {width: 50%; float: left;}
 }
