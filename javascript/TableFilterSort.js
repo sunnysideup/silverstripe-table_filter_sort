@@ -603,7 +603,6 @@ jQuery(document).ready(
 
                 myob.resetObjects();
                 if(myob.myRows.length > 1){
-                    myob.myTableHolder.addClass(myob.loadingClass);
                     window.setTimeout(
                         function() {
                             //COLLECT ...
@@ -613,12 +612,21 @@ jQuery(document).ready(
                             //look for cols that are the same
                             if(myob.debug) { console.profileEnd();console.profile('tableHideColsWhichAreAllTheSame');}
                             myob.tableHideColsWhichAreAllTheSame();
+                            //set table width
+                            if(myob.debug) { console.profileEnd();console.profile('setTableWidth');}
+                            myob.setTableWidth();
+
+                            //now we can hide table ...
+                            myob.myTableHolder.addClass(myob.loadingClass);
+
                             //finalise data dictionary
                             if(myob.debug) { console.profileEnd();console.profile('dataDictionaryCollector');}
                             myob.dataDictionaryCollector();
                             //find defaultSort
                             if(myob.debug) { console.profileEnd();console.profile('findDefaultSort');}
                             myob.findDefaultSort();
+
+
 
                             //LISTENERS ...
                             //set up filter form listener
@@ -669,11 +677,10 @@ jQuery(document).ready(
                             // myob.createFilterForm();
 
                             //RUN SORT / FILTER
-                            //show defaults
-                            if(myob.debug) {console.profileEnd(); console.profile('workOutCurrentFilter');}
-                            myob.workOutCurrentFilter();
-
-                            //show defaults
+                            //filter
+                            if(myob.debug) {console.profileEnd(); console.profile('applyFilter');}
+                            myob.applyFilter();
+                            //sort
                             if(myob.debug) {console.profileEnd(); console.profile('runCurrentSort');}
                             myob.runCurrentSort();
 
@@ -681,6 +688,7 @@ jQuery(document).ready(
 
                             //we are now ready!
                             myob.myTableHolder.removeClass(myob.loadingClass);
+
 
                             //ADD SCROLL AND OTHER STUFF ...
 
@@ -696,6 +704,28 @@ jQuery(document).ready(
             resetObjects: function()
             {
                 myob.myRows = myob.myTable.find(myob.rowSelector);
+            },
+
+            setTableWidth: function() {
+                var html = '<colgroup>';
+                myob.myTableHead.find('tr:first th').each(
+                    function(colNumber, cell) {
+                        var cell = jQuery(cell);
+                        var myWidth = cell.width();
+                        var myWidthPX = myWidth + 'px'
+                        html += '<col width="'+myWidth+'" style="width: '+myWidthPX+'; min-width: '+myWidthPX+'; max-width: '+myWidthPX+';" />';
+                        cell
+                            .css('min-width', myWidthPX)
+                            .css('max-width', myWidthPX)
+                            .css('width', myWidthPX);
+                    }
+                );
+                html +=  '</colgroup>';
+                console.debug(html);
+                myob.myTable.prepend(html);
+                //add push down div ...
+                jQuery('<div id="tfspushdowndiv"></div>').
+                insertBefore(myob.myTable);
             },
 
             //===================================================================
@@ -897,16 +927,32 @@ jQuery(document).ready(
             //===================================================================
 
             fixTableHeaderListener: function() {
-                var widthAndHeightSet = false;
-                if(myob.hasFixedTableHeader) {
-                    jQuery(window).on(
-                        "load resize scroll",
-                        function(e) {
-                            myob.fixTableHeader();
-                        },
-                        myob.millisecondsBetweenActions
-                    );
-                }
+                jQuery(window).on(
+                    "load scroll",
+                    function(e) {
+                        myob.fixTableHeader();
+                    },
+                    myob.millisecondsBetweenActions
+                );
+                jQuery(window).on(
+                    "resize",
+                    function(e) {
+                        myob.myTableHolder.removeClass('fixed-header');
+                        myob.myTable.find('colgroup').remove();
+                        myob.myFilterFormHolder.css("width", "");
+                        myob.myTable
+                            .find('thead tr:first th')
+                            .css({"width": "", "min-width": "", "max-width": ""});
+                        window.setTimeout(
+                            function() {
+                                myob.setTableWidth();
+                                myob.fixTableHeader();
+                            },
+                            myob.millisecondsBetweenActions
+                        );
+                    },
+                    myob.millisecondsBetweenActions
+                );
             },
 
 
@@ -920,13 +966,17 @@ jQuery(document).ready(
                     '.' + myob.openAndCloseFilterFormClass,
                     function(event) {
                         event.preventDefault();
-                        myob.myFilterFormHolder.find('.' + myob.filterOptionsHolderClass).toggleClass(myob.openedClass).slideToggle("fast");
+                        myob.myFilterFormHolder.find('.' + myob.filterOptionsHolderClass).toggleClass(myob.openedClass).slideToggle(
+                            "fast",
+                            function() {
+                                myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight() + 'px');
+                            }
+                        );
                         myob.myTableHolder.toggleClass(myob.filterIsOpenClass);
                         if(myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
                             //filter is now open
                         } else {
-                            //filter is already applied before it is closed
-                            //myob.applyFilter();
+                            //filter is now closed
                         }
                         return false;
                     }
@@ -1242,7 +1292,7 @@ jQuery(document).ready(
                                             height: height
 
                                         },
-                                        opacity: 85,
+                                        opacity: 75,
                                         overlayClose:true,
                                         onClose: function() {
                                             jQuery.modal.close();
@@ -1292,7 +1342,7 @@ jQuery(document).ready(
                     var awesompleteFields = [];
                     var content  = '<form>' +
                                      currentFilterHTML +
-                                     '<a href="#" class="'+myob.openAndCloseFilterFormClass+' button closed">'+filterFormTitle+'</a>' +
+                                     '<a href="#" class="'+myob.openAndCloseFilterFormClass+' button closed top">'+filterFormTitle+'</a>' +
                                      '<div style="display: none;" class="'+myob.filterOptionsHolderClass+'">';
                     Object.keys(myob.dataDictionary).forEach(
                         function(category, categoryIndex) {
@@ -1429,14 +1479,16 @@ jQuery(document).ready(
                                 var extraClass = 'keyword';
                                 if(typeof myob.cfinc[category] !== 'undefined') {
                                     if(typeof myob.cfinc[category][0] !== 'undefined') {
-                                        currentValueForForm = myob.cfinc[category].vtm;
-                                        currentValueForForm = currentValueForForm.raw2attr();
+                                        for(var i = 0; i < myob.cfinc[category].length; i++) {
+                                            currentValueForForm = myob.cfinc[category][i].vtm;
+                                            currentValueForForm = currentValueForForm.raw2attr();
+                                        }
                                     }
                                 }
                             } else if(type === 'tag') {
                                 if(typeof myob.cfinc[category] !== 'undefined') {
                                     for(var i = 0; i < myob.cfinc[category].length; i++) {
-                                        valueIndex = myob.cfinc[category].vtm;
+                                        valueIndex = myob.cfinc[category][i].vtm;
                                         var html = myob.makeFieldForForm('checkbox', category, tabIndex, valueIndex);
                                         if(html.length > 5) {
                                             html = html.replace('<input ', '<input checked="checked" ');
@@ -1690,27 +1742,12 @@ jQuery(document).ready(
                     if(myob.hasFixedTableHeader) {
                         var relativeMove = myob.myFilterFormHolder.outerHeight() + myob.myTableHead.outerHeight();
                         var pushDownDiv = myob.myTableHolder.find('#tfspushdowndiv');
-                        if(pushDownDiv.length === 0) {
-                            jQuery('<div style="height: '+relativeMove+'px;display: none;" id="tfspushdowndiv"></div>').
-                            insertBefore(myob.myTable);
-                        } else {
-                            pushDownDiv.height(relativeMove);
-                            pushDownDiv.css('display', 'none');
-                        }
+                        pushDownDiv.height(relativeMove);
                         //get basic data about scroll situation...
                         var tableOffset = myob.myTableBody.offset().top;
                         var offset = jQuery(window).scrollTop();
 
                         var showFixedHeader = offset > tableOffset ? true: false;
-                        //reset everything!
-                        myob.myTableHolder.removeClass('fixed-header');
-                        //immediately move table down...
-                        //remove everything to recalculate ...
-                        myob.myFilterFormHolder.css("width", "");
-                        //set width of cells
-                        myob.myTable
-                            .find('thead:first tr th, tbody tr:first td, tbody tr:first th')
-                            .css({"width": "", "min-width": ""});
 
                         //end reset
                         if(showFixedHeader === true) {
@@ -1719,26 +1756,13 @@ jQuery(document).ready(
                             window.setTimeout(
                                 function() {
                                     //set width of cells
-                                    //we DO NOT SET WIDTH ON TABLE AS THIS SCREWS THINGS MAJORLY!!!!!!
-                                    myob.myTableBody.find('tr.show:first th, tr.show:first td').each(
-                                        function(colNumber, cell) {
-                                            var cell = jQuery(cell);
-                                            var myWidth = cell.width();
-                                            cell.css('min-width', myWidth);
-                                            jQuery('thead:first tr').each(
-                                                function(i, tr) {
-                                                    jQuery(tr).children().eq(colNumber).width(myWidth);
-                                                }
-                                            );
-                                        }
-                                    );
-                                    pushDownDiv.css('display', 'block');
                                     myob.myTableHolder.addClass('fixed-header');
-
+                                    myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight());
                                 },
                                 myob.millisecondsBetweenActions
                             );
-                            myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight());
+                        } else {
+                            myob.myTableHolder.removeClass('fixed-header');
                         }
                     }
                 } else {

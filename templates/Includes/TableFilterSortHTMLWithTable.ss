@@ -7,6 +7,7 @@
 </head>
 
 <body id="tfs-modal-pop-up">
+    <div id="wrapper">
 <% if $AddForm %>
 
     $AddForm
@@ -22,6 +23,6 @@
     <% include TableFilterSortFooter %>
     </div>
 <% end_if %>
-
+    </div>
 </body>
 </html>

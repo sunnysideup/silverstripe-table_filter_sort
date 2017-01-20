@@ -30,6 +30,7 @@ class TableFilterSortServerSaver extends DataObject {
     private static $db = array(
         'URLSegment' => 'Varchar(50)',
         'Title' => 'Varchar(50)',
+        'Author' => 'Varchar(50)',
         'Description' => 'Varchar(200)',
         'ParentPageID' => 'Varchar(200)',
         'Data' => 'Text'
@@ -51,12 +52,14 @@ class TableFilterSortServerSaver extends DataObject {
     private static $summary_fields = array(
         'Created' => 'Created',
         'Title' => 'Title',
+        'Author' => 'Title',
         'Description' => 'Description',
         'ParentPageID' => 'Show in'
     );
 
     private static $field_labels = array(
         'Title' => 'Title',
+        'Author' => 'Author',
         'Description' => 'Description',
         'ParentPageID' => 'Show in',
         'Tags' => 'Tag'

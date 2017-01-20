@@ -225,8 +225,6 @@ $html = create_test();
 
         <div class="tableFilterSortHolder">
 
-            <div class="saveAndLoad"></div>
-
             <div class="tableFilterSortFilterFormHolder"
                 data-title="Filter Table Below"
                 data-title-clear-button="Clear"

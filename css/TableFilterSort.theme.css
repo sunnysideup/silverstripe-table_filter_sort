@@ -25,7 +25,7 @@ h3 {
 
 .fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder {
     box-sizing: border-box;
-    background-color: #aaa;
+    background-color: #b5b5b5;
     border: 1px solid #fff;
 }
 
@@ -35,7 +35,6 @@ h3 {
 
 .tableFilterSortTable, .tableFilterSortTable thead, .tableFilterSortTable tbody {
     border-collapse: collapse;
-    ;
 }
 
 a {
@@ -172,12 +171,12 @@ ul li {
 }
 
 .tableFilterSortFilterFormHolder .tableFilterSortCurrentSearchHolder {
-    width: calc(100% - 17em);
+    width: 100%;
     float: right;
     text-align: right;
     color: #555;
 }
-
+.tableFilterSortOpenFilterForm.top {position: absolute;}
 .tableFilterSortFilterFormHolder .tableFilterSortCurrentSearchHolder  h3 {
     display: none;
 }
@@ -214,13 +213,21 @@ ul li {
 .tableFilterSortCommonContentHolder h3 {
     display: none;
 }
-
+.tableFilterSortFilterFormOptions {
+    clear: both;
+    padding-top: 10px;
+}
 .sortable, .clear a {
     text-decoration: none;
 }
 
 .no-matches-message {
     display: none;
+    text-align: center;
+    background-color: crimson;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px;
 }
 
 .filter-selected {
@@ -252,7 +259,7 @@ tr.hide, tr.no-match {
     background-position: top center;
 }
 
-.button {
+.button, input[type='submit'] {
     display: inline-block;
     background: #3498db;
     background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
@@ -272,7 +279,7 @@ tr.hide, tr.no-match {
     font-weight: bold;
 }
 
-.button:hover {
+.button:hover, input[type='submit']:hover {
     background: #3cb0fd;
     background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
     background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
@@ -280,6 +287,12 @@ tr.hide, tr.no-match {
     background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
     background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
     text-decoration: none;
+}
+
+input[type='submit'] {
+    display: block;
+    margin: 10px auto;
+    border: none!important;
 }
 
 .paginationTop {
@@ -295,6 +308,13 @@ tr.hide, tr.no-match {
 .pagination span, .pagination a {
     padding: 0 10px;
     display: inline-block;
+}
+
+.pagination span:last-child, .pagination a:last-child{
+    padding-right: 0px;
+}
+.pagination span:first-child, .pagination a:first-child{
+    padding-left: 0px;
 }
 
 .line {
@@ -332,13 +352,6 @@ input[type="checkbox"] {
     box-sizing: border-box;
 }
 
-td:first-child a {
-    font-size: 25px!important;
-    text-decoration: none;
-    display: block;
-    float: right;
-    clear: right;
-}
 
 .fav .addFav {
     color: red;
@@ -413,6 +426,12 @@ table tbody tr .hasFader #favouriteFader li {
     float: left;
 }
 
+.filterIsOpen .clear,  .filterIsOpen .saveAndLoad.load  {
+    display: none;
+}
+.saveAndLoad.save {display: none;}
+.filterIsOpen .saveAndLoad.save {display: list-item;;}
+.favouritesFilter li {display: list-item!important;}
 @-moz-keyframes show_on_top {
     0% {
         opacity: 0;
@@ -491,8 +510,8 @@ table tbody tr .hasFader #favouriteFader li {
 /** just adding 1 PX to header cells to make it perfect! */
 @media screen and (-webkit-min-device-pixel-ratio:0) {
     /* CSS Statements that only apply on webkit-based browsers (Chrome, Safari, etc.) */
-    .fixed-header .tableFilterSortTable thead th {
-        padding-left: 11px;
+    .fixed-header .tableFilterSortTable thead tr: first{
+        padding-left: 13px!important;
     }
 }
 
@@ -500,4 +519,21 @@ table tbody tr .hasFader #favouriteFader li {
     .fixed-header .tableFilterSortTable thead {
         margin-left: -1px;
     }
+}
+
+
+#tfs-modal-pop-up {background-color: #eee; position: absolute; padding: 0; margin: 0; overflow: auto; width: 100%; height: 100%;}
+#tfs-modal-pop-up #wrapper {padding: 1em;}
+#tfs-modal-pop-up fieldset {outline: none; border: none;}
+#tfs-modal-pop-up .field {padding-bottom: 10px;}
+#tfs-modal-pop-up .field label{display: none}
+#tfs-modal-pop-up .field input,
+#tfs-modal-pop-up .field textarea {
+    width: 80%;
+    border: 1px solid #3cb0fd;
+    border-radius: 5px;
+    padding: 10px;
+}
+@media screen and (min-width: 550px)  {
+    #tfs-modal-pop-up .field {width: 50%; float: left;}
 }
