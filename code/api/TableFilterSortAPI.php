@@ -53,7 +53,7 @@ class TableFilterSortAPI extends Object
             $js = array_diff($js, $blockArray);
             $css = array_diff($css, $blockArray);
         }
-        if(Director::isDev()) {
+        if(Director::isDev() && 1 == 2) {
             foreach($css as $link) {
                 Requirements::themedCSS($link, 'table_filter_sort');
             }
