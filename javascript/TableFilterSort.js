@@ -1567,7 +1567,7 @@ jQuery(document).ready(
 
             runCurrentSort: function()
             {
-                var currentSortObject = myob.myTableHead.find(myob.sortLinkSelector+'['+myob.csort.scat+']').first();
+                var currentSortObject = myob.myTableHead.find(myob.sortLinkSelector+'[data-sort-field="'+myob.csort.scat+'"]').first();
                 if(currentSortObject && currentSortObject.length > 0) {
                     currentSortObject.click();
                 }
