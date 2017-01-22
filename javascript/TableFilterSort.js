@@ -100,6 +100,12 @@ jQuery(document).ready(
             myFilterFormHolder: null,
 
             /**
+             * selector for the filter form inner
+             * @var jQuery Object
+             */
+            myFilterFormInner: null,
+
+            /**
              * selector for the table
              * @var jQuery Object
              */
@@ -124,17 +130,17 @@ jQuery(document).ready(
             myRows: null,
 
             /**
-            * to keep field options simple ...
-            * MyFieldA:
-            *    CanFilter: true
-            *    CanSort: false
-            *    DataType: number | string | date
-            *    Options: [A,B,C]
-            * MyFieldB:
-            *    CanFilter: true
-            *    CanSort: false
-            *    DataType: number | string | date
-            *    Options: [A,B,C]
+             * to keep field options simple ...
+             * MyFieldA:
+             *    CanFilter: true
+             *    CanSort: false
+             *    DataType: number | string | date
+             *    Options: [A,B,C]
+             * MyFieldB:
+             *    CanFilter: true
+             *    CanSort: false
+             *    DataType: number | string | date
+             *    Options: [A,B,C]
              * @var array
              */
             dataDictionary:[],
@@ -148,6 +154,13 @@ jQuery(document).ready(
              * @type {array}
              */
             filterAndSortVariables: ["cfinc","cforcat","cfex","csort"],
+
+            /**
+             * variables that determine the favourites
+             *  - myfavs
+             * @type {array}
+             */
+            favouritesVariables: ['myfavs'],
 
             /**
              * list of current filters by category
@@ -248,9 +261,15 @@ jQuery(document).ready(
             millisecondsBetweenActions: 10,
 
             /**
+             * a variable that holds setTimeout
+             * @type {function}
+             */
+            setTableWidthInFuture: null,
+
+            /**
              * @type array
              */
-            validDataTypes: ['number', 'string', 'date'], // 'date', 'boolean' to add!
+            validDataTypes: ['number', 'string', 'date', 'boolean'],
 
             /**
              * when trying to establish the data-type
@@ -287,29 +306,6 @@ jQuery(document).ready(
              *
              */
 
-            /**
-             * customise the title of the filter button
-             * @var string
-             */
-            filterTitle: "Filter Table",
-
-            /**
-             *
-             * @type string
-             */
-            noFilterSelectedText: 'No filter selected',
-
-            /**
-             *
-             * @type string
-             */
-            closeAndApplyFilterText: 'Close and Apply Filter',
-
-            /**
-             *
-             * @type string
-             */
-            cfincText: '',
 
             /**
              *
@@ -341,61 +337,14 @@ jQuery(document).ready(
              */
             filtersTitle: 'Filter',
 
+
             /**
              *
              *
-             * SELECTORS
+             * PAGINATION SELECTORS
              *
              *
              */
-
-            /**
-            * @var string
-            */
-            tableSelector: 'table.tableFilterSortTable',
-
-            /**
-             * @var string
-             */
-            rowSelector: 'tr.tfsRow',
-
-            /**
-             * items that can be filtered / sorted for ...
-             * @var string
-             */
-            filterItemSelector: 'span[data-filter]',
-
-            /**
-             * @var string
-             */
-            showMoreDetailsSelector: '.more',
-
-            /**
-            * @var string
-            */
-            moreDetailsSelector: '.hidden',
-
-            /**
-            * @var string
-            */
-            filterFormHolderSelector: '.tableFilterSortFilterFormHolder',
-
-            /**
-            * @var string
-            */
-            sortLinkSelector: 'a.sortable',
-
-            /**
-             * selector used to identify add to favourite Links
-             * @type {String}
-             */
-            favouriteLinkSelector: 'a.addFav',
-
-            /**
-             * class for an element showing details of hidden rows
-             * @var string
-             */
-            moreRowEntriesSelector: ".tableFilterSortMoreEntries",
 
             /**
              * class for an element that shows the number of matches
@@ -433,24 +382,168 @@ jQuery(document).ready(
              */
             paginationSelector: ".pagination",
 
+
+
+
+
             /**
              *
              *
-             * Classes
+             * CURRENT STATE CLASSES
              *
              *
              */
-             /**
-              * class for an element that holds the pagination
-              * @var string
-              */
-             saveAndLoadClass: "saveAndLoad",
 
             /**
              * loading class when things are being calculated
              * @type string
              */
             loadingClass: 'loading',
+
+            /**
+             * loading class when things are being calculated
+             * @type string
+             */
+            fixedHeaderClass: 'fixed-header',
+
+            /**
+             * class to show that filter form CAN be used
+             * i.e. the table is not in the viewport (scrolled too far or too little)
+             * this class is also applied if the filter is open
+             * @var string
+             */
+            filterInUseClass: 'tfs-filter-in-use',
+
+            /**
+             * class to show that filter form CAN NOT be used
+             * i.e. the table is not in the viewport (scrolled too far or too little)
+             *
+             * @var string
+             */
+            filterNotInUseClass: 'tfs-filter-not-in-use',
+
+            /**
+             * class to show that the form is open
+             * @var string
+             */
+            filterIsOpenClass: 'filter-is-open',
+
+            /**
+             * class to show that the form is open
+             * @var string
+             */
+            filterIsClosedClass: 'filter-is-closed',
+
+            /**
+             * class to show that filter form CAN NOT be used
+             * i.e. the table is not in the viewport (scrolled too far or too little)
+             *
+             * @var string
+             */
+            hasFilterClass: 'tfs-has-filter',
+
+            /**
+             * class to show that filter form CAN NOT be used
+             * i.e. the table is not in the viewport (scrolled too far or too little)
+             *
+             * @var string
+             */
+            doesNotHaveFilterClass: 'tfs-does-not-have-filter',
+
+            /**
+             *
+             * @var string
+             */
+            hasFavouritesClass: 'tfs-has-favourites',
+
+            /**
+             * class to show that filter form CAN NOT be used
+             * i.e. the table is not in the viewport (scrolled too far or too little)
+             *
+             * @var string
+             */
+            hasFavouritesInFilterClass: 'tfs-has-favourites-in-filter',
+
+
+            /**
+             *
+             *
+             * SPECIAL AREAS
+             *
+             *
+             */
+
+            /**
+             * class for an element showing details of hidden rows
+             * @var string
+             */
+            moreRowEntriesSelector: ".tfs-more-entries",
+
+            /**
+             * class for element that holds common content (that is the same in ALL rows)
+             * @var string
+             */
+            commonContentHolderClass: 'tfs-common-content-holder',
+
+            /**
+             * class of element that shows the no match message
+             * @var string
+             */
+            noMatchMessageClass: 'no-matches-message',
+
+            /**
+             * element that holds all the filter stuff
+             * @var string
+             */
+            filterFormHolderSelector: '.tfs-filter-form-holder',
+
+            /**
+             * element that holds all the filter stuff
+             * @var string
+             */
+            filterFormInnerSelector: '.tfs-filter-form-inner',
+
+
+            /**
+             *
+             *
+             * IN TABLE SELECTORS & CLASSES
+             *
+             *
+             */
+
+            /**
+             * @var string
+             */
+            tableSelector: 'table.tfs-table',
+
+            /**
+             * @var string
+             */
+            rowSelector: 'tr.tfstr',
+
+            /**
+             * items that can be filtered / sorted for ...
+             * @var string
+             */
+            filterItemSelector: 'span[data-filter]',
+
+            /**
+             * @var string
+             */
+            showMoreDetailsSelector: '.more',
+
+            /**
+             * @var string
+             */
+            moreDetailsSelector: '.hidden',
+
+            /**
+             * selector used to identify add to favourite Links
+             * @type {String}
+             */
+            favouriteLinkSelector: 'a.addFav',
+
 
             /**
              * class for rows that should show
@@ -477,92 +570,16 @@ jQuery(document).ready(
             notMatchClass: 'no-match',
 
             /**
-             * class for items that are closed (more, filter form, etc..)
+             * class for items that are opened (more, filter form, etc..)
              * @var string
              */
             openedClass: 'opened',
 
             /**
-             * class to show that the form is open
+             * class for items that are closed (more, filter form, etc..)
              * @var string
              */
-            filterIsOpenClass: 'filterIsOpen',
-
-            /**
-             * @var string
-             */
-            sectionFilterClassAppendix: 'Filter',
-
-            /**
-             * class for element that holds common content (that is the same in ALL rows)
-             * @var string
-             */
-            commonContentHolderClass: 'tableFilterSortCommonContentHolder',
-
-            /**
-             * element that holds the current filter info
-             * @var string
-             */
-            currentSearchFilterClass: 'tableFilterSortCurrentSearchHolder',
-
-            /**
-             * class that is used for links that open and close the filter form
-             * @var string
-             */
-            openAndCloseFilterFormClass: 'tableFilterSortOpenFilterForm',
-
-            /**
-             * class of element that holds the filter options ...
-             * @var string
-             */
-            filterOptionsHolderClass: 'tableFilterSortFilterFormOptions',
-
-            /**
-             * class for element that holds one filter group (e.g. Weight)
-             * @var string
-             */
-            filterGroupClass: 'filterColumn',
-
-            /**
-             * @var string
-             */
-            groupLabelClass: 'groupLabel',
-
-            /**
-             * class of element that holds the close and apply filter button
-             * @var string
-             */
-            applyFilterClass: 'applyFilter',
-
-            /**
-             * class to show that filter form CAN be used
-             * @var string
-             */
-            filterInUseClass: 'tableFilterSortFilterInUse',
-
-            /**
-             * class to show that filter form CAN NOT be used
-             * @var string
-             */
-            filterNotInUseClass: 'tableFilterSortFilterNotInUse',
-
-            /**
-             * class of element that shows the no match message
-             * @var string
-             */
-            noMatchMessageClass: 'no-matches-message',
-
-            /**
-             * class to show that something is currently sorted in ascending order.
-             * @var string
-             */
-            sortAscClass: 'sort-asc',
-
-            /**
-             * class to show that something is currently sorted in descending order.
-             * @var string
-             */
-            sortDescClass: 'sort-desc',
+            closedClass: 'closed',
 
             /**
              *
@@ -577,37 +594,147 @@ jQuery(document).ready(
             favouriteClass: 'fav',
 
             /**
+             *
+             *
+             * FILTER ACTION CLASSES
+             *
+             *
+             */
+
+             /**
+             * class for element(s) that holds the current filter info
+             * @var string
+             */
+             currentSearchFilterClass: 'tfs-current-search-holder',
+
+            /**
+             * class that is used for links that open and close the filter form
+             * @var string
+             */
+            openAndCloseFilterFormClass: 'tfs-open-filter-form',
+
+            /**
+             * class for an element that links for sever interaction
+             * @var string
+             */
+            saveAndLoadClass: "tfs-save-and-load",
+
+            /**
+             * current filter
+             * @var string
+             */
+            currentFilterClass: "tfs-current-filter",
+
+            /**
+             * element that holds the current filter info
+             * @var string
+             */
+            clearFilterClass: 'tfs-clear',
+
+            /**
+             * selector used to identify add to favourite Links
+             * @type {String}
+             */
+            showFavouritesSelector: '.filter-for-favourites a',
+
+            /**
+             *
+             *
+             * FILTER FORM CLASSES
+             *
+             *
+             */
+
+            /**
+             * appendix after class for filter group
+             * e.g. Boolean_Filter
+             * where Filter is the appendix
+             * @var string
+             */
+            sectionFilterClassAppendix: 'Filter',
+
+            /**
+             * class of element that holds the filter options ...
+             * @var string
+             */
+            filterOptionsHolderClass: 'tfs-filter-form-options',
+
+            /**
+             * class for element that holds one filter group (e.g. Weight)
+             * @var string
+             */
+            filterGroupClass: 'tfs-filter-column',
+
+            /**
+             * label for filter group
+             * @var string
+             */
+            groupLabelClass: 'tfs-group-label',
+
+            /**
+             *
+             *
+             * TABLE HEADER SELECTORS AND CLASSES
+             *
+             *
+             */
+
+             /**
+             * @var string
+             */
+             sortLinkSelector: 'a.sortable',
+
+            /**
+             * class to show that something is currently sorted in ascending order.
+             * @var string
+             */
+            sortAscClass: 'sort-asc',
+
+            /**
+             * class to show that something is currently sorted in descending order.
+             * @var string
+             */
+            sortDescClass: 'sort-desc',
+
+
+            /**
              * startup
              *
              */
             init: function(holderNumber){
-
                 //get the holders
                 myob.holderNumber = holderNumber;
                 myob.myTableHolder = myTableHolder;
                 myob.myFilterFormHolder = myob.myTableHolder.find(myob.filterFormHolderSelector).first();
+                myob.myFilterFormInner = myob.myFilterFormHolder.find(myob.filterFormInnerSelector).first();
                 myob.myTable = myob.myTableHolder.find(myob.tableSelector).first();
                 myob.myTableHead = myob.myTableHolder.find("table thead");
                 myob.myTableBody = myob.myTable.find(" > tbody");
+                //get the rows
+                myob.resetObjects();
 
-                myob.favouritesParentPageID = myob.myFilterFormHolder.attr("data-favourites-parent-page-id");
+                //are we saving favourites?
+                myob.favouritesParentPageID = myob.myTableHolder.attr("data-favourites-parent-page-id");
                 if(typeof myob.favouritesParentPageID === 'string' && myob.favouritesParentPageID.length > 0) {
                     myob.hasFavouritesSaving = true;
                 }
-                myob.filtersParentPageID = myob.myFilterFormHolder.attr("data-filters-parent-page-id");
+
+                //are we saving filter?
+                myob.filtersParentPageID = myob.myTableHolder.attr("data-filters-parent-page-id");
                 if(typeof myob.filtersParentPageID === 'string' && myob.filtersParentPageID.length > 0) {
                     myob.hasFilterSaving = true;
                 }
 
+                //base URL
                 myob.baseURL = location.protocol + '//' + location.host + location.pathname;
 
-                myob.resetObjects();
                 if(myob.myRows.length > 1){
                     window.setTimeout(
                         function() {
-                            //COLLECT ...
+                            //COLLECT AND FIX
+                            // get the rows .
                             //collect filter items
-                            if(myob.debug) { console.profileEnd();console.profile('filterItemCollector');}
+                            if(myob.debug) { console.profile('filterItemCollector');}
                             myob.filterItemCollector();
                             //look for cols that are the same
                             if(myob.debug) { console.profileEnd();console.profile('tableHideColsWhichAreAllTheSame');}
@@ -615,10 +742,10 @@ jQuery(document).ready(
                             //set table width
                             if(myob.debug) { console.profileEnd();console.profile('setTableWidth');}
                             myob.setTableWidth();
-
                             //now we can hide table ...
                             myob.myTableHolder.addClass(myob.loadingClass);
 
+                            //MASSAGE DATA AND FIND SORT
                             //finalise data dictionary
                             if(myob.debug) { console.profileEnd();console.profile('dataDictionaryCollector');}
                             myob.dataDictionaryCollector();
@@ -629,31 +756,22 @@ jQuery(document).ready(
 
 
                             //LISTENERS ...
-                            //set up filter form listener
                             if(myob.debug) { console.profileEnd();console.profile('fixTableHeaderListener');}
                             myob.fixTableHeaderListener();
-                            //set up filter form listener
                             if(myob.debug) { console.profileEnd();console.profile('setupFilterFormListeners');}
                             myob.setupFilterFormListeners();
-                            //set up sort listener
                             if(myob.debug) { console.profileEnd();console.profile('setupSortListeners');}
                             myob.setupSortListeners();
-                            //add pagination listener
                             if(myob.debug) { console.profileEnd();console.profile('paginationListeners');}
                             myob.paginationListeners();
-                            //allow things to slide up and down
                             if(myob.debug) { console.profile('setupMoreDetailsListener');}
                             myob.setupMoreDetailsListener();
-                            //listen for forward and back buttons
                             if(myob.debug) { console.profile('addURLChangeListener');}
                             myob.addURLChangeListener();
-                            //listen to favourite links, if any
                             if(myob.debug) { console.profileEnd();console.profile('openServerModalWindowListener');}
                             myob.openServerModalWindowListener();
-                            //listen to favourite links, if any
                             if(myob.debug) { console.profileEnd();console.profile('favouriteLinkListener');}
                             myob.favouriteLinkListener();
-                            //add direct filter listener, this can only be done afterwards
                             if(myob.debug) { console.profileEnd();console.profile('directFilterLinkListener');}
                             myob.directFilterLinkListener();
 
@@ -708,7 +826,7 @@ jQuery(document).ready(
 
             setTableWidth: function() {
                 var html = '<colgroup>';
-                myob.myTableHead.find('tr:first th').each(
+                myob.myTableHead.find('tr:first th:visible').each(
                     function(colNumber, cell) {
                         var cell = jQuery(cell);
                         var myWidth = cell.width();
@@ -723,7 +841,8 @@ jQuery(document).ready(
                 html +=  '</colgroup>';
                 myob.myTable.prepend(html);
                 //add push down div ...
-                jQuery('<div id="tfspushdowndiv"></div>').
+                myob.myTableHolder.find('.tfspushdowndiv').first().remove();
+                jQuery('<div class="tfspushdowndiv"></div>').
                 insertBefore(myob.myTable);
             },
 
@@ -747,7 +866,6 @@ jQuery(document).ready(
                                 value = el.text();
                                 category = el.attr('data-filter');
                                 if(value.trim().length > 0) {
-                                    if(myob.debug) { console.debug("adding "+value+" to "+category);}
                                     if(typeof myob.dataDictionary[category] === "undefined") {
                                         myob.dataDictionary[category] = {};
                                     }
@@ -936,13 +1054,14 @@ jQuery(document).ready(
                 jQuery(window).on(
                     "resize",
                     function(e) {
-                        myob.myTableHolder.removeClass('fixed-header');
+                        myob.myTableHolder.removeClass(myob.fixedHeaderClass);
                         myob.myTable.find('colgroup').remove();
                         myob.myFilterFormHolder.css("width", "");
                         myob.myTable
                             .find('thead tr:first th')
                             .css({"width": "", "min-width": "", "max-width": ""});
-                        window.setTimeout(
+                        window.clearTimeout(myob.setTableWidthInFuture);
+                        myob.setTableWidthInFuture = window.setTimeout(
                             function() {
                                 myob.setTableWidth();
                                 myob.fixTableHeader();
@@ -960,45 +1079,55 @@ jQuery(document).ready(
              */
             setupFilterFormListeners: function()
             {
+                //set default
+                myob.myFilterFormInner.hide();
+                //open and close form
                 myob.myFilterFormHolder.on(
                     'click',
                     '.' + myob.openAndCloseFilterFormClass,
                     function(event) {
                         event.preventDefault();
-                        myob.myFilterFormHolder.find('.' + myob.filterOptionsHolderClass).toggleClass(myob.openedClass).slideToggle(
+                        myob.myFilterFormInner.slideToggle(
                             "fast",
                             function() {
-                                myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight() + 'px');
+                                //set the height of the filter form
+                                if(myob.hasFixedTableHeader) {
+                                    myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight() + 'px');
+                                }
+                                myob.myTableHolder.toggleClass(myob.filterIsOpenClass);
+                                if(myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
+                                    //filter is now open
+                                } else {
+                                    //filter is now closed
+                                }
                             }
                         );
-                        myob.myTableHolder.toggleClass(myob.filterIsOpenClass);
-                        if(myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
-                            //filter is now open
-                        } else {
-                            //filter is now closed
-                        }
                         return false;
                     }
                 );
-                myob.myFilterFormHolder.on(
-                    'change',
-                    'input',
-                    function(event) {
-                        myob.applyFilter();
-                    }
-                );
+
+                //clear filter
                 myob.myFilterFormHolder.on(
                     'click',
-                    '.clear a',
+                    '.' + myob.clearFilterClass + ' a',
                     function(event) {
                         event.preventDefault();
                         myob.cfinc = {};
                         myob.createFilterForm();
                         myob.applyFilter();
                         return false;
-                        //myob.createFilterForm();
                     }
                 );
+
+                //change input
+                myob.myFilterFormInner.on(
+                    'change',
+                    'input',
+                    function(event) {
+                        myob.applyFilter();
+                    }
+                );
+
             },
 
 
@@ -1079,7 +1208,7 @@ jQuery(document).ready(
             {
                 myob.myTableHolder.on(
                     'click',
-                    myob.paginationSelector+' a',
+                    myob.paginationSelector + ' a',
                     function(event) {
                         event.preventDefault();
                         var pageNumber = jQuery(this).attr('data-page');
@@ -1090,7 +1219,7 @@ jQuery(document).ready(
             },
 
             /**
-             * set up toggle slides ...
+             * set up toggle slides with the table
              */
             setupMoreDetailsListener: function()
             {
@@ -1100,9 +1229,12 @@ jQuery(document).ready(
                     myob.showMoreDetailsSelector,
                     function(event) {
                         event.preventDefault();
+                        //my el
                         var myEl = jQuery(this);
-                        var myRow = myEl.closest('tr');
-                        myRow
+                        myEl.toggleClass(myob.openedClass);
+                        //row
+                        var row = myEl.closest('tr');
+                        row
                             .toggleClass(myob.openedClass)
                             .find(myob.moreDetailsSelector)
                             .each(
@@ -1112,7 +1244,6 @@ jQuery(document).ready(
                                     moreDetailsItem.toggleClass(myob.openedClass);
                                 }
                             );
-                        myEl.toggleClass(myob.openedClass);
                     }
                 );
             },
@@ -1141,13 +1272,13 @@ jQuery(document).ready(
             {
                 myob.myTableBody.on(
                     'click',
-                    'span[data-filter].' + myob.directLinkClass,
+                    myob.filterItemSelector + '.' + myob.directLinkClass,
                     function(event){
                         event.preventDefault();
                         var myEl = jQuery(this);
                         var category = myEl.attr('data-filter');
                         var filterValue = myEl.text().trim();
-                        var filterHolder = myob.myFilterFormHolder
+                        var filterHolder = myob.myFilterFormInner
                             .find('.'+myob.filterGroupClass+'[data-to-filter="'+category+'"]');
                         var fieldType = filterHolder.attr('field-type');
                         var filterToTriger = filterHolder
@@ -1170,30 +1301,22 @@ jQuery(document).ready(
                                 filterValue
                             );
                         }
-
-                       if(highlightIdenticals) {
-                            myob.myRows
-                                .find('span.dl[data-filter="'+category+'"]').each(
-                                    function(i, el) {
-                                        var myEl = jQuery(el);
-                                        if(myEl.text().trim() === filterValue) {
-                                            myEl.addClass(myob.directLinkClass+'-on');
+                        var onClass = myob.directLinkClass+'-on';
+                        myob.myRows
+                            .find('span[data-filter="'+category+'"].'+myob.directLinkClass).each(
+                                function(i, el) {
+                                    var myEl = jQuery(el);
+                                    if(myEl.text().trim() === filterValue) {
+                                        if(highlightIdenticals) {
+                                            myEl.addClass(onClass);
+                                        } else {
+                                            myEl.removeClass(onClass);
                                         }
                                     }
-                                );
-                        } else {
-                            myob.myRows
-                                .find('span.dl[data-filter="'+category+'"]').each(
-                                    function(i, el) {
-                                        var myEl = jQuery(el);
-                                        if(myEl.text().trim() === filterValue) {
-                                            myEl.removeClass(myob.directLinkClass+'-on');
-                                        }
-                                    }
-                                );
-                            }
-
+                                }
+                            );
                         myob.applyFilter();
+
                         return false;
                     }
                 );
@@ -1202,7 +1325,8 @@ jQuery(document).ready(
             favouriteLinkListener: function(){
                 myob.hasFavourites = myob.myTableBody.find(myob.favouriteLinkSelector).length > 0;
                 if(myob.hasFavourites) {
-                    myob.myTableHolder.on(
+                    //favouite links in table
+                    myob.myTableBody.on(
                         'click',
                         myob.favouriteLinkSelector,
                         function(event){
@@ -1214,22 +1338,6 @@ jQuery(document).ready(
                             if(id && typeof id !== 'undefined' && id !== '') {
                                 if(rowHolder.hasClass(myob.favouriteClass)) {
                                     myob.myfavs.push(id);
-                                    if(myob.hasFavouritesSaving) {
-                                        var html = '<ul id="favouriteFader">'+myob.makeRetrieveButtons(true, false, 'favourites')+'</ul>';
-                                        cellHolder.append(html).addClass('hasFader');
-                                        window.setTimeout(
-                                            function() {
-                                                jQuery('#favouriteFader').fadeOut(
-                                                    500,
-                                                    function() {
-                                                        jQuery('#favouriteFader').remove();
-                                                        cellHolder.removeClass('hasFader');
-                                                    }
-                                                );
-                                            },
-                                            4500
-                                        );
-                                    }
                                 } else {
                                     var index = myob.myfavs.indexOf(id);
                                     if (index > -1) {
@@ -1238,10 +1346,32 @@ jQuery(document).ready(
                                 }
                                 if(typeof Cookies !== 'undefined') {
                                     Cookies.set('myfavs', myob.myfavs, {path: myob.baseURL, expires: 180});
-                                    Cookies.set('lastFilter', myob.currentURL(), {path: myob.baseURL, expires: 180});
                                 }
                             }
+                            if(myob.myfavs.length > 0) {
+                                myob.myTableHolder.addClass(myob.hasFavouritesClass);
+                            } else {
+                                myob.myTableHolder.removeClass(myob.hasFavouritesClass);
+                            }
                             return false;
+                        }
+                    );
+
+                    //show / hide favourites
+                    myob.myTableHolder.on(
+                        'click',
+                        myob.showFavouritesSelector,
+                        function(event){
+                            event.preventDefault();
+                            var filterToTriger = myob.myFilterFormInner.find('input[name="Favourites"]').first();
+                            if(filterToTriger.prop('checked') === true){
+                                filterToTriger.prop('checked', false).trigger('change');
+                            }
+                            else {
+                                myob.myFilterFormHolder.find('.' + myob.clearFilterClass + ' a').click();
+                                var filterToTriger = myob.myFilterFormInner.find('input[name="Favourites"]').first();
+                                filterToTriger.prop('checked', true).trigger('change');
+                            }
                         }
                     );
                 }
@@ -1262,15 +1392,36 @@ jQuery(document).ready(
                     '.' + myob.saveAndLoadClass + ' a',
                     function(event){
                         event.preventDefault();
+                        //why this?
                         myob.myTable.removeClass(myob.loadingClass);
+
+                        //get els
                         var myEl = jQuery(this);
-                        var url = myEl.attr('data-url');
-                        var parentPageID = myEl.attr('data-parent-page-id');
-                        variables = myEl.attr('data-variables');
-                        variables = variables.split(',');
+                        var myParent = myEl.closest('.' + myob.saveAndLoadClass);
+                        //get connection type details
+                        var url = myob.serverConnectionURL;
+                        var isFilter = false;
+                        var isSave = false;
+                        var parentPageID = myob.filtersParentPageID;
+                        var variables = myob.filterAndSortVariables;
+                        if(myParent.hasClass('filters')) {
+                            isFilter = true;
+                        }
+                        else if(myParent.hasClass('favourites')) {
+                            parentPageID = myob.favouritesParentPageID;
+                            variables = myob.favouritesVariables;
+                        }
+                        if(myParent.hasClass('save')) {
+                            isSave = true;
+                            url += 'start/'
+                        } else {
+                            url += 'index/'
+                        }
                         var data = {};
-                        for(var i = 0; i  < variables.length; i++) {
-                            data[variables[i]] = myob[variables[i]];
+                        if(isSave === true) {
+                            for(var i = 0; i  < variables.length; i++) {
+                                data[variables[i]] = myob[variables[i]];
+                            }
                         }
                         data.ParentPageID = parentPageID;
                         jQuery.post(
@@ -1326,23 +1477,13 @@ jQuery(document).ready(
             {
                 //create html content and add to top of page
 
-                if(myob.myFilterFormHolder.length > 0) {
+                if(myob.myFilterFormInner.length > 0) {
                     //clear it so that we can rebuild it ...
-                    myob.myFilterFormHolder.html("");
+                    myob.myFilterFormInner.html("");
                     var cfincHTML = "";
-                    var filterFormTitle = myob.myFilterFormHolder.attr("data-title");
-                    if(typeof filterFormTitle === "undefined") {
-                        filterFormTitle = myob.filterTitle;
-                    }
-                    if(myob.myTableHolder.find('.' + myob.currentSearchFilterClass).length === 0) {
-                        var currentFilterHTML = '<div class="'+myob.currentSearchFilterClass+'"></div>';
-                    }
                     var tabIndex = 1;
                     var awesompleteFields = [];
-                    var content  = '<form>' +
-                                     currentFilterHTML +
-                                     '<a href="#" class="'+myob.openAndCloseFilterFormClass+' button closed top">'+filterFormTitle+'</a>' +
-                                     '<div style="display: none;" class="'+myob.filterOptionsHolderClass+'">';
+                    var content  = '<form class="'+myob.filterOptionsHolderClass+'">';
                     Object.keys(myob.dataDictionary).forEach(
                         function(category, categoryIndex) {
                             if(myob.dataDictionary[category]['CanFilter']) {
@@ -1382,9 +1523,6 @@ jQuery(document).ready(
                              myob.favouritesCategoryTitle
                         );
                         content += myob.makeFieldForForm('favourites', myob.favouritesCategoryTitle, tabIndex, 0);
-                        if(myob.hasFavouritesSaving) {
-                            content += myob.makeRetrieveButtons(true, true, 'favourites');
-                        }
                         content += myob.makeSectionFooterForForm();
                         tabIndex++;
                     }
@@ -1396,25 +1534,16 @@ jQuery(document).ready(
                         content += myob.makeFieldForForm('keyword', myob.keywordsCategoryTitle, tabIndex, 0);
                         content += myob.makeSectionFooterForForm();
                     }
+                    content += '</form>';
 
-                    //add buttons
-                    var closeAndApplyFilterText = myob.myFilterFormHolder.attr("data-title-close-and-apply");
-                    if(typeof closeAndApplyFilterText === "undefined") {
-                        closeAndApplyFilterText = myob.closeAndApplyFilterText;
-                    }
-                    content += '' +
-                                     '<div class="'+myob.applyFilterClass+'">' +
-                                     '<a href="#" class="'+myob.openAndCloseFilterFormClass+' button closed">'+closeAndApplyFilterText+'</a>' +
-                                     '</div>' +
-                                     '</div>' +
-                                     '</form>';
-                    myob.myFilterFormHolder.html(content);
+                    //FINALISE!
+                    myob.myFilterFormInner.html(content);
                     var i = 0;
                     var input;
                     for(i = 0; i < awesompleteFields.length; i++) {
                         category = awesompleteFields[i];
                         //console.debug(category);
-                        var jQueryInput = myob.myFilterFormHolder.find('input[name="'+category+'"].awesomplete').first();
+                        var jQueryInput = myob.myFilterFormInner.find('input[name="'+category+'"].awesomplete').first();
                         var id = jQuery(jQueryInput).attr('id');
                         //console.debug(id);
                         var input = document.getElementById(id);
@@ -1456,7 +1585,7 @@ jQuery(document).ready(
                 var cleanCategory = category.replace(/\W/g, '');
                 var cleanValue = valueIndex.toString().toLowerCase();
                 var valueID = ('TFS_' + cleanCategory + '_' + cleanValue).replace(/[^a-zA-Z0-9]+/g, '_');
-                if(myob.myFilterFormHolder.find('input#'+valueID).length === 0){
+                if(myob.myFilterFormInner.find('input#'+valueID).length === 0){
                     var startString = '<li class="' + type + 'Field">';
                     var endString = '</li>';
                     switch (type) {
@@ -1525,10 +1654,10 @@ jQuery(document).ready(
                             var s = startString +
                                     '<span class="gt">' +
                                     ' <label for="' + valueID + '_gt">' + myob.greaterThanLabel + '</label>' +
-                                    ' <input data-dir="gt" data-label="' + myob.greaterThanLabel.raw2attr() + '" class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '" tabindex="'+tabIndex+'" value="'+currentValueForForm['gt'].raw2attr()+'" />' +
+                                    ' <input data-dir="gt" data-label="' + myob.greaterThanLabel.raw2attr() + '" class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '" tabindex="'+tabIndex+'" value="'+currentValueForForm['gt']+'" />' +
                                     ' </span><span class="lt">' +
                                     ' <label for="' + valueID + '_lt">' + myob.lowerThanLabel + '</label>' +
-                                    ' <input data-dir="lt" data-label="' + myob.lowerThanLabel.raw2attr() + '"  class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '_lt" tabindex="'+tabIndex+'" value="'+currentValueForForm['lt'].raw2attr()+'" />' +
+                                    ' <input data-dir="lt" data-label="' + myob.lowerThanLabel.raw2attr() + '"  class="number" step="any" type="number" name="' + cleanCategory + '[]" id="' + valueID + '_lt" tabindex="'+tabIndex+'" value="'+currentValueForForm['lt']+'" />' +
                                     ' </span>' +
                                     endString;
                             if(type === 'date') {
@@ -1744,7 +1873,7 @@ jQuery(document).ready(
                         if(addFilterForm) {
                             relativeMove += myob.myFilterFormHolder.outerHeight();
                         }
-                        var pushDownDiv = myob.myTableHolder.find('#tfspushdowndiv');
+                        var pushDownDiv = myob.myTableHolder.find('.tfspushdowndiv');
                         pushDownDiv.height(relativeMove);
                         //get basic data about scroll situation...
                         var tableOffset = myob.myTableBody.offset().top;
@@ -1761,7 +1890,7 @@ jQuery(document).ready(
                             window.setTimeout(
                                 function() {
                                     //set width of cells
-                                    myob.myTableHolder.addClass('fixed-header');
+                                    myob.myTableHolder.addClass(myob.fixedHeaderClass);
                                     var top = 0;
                                     if(addFilterForm) {
                                         top = myob.myFilterFormHolder.outerHeight();
@@ -1771,7 +1900,7 @@ jQuery(document).ready(
                                 myob.millisecondsBetweenActions
                             );
                         } else {
-                            myob.myTableHolder.removeClass('fixed-header');
+                            myob.myTableHolder.removeClass(myob.fixedHeaderClass);
                         }
                     }
                 } else {
@@ -1857,17 +1986,31 @@ jQuery(document).ready(
                     var dotCount = 0;
                     var startOfPaginator = currentPage - 2;
                     var endOfPaginator = currentPage + 2;
-                      for(i = 0; i < pageCount; i++ ) {
+                    var classes = [];
+                    for(i = 0; i < pageCount; i++ ) {
                         if(currentPage === i) {
                             dotCount = 0;
                             pageHTML += '<span>['+(i+1)+']</span>';
                         } else {
                             test1 = (i > startOfPaginator && i < endOfPaginator);
-                            test2 = (i >= (pageCount - 3));
-                            test3 = (i < (0 + 3));
+                            test2 = (i >= (pageCount - 1));
+                            test3 = (i < (0 + 1));
                             if(test1 || test2 || test3) {
+                                classes = [];
                                 dotCount = 0;
-                                pageHTML += '<a href="#" data-page="'+i+'">'+(i+1)+'</a> ';
+                                if(i === 0) {
+                                    classes.push('first');
+                                }
+                                if(i === (pageCount - 1)) {
+                                    classes.push('last');
+                                }
+                                if(i === (currentPage - 1)) {
+                                    classes.push('prev');
+                                }
+                                if(i === (currentPage  + 1)) {
+                                    classes.push('next');
+                                }
+                                pageHTML += '<a href="#" class="'+classes.join(' ')+'"data-page="'+i+'">'+(i+1)+'</a> ';
                             } else {
                                 if(dotCount < 3) {
                                     dotCount++;
@@ -1878,8 +2021,6 @@ jQuery(document).ready(
                          pageHTML += ' ';
                      }
                      myob.myTableHolder.find(myob.moreRowEntriesSelector).show();
-                } else {
-                    myob.myTableHolder.find(myob.moreRowEntriesSelector).not('.alwaysShow').hide();
                 }
                 minRow++;
                 myob.myTableHolder.find(myob.minRowSelector).text(minRow);
@@ -1904,8 +2045,12 @@ jQuery(document).ready(
                         myob.millisecondsBetweenActions
                     );
                 }
+                var currentURL = myob.currentURL();
                 if(myob.useBackAndForwardButtons) {
-                    history.pushState(null, null, myob.currentURL());
+                    history.pushState(null, null, currentURL);
+                }
+                if(typeof Cookies !== 'undefined') {
+                    Cookies.set('lastFilter', currentURL, {path: myob.baseURL, expires: 180});
                 }
                 myob.resetObjects();
                 if(typeof myob.endRowFX2 === 'function') {
@@ -1931,47 +2076,6 @@ jQuery(document).ready(
                     var urlpart = "tfs=" + encodeURI(JSON.stringify(urlObject));
                 }
                 return myob.baseURL + '#' + urlpart
-            },
-
-            /**
-             * makes the favourites or filters buttons
-             * @param  {boolean} canSave can the data be saved?
-             * @param  {string}  type    favourites | filters
-             * @return {string}          html
-             */
-            makeRetrieveButtons: function(canSave, canLoad, type)
-            {
-                var buttons = [];
-                var url = myob.serverConnectionURL;
-                switch(type) {
-                    case 'favourites':
-                        var title = myob.favouritesCategoryTitle;
-                        var parentPageID = myob.favouritesParentPageID;
-                        var variables = 'myfavs';
-                        break;
-                    case 'filters':
-                        var title = myob.filtersTitle;
-                        var parentPageID = myob.filtersParentPageID;
-                        var variables = myob.filterAndSortVariables.join(',');
-                        break;
-                }
-                if(canSave) {
-                    buttons.push(
-                        '<li class="save '+type+' '+myob.saveAndLoadClass+'">' +
-                        '<a href="#" data-url="'+url+'start/" data-parent-page-id="'+parentPageID+'" data-variables="'+variables+'">Save</a>'+
-                        '</li>'
-                    );
-                }
-                if(canLoad) {
-                    buttons.push(
-                        '<li class="load '+type+' '+myob.saveAndLoadClass+'">' +
-                        '<a href="#" data-url="'+url+'index/" data-parent-page-id="'+parentPageID+'" data-variables="'+variables+'">Find</a>'+
-                        '</li>'
-                    );
-                }
-                if(buttons.length > 0) {
-                    return buttons.join('');
-                }
             },
 
 
@@ -2056,7 +2160,10 @@ jQuery(document).ready(
                                                 }
                                                 myob.cfinc[category].push({vtm: vtm, ival: ival});
                                                 ivals.push(vtm);
+                                                myob.myTableHolder.addClass(myob.hasFavouritesInFilterClass);
                                                 if(myob.debug) {console.log("... adding '"+category+"' to '"+vtm+"'");}
+                                            } else {
+                                                myob.myTableHolder.removeClass(myob.hasFavouritesInFilterClass);
                                             }
                                             break;
                                         case 'number':
@@ -2094,35 +2201,21 @@ jQuery(document).ready(
                         }
                     //funny indenting to stay ....
                 );
-                var hasFilter = Object.keys(myob.cfinc).length > 0 ? true : false;
-                var buttons = [];
-                if(hasFilter === true) {
-                    buttons.push('<li class="clear"><a href="#">✖</a></li>');
-                } else {
-                    html = '<li class="noFilterSelected">'+myob.noFilterSelectedText+'</li>';
-                }
-                if(myob.hasFilterSaving) {
-                    buttons.push(myob.makeRetrieveButtons(hasFilter, true, 'filters'))
-                }
-
-                if(buttons.length > 0) {
-                    var buttonHTML = buttons.join('');
-                    html =  buttonHTML + html;
-                }
-                if(html.length > 0) {
-                    html = '<ul>' + html + '</ul>';
-                }
                 var targetDomElement = myob.myTableHolder.find('.'+myob.currentSearchFilterClass);
-                var title = targetDomElement.attr('data-title');
-                if(typeof title === 'undefined') {
-                    title = myob.cfincText;
+                var hasFilter = Object.keys(myob.cfinc).length > 0 ? true : false;
+                if(hasFilter === true) {
+                    html = '<ul>' + html + '</ul>';
+                    var title = targetDomElement.attr('data-title');
+                    if(typeof title === 'string' && title.length > 0) {
+                        title = '<h3>' + title + '</h3>';
+                        html = title + html;
+                    }
+                    myob.myTableHolder.addClass(myob.hasFilterClass).removeClass(myob.doesNotHaveFilterClass);
+                } else {
+                    html = targetDomElement.attr('data-no-filter-text');
+                    myob.myTableHolder.removeClass(myob.hasFilterClass).addClass(myob.doesNotHaveFilterClass);
                 }
-                if(title.length) {
-                    title = '<h3>' + title + '</h3>';
-                }
-                html = title + html;
                 targetDomElement.html(html);
-
             },
 
             //===================================================================
@@ -2190,15 +2283,19 @@ jQuery(document).ready(
                         jQuery.getJSON(
                             url,
                             function( response ) {
+                                var forceFavs = false
                                 var data = response.Data;
                                 data = JSON.parse(data);
                                 for (var property in data) {
                                     if (data.hasOwnProperty(property)) {
                                         myob[property] = data[property];
                                         myob.serverDataToApply[property] = true;
+                                        if(property === 'myfavs') {
+                                            forceFavs = true;
+                                        }
                                     }
                                 }
-                                myob.processRetrievedData();
+                                myob.processRetrievedData(forceFavs);
                                 myob.myTable.removeClass(myob.loadingClass);
                             }
                         ).fail(
@@ -2214,7 +2311,7 @@ jQuery(document).ready(
                 }
             },
 
-            processRetrievedData: function()
+            processRetrievedData: function(forceFavs)
             {
                 if(typeof myob.serverDataToApply['myfavs'] !== 'undefined' && myob.serverDataToApply['myfavs'] === true) {
                     //remove all favourites
@@ -2225,6 +2322,18 @@ jQuery(document).ready(
                             var id = myob.myfavs[fav];
                             myob.myTableBody.find('#' + id).addClass(myob.favouriteClass);
                         }
+                    }
+                    if(myob.myfavs.length > 0) {
+                        myob.myTableHolder.addClass(myob.hasFavouritesClass);
+                    } else {
+                        myob.myTableHolder.removeClass(myob.hasFavouritesClass);
+                    }
+                    if(forceFavs === true) {
+                        if(myob.myTableHolder.hasClass(myob.hasFavouritesInFilterClass)) {
+                            //doing it twice!
+                            myob.myTableHolder.find(myob.showFavouritesSelector).click();
+                        }
+                        myob.myTableHolder.find(myob.showFavouritesSelector).click();
                     }
                     delete myob.serverDataToApply['myfavs']
                 }
@@ -2243,6 +2352,7 @@ jQuery(document).ready(
                         .attr('data-sort-direction', direction)
                         .click();
                     delete myob.serverDataToApply['csort'];
+
                 }
             },
 

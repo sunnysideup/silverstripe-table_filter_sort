@@ -1,5 +1,5 @@
 <% if MyList %>
-<table class="tableFilterSortTable">
+<table class="tfs-table">
     <thead>
         <tr>
             <th scope="col">
@@ -21,7 +21,7 @@
 
 <tbody>
     <% loop MyList %>
-<tr class="tfsRow hide" id="tfs$ID">
+<tr class="tfstr hide" id="tfs$ID">
 <td>
     <a href="$URLSegment" class="load">
         <span data-filter="Title">$Title</span>

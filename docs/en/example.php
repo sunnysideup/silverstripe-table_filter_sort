@@ -166,10 +166,10 @@ function create_test()
     $limit = isset($_GET['i']) ? $_GET['i'] : 300;
     for($i = 0; $i < $limit; $i++) {
         $html .= '
-        <tr class="tfsRow hide" id="tfs'.$i.'">
+        <tr class="tfstr hide" id="tfs'.$i.'">
             <td>
                 <a href="#" class="more">+</a>
-                <a href="#" class="externalLink addFav" target="_blank" title="Add to Favourites">♥</a>
+                <a href="#" class="addFav" title="Add to Favourites">♥</a>
                 <span data-filter="SKU">'.($i+1).'</span><br />
                 <p style="display: none;" class="hidden">
                     Some more content goes here.
@@ -202,10 +202,8 @@ $html = create_test();
 
 
 
-?>
-
-<!DOCTYPE html>
-<html>
+?><!DOCTYPE html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <title>Example Filter Table</title>
@@ -221,35 +219,86 @@ $html = create_test();
             <p style="text-align: center;">
                 You can set the number of rows by adding a GET veriable <strong>i</strong> to the current URL. (e.g. ...example.php?i=500).
             </p>
+            <p>Below the table is an examle of the <a href="#html">HTML</a> you need to use.</p>
         </header>
 
-        <div class="tableFilterSortHolder">
+        <main
+            class="tfs-holder"
+            data-filters-parent-page-id="Test Filters"
+            data-favourites-parent-page-id="Test Favourites"
+        >
+            <div class="loading-screen">
+                <svg xmlns="http://www.w3.org/2000/svg" width="196px" height="196px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="uil-ripple"><rect x="0" y="0" width="100" height="100" fill="none" class="bk"/><g> <animate attributeName="opacity" dur="3s" repeatCount="indefinite" begin="0s" keyTimes="0;0.33;1" values="1;1;0"/><circle cx="50" cy="50" r="38.6472" stroke="#8f8f8f" fill="none" stroke-width="6" stroke-linecap="round"><animate attributeName="r" dur="3s" repeatCount="indefinite" begin="0s" keyTimes="0;0.33;1" values="0;22;44"/></circle></g><g><animate attributeName="opacity" dur="3s" repeatCount="indefinite" begin="1.5s" keyTimes="0;0.33;1" values="1;1;0"/><circle cx="50" cy="50" r="22.2293" stroke="#666666" fill="none" stroke-width="6" stroke-linecap="round"><animate attributeName="r" dur="3s" repeatCount="indefinite" begin="1.5s" keyTimes="0;0.33;1" values="0;22;44"/></circle></g></svg>
+            </div>
+            <div class="tfs-filter-form-holder">
+                <div class="tfs-filter-form-holder-section top left">
+                    <ul>
+                        <li class="tfs-open-filter-form tfs-action open-filter">
+                            <a href="#">Create Filter</a>
+                        </li>
+                        <li class="tfs-save-and-load load filters tfs-action">
+                            <a href="#">Load Filter</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tfs-filter-form-holder-section top right">
+                    <ul>
 
-            <div class="tableFilterSortFilterFormHolder"
-                data-title="Filter Table Below"
-                data-title-clear-button="Clear"
-                data-title-close-and-apply="Apply Your Selection"
-                data-filters-parent-page-id="test-filters"
-                data-favourites-parent-page-id="test-favs"
-            ></div>
+                        <li class="tfs-save-and-load save filters tfs-action">
+                            <a href="#">Save Filter</a>
+                        </li>
 
+                        <li class="tfs-current-search-holder" data-no-filter-text="No filter selected"></li>
+                        <li class="tfs-match-count-holder">
+                            <strong>Results:</strong>
+                            <span class="match-row-number">0</span> /
+                            <span class="total-row-number">0</span>
+                        </li>
+                    </ul>
+                </div>
 
-            <section class="tableFilterSortMoreEntries paginationTop">
+                <div class="tfs-filter-form-inner"></div>
+
+                <div class="tfs-filter-form-holder-section bottom left">
+                    <ul>
+                        <li class="tfs-clear tfs-action">
+                            <a href="#">Clear Filter</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="tfs-filter-form-holder-section bottom right">
+                    <ul>
+                        <li class="tfs-open-filter-form tfs-action">
+                            <a href="#">Close and Apply</a>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="tfs-more-entries pagination-top">
                 <span class="line">
-                    <strong>Select Page:</strong> <span class="pagination"></span>
+                    <span class="pagination"></span>
                 </span>
-            </section>
-            <section class="tableFilterSortMoreEntriesAlwaysShow">
-                <span class="line">
-                    <strong>Filtered:</strong>
-                    <span class="match-row-number">0</span> /
-                    <span class="total-row-number">0</span>.
-                </span>
-            </section>
+            </div>
 
+            <div class="tfs-common-content-holder" data-title="Common Info"></div>
 
-            <div class="tableFilterSortCommonContentHolder" data-title="Common Info"></div>
-            <table class="tableFilterSortTable">
+            <div class="tfs-current-favourites">
+                <ul>
+                    <li class="filter-for-favourites tfs-action">
+                        <a href="#">Show Favourites</a>
+                    </li>
+                    <li class="tfs-save-and-load load favourites tfs-action">
+                        <a href="#">Load Favourites</a>
+                    </li>
+                    <li class="tfs-save-and-load save favourites tfs-action">
+                        <a href="#">Save Favourites</a>
+                    </li>
+                </ul>
+            </div>
+            <table class="tfs-table">
                 <thead>
                     <tr>
                         <th scope="col">
@@ -303,29 +352,23 @@ $html = create_test();
                     <?php echo $html ?>
                 </tbody>
             </table>
-            <p class="message warning no-matches-message">No entries match your filter</p>
-            <section class="tableFilterSortMoreEntries">
-                <span class="line">
-                    <strong>Filtered:</strong>
-                    <span class="match-row-number">0</span> /
-                    <span class="total-row-number">0</span>.
-                </span>
-                <span class="line">
-                    <strong>Currently Shown:</strong> <span class="total-showing-row-number">0</span>
-                    (<span class="min-row-number">0</span>
-                    - <span class="max-row-number">0</span>).
-                </span>
-                <span class="line">
-                    <strong>Select Page:</strong> <span class="pagination"></span>
-                </span>
-            </section>
 
-        </div>
+            <p class="message warning no-matches-message">No entries match your filter</p>
+
+            <div class="tfs-more-entries pagination-bottom">
+                <span class="line">
+                    <strong>Currently Shown:</strong>
+                    <span class="total-showing-row-number">0</span>
+                    (<span class="min-row-number">0</span> - <span class="max-row-number">0</span>)
+                </span>
+            </div>
+
+        </main>
 
         <script src="https://code.jquery.com/jquery-git.min.js"></script>
         <script type="text/javascript">
             var TableFilterSortTableList = []
-            TableFilterSortTableList.push('.tableFilterSortHolder');
+            TableFilterSortTableList.push('.tfs-holder');
         </script>
         <script src="../../javascript/jsurl.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/jquery.simplemodal-1.4.5?x=<?php echo rand(0,9999999999) ?>"></script>
@@ -333,14 +376,14 @@ $html = create_test();
         <script src="../../javascript/awesomplete.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/TableFilterSort.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script>
-            var html = jQuery('.tableFilterSortHolder').first().clone();
+            var html = jQuery('.tfs-holder').first().clone();
             var firstRow = html.find('table tbody tr').get(0).outerHTML;
             html.find('table tbody').remove();
             html.find('table').append('\n\n<tbody>\n        ' + firstRow + '\n</tbody>'+'\n\n\n                ');
             html = html.html();
             html = html.split('<').join('&lt;')
             html = html.split('>').join('&gt;')
-            document.write('<h2>Template Example</h2><pre style="white-space: pre-wrap;word-wrap: break-word;">' + html + '</pre>');
+            document.write('<h2 id="html">Template Example</h2><pre style="white-space: pre-wrap; word-wrap: break-word;">&lt;main class="tfs-holder"&gt;' + html + '&lt;/main&gt;</pre>');
         </script>
 
 </html>

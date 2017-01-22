@@ -1,0 +1,65 @@
+buttons.push(myob.makeRetrieveButtons(hasFilter, true, 'filters'))
+remove inline "add to favourites"
+update save and retrieve buttons
+
+
+1. replace tableFilterSort with tfs-
+2. replace CurrentSearchHolder with current-search-holder
+3. replace CommonContentHolder with common-content-holder
+4. replace MoreEntries with more-entries
+5. replace OpenFilterForm with open-filter-form
+6. replace saveAndLoad with save-and-load
+7. replace paginationTop with pagination-top
+8. replace filterFormHolder with filter-form-holder
+9. replace tfs-Holder with tfs-holder
+10. replace tfs-Table with tfs-table
+11. replace FilterFormOptions with filter-form-options
+12. replace filterColumn with filter-column
+13. replace groupLabel with group-label
+14. replace FilterInUse with filter-in-use
+15. replace FilterNotInUse with filter-not-in-use
+16. replace filterIsOpen with filter-is-open
+17. replace groupLabel with tfs-group-label
+18. replace filterColumn with tfs-filter-column
+19. replace no-filter-selected with current-filter-no-filter
+20. replace open-filter-form with tfs-open-filter-form
+21. replace save-and-load with tfs-save-and-load
+22. replace current-filter-no-filter with tfs-current-filter-no-filter"
+23. replace current-filter with tfs-current-filter
+24. replace clear with tfs-clear
+25. replace tfsRow with tfstr
+26. span[data-filter] with em[data-f]
+
+ data-url="/tfs/start/" data-parent-page-id="test-filters" data-variables="cfinc,cforcat,cfex,csort"
+
+
+
+            /**
+             * class to show that the form is open
+             * @var string
+             */
+            filterIsOpenClass: 'filter-is-open',
+
+            /**
+             * customise the title of the filter button
+             * @var string
+             */
+            filterTitle: "Filter Table",
+
+            /**
+             *
+             * @type string
+             */
+            noFilterSelectedText: 'No filter selected',
+
+            /**
+             *
+             * @type string
+             */
+            closeAndApplyFilterText: 'Close and Apply Filter',
+
+                        /**
+                         *
+                         * @type string
+                         */
+                        cfincText: '',
