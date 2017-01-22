@@ -3,6 +3,9 @@
     <thead>
         <tr>
             <th scope="col">
+                <a href="#" class="sortable" data-sort-field="Created" data-sort-direction="asc" data-sort-type="number">Created</a>
+            </th>
+            <th scope="col">
                 <a href="#" class="sortable" data-sort-field="Title" data-sort-direction="asc" data-sort-type="string">Title</a>
             </th>
             <th scope="col">
@@ -22,6 +25,7 @@
 <tbody>
     <% loop MyList %>
 <tr class="tfstr hide" id="tfs$ID">
+<td>$Created.Ago<span data-filter="Created" class="hide">$Created.Format(U)</span></td>
 <td>
     <a href="$URLSegment" class="load">
         <span data-filter="Title">$Title</span>
@@ -32,6 +36,7 @@
 </td>
 <td>$Description</td>
 <td><% if Tags %><% loop Tags %><% if $Last && $First = false %> and <% end_if %><span data-filter="Tags" class="dl">$Title</span><% if Last %>.<% else %>, <% end_if %><% end_loop %><% else %><span data-filter="Tags">$Title</span><% end_if %></td>
+
 </tr>
     <% end_loop %>
 </tbody>
