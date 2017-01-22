@@ -332,7 +332,7 @@ $html = create_test();
                             <a href="#"
                                 class="sortable"
                                 data-sort-field="Price"
-                                data-sort-direction="asc"
+                                data-sort-direction="desc"
                                 data-sort-type="number"
                                 data-sort-default="true"
                             >Price</a>
