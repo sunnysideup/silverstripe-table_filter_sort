@@ -26,9 +26,9 @@ update save and retrieve buttons
 21. replace save-and-load with tfs-save-and-load
 22. replace current-filter-no-filter with tfs-current-filter-no-filter"
 23. replace current-filter with tfs-current-filter
-24. replace clear with tfs-clear
+24. replace .clear with .tfs-clear
 25. replace tfsRow with tfstr
-26. span[data-filter] with em[data-f]
+
 
  data-url="/tfs/start/" data-parent-page-id="test-filters" data-variables="cfinc,cforcat,cfex,csort"
 
