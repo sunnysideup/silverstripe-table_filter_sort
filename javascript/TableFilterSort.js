@@ -153,31 +153,31 @@ jQuery(document).ready(
 
             /**
              * starting point for showing rows
-             * @type Int
+             * @type {Int}
              */
             showFromRow: 0,
 
             /**
              * rows to show
-             * @type Int
+             * @type {Int}
              */
             visibleRowCount: 50,
 
             /**
              * rows to show
-             * @type Int
+             * @type {Int}
              */
             totalRowCount: 0,
 
             /**
              * maximum number of checkboxes in the filter before it becomes a text filter
-             * @type Int
+             * @type {Int}
              */
             maximumNumberOfFilterOptions: 30,
 
             /**
              * number of milliseconds to check if filter is in use ...
-             * @type Int
+             * @type {Int}
              */
             intervalForFilterCheck: 1000,
 
@@ -212,14 +212,14 @@ jQuery(document).ready(
             millisecondsBetweenActions: 10,
 
             /**
-             * @type array
+             * @type {array}
              */
             validDataTypes: ['number', 'string', 'date'], // 'date', 'boolean' to add!
 
             /**
              * when trying to establish the data-type
              * max
-             * @type int
+             * @type {int}
              */
             maxNumberOfValuesToCheck: 500,
 
@@ -251,55 +251,55 @@ jQuery(document).ready(
 
             /**
              * customise the title of the filter button
-             * @var string
+             * @type {string}
              */
             filterTitle: "Filter Table",
 
             /**
              *
-             * @type string
+             * @type {string}
              */
             noFilterSelectedText: 'No filter selected',
 
             /**
              *
-             * @type string
+             * @type {string}
              */
             closeAndApplyFilterText: 'Close and Apply Filter',
 
             /**
              *
-             * @type string
+             * @type {string}
              */
             currentFilterText: '',
 
             /**
              *
-             * @type string
+             * @type {string}
              */
             greaterThanLabel: '&gt; ',
 
             /**
              *
-             * @type string
+             * @type {string}
              */
             lowerThanLabel: '&lt; ',
 
             /**
              *
-             * @type string
+             * @type {string}
              */
             keywordsCategoryTitle: 'Keywords',
 
             /**
              *
-             * @type string
+             * @type {string}
              */
             favouritesCategoryTitle: 'Favourites',
 
             /**
              *
-             * @type string
+             * @type {string}
              */
             filtersTitle: 'Filter',
 
@@ -312,38 +312,38 @@ jQuery(document).ready(
              */
 
             /**
-            * @var string
+            * @type {string}
             */
             tableSelector: 'table.tableFilterSortTable',
 
             /**
-             * @var string
+             * @type {string}
              */
             rowSelector: 'tr.tfsRow',
 
             /**
              * items that can be filtered / sorted for ...
-             * @var string
+             * @type {string}
              */
             filterItemSelector: 'span[data-filter]',
 
             /**
-             * @var string
+             * @type {string}
              */
             showMoreDetailsSelector: '.more',
 
             /**
-            * @var string
+            * @type {string}
             */
             moreDetailsSelector: '.hidden',
 
             /**
-            * @var string
+            * @type {string}
             */
             filterFormHolderSelector: '.tableFilterSortFilterFormHolder',
 
             /**
-            * @var string
+            * @type {string}
             */
             sortLinkSelector: 'a.sortable',
 
@@ -355,49 +355,49 @@ jQuery(document).ready(
 
             /**
              * class for an element showing details of hidden rows
-             * @var string
+             * @type {string}
              */
             moreRowEntriesSelector: ".tableFilterSortMoreEntries",
 
             /**
              * class for an element that shows the number of matches
-             * @var string
+             * @type {string}
              */
             matchRowCountSelector: ".match-row-number",
 
             /**
              * class for an element that shows the start row
-             * @var string
+             * @type {string}
              */
             minRowSelector: ".min-row-number",
 
             /**
              * class for an element that shows the end row
-             * @var string
+             * @type {string}
              */
             maxRowSelector: ".max-row-number",
 
             /**
              * class for an element that shows total number of rows available
-             * @var string
+             * @type {string}
              */
             totalRowCountSelector: ".total-row-number",
 
             /**
              * class for an element that shows the number of rows visible
-             * @var string
+             * @type {string}
              */
             visibleRowCountSelector: ".total-showing-row-number",
 
             /**
              * class for an element that holds the pagination
-             * @var string
+             * @type {string}
              */
             paginationSelector: ".pagination",
 
             /**
              * class for an element that holds the pagination
-             * @var string
+             * @type {string}
              */
             saveAndLoadSelector: ".saveAndLoad",
 
@@ -411,125 +411,125 @@ jQuery(document).ready(
 
             /**
              * loading class when things are being calculated
-             * @type string
+             * @type {string}
              */
             loadingClass: 'loading',
 
             /**
              * class for rows that should show
-             * @type 'string'
+             * @type {string}
              */
             showClass: 'show',
 
             /**
              * class for rows that should NOT show
-             * @type string
+             * @type {string}
              */
             hideClass: 'hide',
 
             /**
              * class for matching rows
-             * @type string
+             * @type {string}
              */
             matchClass: 'match',
 
             /**
              * class for non-matching rows
-             * @type string
+             * @type {string}
              */
             notMatchClass: 'no-match',
 
             /**
              * class for items that are closed (more, filter form, etc..)
-             * @var string
+             * @type {string}
              */
             openedClass: 'opened',
 
             /**
              * class to show that the form is open
-             * @var string
+             * @type {string}
              */
             filterIsOpenClass: 'filterIsOpen',
 
             /**
-             * @var string
+             * @type {string}
              */
             sectionFilterClassAppendix: 'Filter',
 
             /**
              * class for element that holds common content (that is the same in ALL rows)
-             * @var string
+             * @type {string}
              */
             commonContentHolderClass: 'tableFilterSortCommonContentHolder',
 
             /**
              * element that holds the current filter info
-             * @var string
+             * @type {string}
              */
             currentSearchFilterClass: 'tableFilterSortCurrentSearchHolder',
 
             /**
              * class that is used for links that open and close the filter form
-             * @var string
+             * @type {string}
              */
             openAndCloseFilterFormClass: 'tableFilterSortOpenFilterForm',
 
             /**
              * class of element that holds the filter options ...
-             * @var string
+             * @type {string}
              */
             filterOptionsHolderClass: 'tableFilterSortFilterFormOptions',
 
             /**
              * class for element that holds one filter group (e.g. Weight)
-             * @var string
+             * @type {string}
              */
             filterGroupClass: 'filterColumn',
 
             /**
-             * @var string
+             * @type {string}
              */
             groupLabelClass: 'groupLabel',
 
             /**
              * class of element that holds the close and apply filter button
-             * @var string
+             * @type {string}
              */
             applyFilterClass: 'applyFilter',
 
             /**
              * class to show that filter form CAN be used
-             * @var string
+             * @type {string}
              */
             filterInUseClass: 'tableFilterSortFilterInUse',
 
             /**
              * class to show that filter form CAN NOT be used
-             * @var string
+             * @type {string}
              */
             filterNotInUseClass: 'tableFilterSortFilterNotInUse',
 
             /**
              * class of element that shows the no match message
-             * @var string
+             * @type {string}
              */
             noMatchMessageClass: 'no-matches-message',
 
             /**
              * class to show that something is currently sorted in ascending order.
-             * @var string
+             * @type {string}
              */
             sortAscClass: 'sort-asc',
 
             /**
              * class to show that something is currently sorted in descending order.
-             * @var string
+             * @type {string}
              */
             sortDescClass: 'sort-desc',
 
             /**
              *
-             * @var string
+             * @type {string}
              */
             directLinkClass: 'dl',
 
@@ -1986,7 +1986,11 @@ jQuery(document).ready(
             retrieveDataFromServer: function()
             {
                 var qd = {};
-                if(typeof location.search !== 'undefined' && location.search && location.search.length > 0) {
+                if(
+                    typeof location.search !== 'undefined' &&
+                    location.search &&
+                    location.search.length > 0
+                ) {
                     location.search.substr(1).split("&").forEach(
                         function(item) {
                             var s = item.split("="),
