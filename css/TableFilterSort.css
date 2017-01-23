@@ -112,5 +112,5 @@ tr.hide, tr.no-match {
 
 .fixed-header.tfs-filter-in-use table thead {
     z-index: 9;
-    display: table;
+    display: table-header-group;
 }

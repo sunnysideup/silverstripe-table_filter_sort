@@ -26,7 +26,7 @@ class TableFilterSortAPI extends Object
      * @param  boolean $includeInPage     if you like to include jQuery then add link here...
      */
     public static function include_requirements(
-        $tableSelector = '.tableFilterSortHolder',
+        $tableSelector = '.tfs-holder',
         $blockArray = array(),
         $jqueryLocation = '',
         $includeInPage = true
@@ -53,7 +53,7 @@ class TableFilterSortAPI extends Object
             $js = array_diff($js, $blockArray);
             $css = array_diff($css, $blockArray);
         }
-        if(Director::isDev() && 1 == 2) {
+        if(Director::isDev()) {
             foreach($css as $link) {
                 Requirements::themedCSS($link, 'table_filter_sort');
             }
@@ -81,7 +81,7 @@ class TableFilterSortAPI extends Object
                     }
                 }
                 if( ! $hasBeenIncluded) {
-                    Requirements::themedCSS($link);
+                    Requirements::themedCSS($link, 'table_filter_sort');
                 }
             }
             Requirements::customCSS($allCss, 'table_filter_sort_css');

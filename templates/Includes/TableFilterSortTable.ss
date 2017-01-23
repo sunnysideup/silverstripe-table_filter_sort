@@ -47,3 +47,4 @@
 <% else %>
     <p class="no-matches-message">Sorry, no data is currently available.</p>
 <% end_if %>
+<p class="message warning no-matches-message">No entries match your filter</p>

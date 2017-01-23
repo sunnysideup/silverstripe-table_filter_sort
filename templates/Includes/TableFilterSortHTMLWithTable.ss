@@ -27,8 +27,5 @@
 
 <% end_if %>
     </div>
-    <script>
-var TableFilterSortTableList = ['.tfs-holder'];
-    </script>
 </body>
 </html>

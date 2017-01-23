@@ -50,7 +50,6 @@ ul li {
     text-decoration: none;
 }
 
-
 a:active {
     color: crimson;
     background-color: pink;
@@ -79,8 +78,17 @@ a:active {
     padding: 10px;
     overflow: hidden;
 }
-.tfs-current-favourites {text-align: right;direction:rtl;}
-.tfs-current-favourites li {display: block; padding-left: 20px; float: right; }
+
+.tfs-current-favourites {
+    text-align: right;
+    direction: rtl;
+}
+
+.tfs-current-favourites li {
+    display: block;
+    padding-left: 20px;
+    float: right;
+}
 
 /*
  * **********************************************
@@ -93,6 +101,7 @@ a:active {
     padding: 10px;
     color: #fff;
 }
+
 .tfs-common-content-holder h3 {
     padding: 0;
     margin: 0;
@@ -139,24 +148,37 @@ a:active {
 .tfs-open-filter-form a {
     background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%233498db" height="24" viewBox="0 0 24 24" width="24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
 }
+
 .filter-for-favourites a {
     background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%233498db" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>');
 }
+
 .tfs-has-favourites-in-filter .filter-for-favourites a {
     background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%233498db" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');
 }
-.tfs-action a{
+
+.tfs-action {
+    padding-top: 0!important;
+    padding-bottom: 0!important;
+    margin-top: 0!important;
+    margin-bottom: 0!important;
+    height: 24px!important;
+    width: 24px!important;
+    line-height: 1!important;
+}
+.tfs-action a {
     background-repeat: no-repeat;
     background-position: top left;
     display: inline-block;
     height: 24px;
     width: 24px;
     color: transparent!important;
-    text-indent: -999px;
     outline: 0;
 }
 
-.tfs-action a:hover {background-position: 0 -1px;}
+.tfs-action a:hover {
+    background-position: 0 -1px;
+}
 
 /*
  * **********************************************
@@ -169,33 +191,61 @@ a:active {
 }
 
 /* corners */
-.tfs-filter-form-holder-section {padding: 10px;}
-.tfs-filter-form-holder-section.left {float: left;}
-.tfs-filter-form-holder-section.right {float: text; }
-.tfs-filter-form-holder-section.bottom {display: none;}
-.tfs-filter-form-holder-section.bottom {display: none;}
+.tfs-filter-form-holder-section {
+    padding: 10px;
+}
+
+.tfs-filter-form-holder-section.left {
+    float: left;
+}
+
+.tfs-filter-form-holder-section.right {
+    float: right;
+}
+
+.tfs-filter-form-holder-section.bottom {
+    display: none;
+}
+
+.tfs-filter-form-holder-section.bottom {
+    display: none;
+}
 /* list items */
-.tfs-filter-form-holder-section li {display: inline-block;}
-.tfs-filter-form-holder-section.right li{display: list-item; text-align: right}
+.tfs-filter-form-holder-section li {
+    display: inline-block;
+}
+
+.tfs-filter-form-holder-section.right li {
+    display: list-item;
+    text-align: right;
+    float: right;
+    clear: right;
+}
 
 /* hide save unless filter is open */
- li.tfs-save-and-load.save.filters {display: none;}
-.filter-is-open.tfs-has-filter li.tfs-save-and-load.save.filters {display: list-item;}
+li.tfs-save-and-load.save.filters {
+    display: none;
+}
+
+.filter-is-open.tfs-has-filter li.tfs-save-and-load.save.filters {
+    display: list-item;
+}
+
 .filter-is-open .tfs-filter-form-holder-section.bottom,
 .filter-is-open.tfs-has-filter .tfs-filter-form-holder-section.bottom.left .tfs-clear,
-.tfs-has-favourites .tfs-current-favourites{
-     display: block;
- }
+.tfs-has-favourites .tfs-current-favourites {
+    display: block;
+}
 /* show load unless filter is open */
 .filter-is-open .tfs-filter-form-holder-section.top li.tfs-save-and-load.load.filters,
 .filter-is-open .tfs-filter-form-holder-section.top.right li.tfs-current-search-holder,
 .tfs-filter-form-holder-section.bottom.left .tfs-clear,
-.tfs-current-favourites{
+.tfs-current-favourites {
     display: none;
 }
 
 
-.tfs-filter-form-inner {clear: both;}
+
 
 
 /*
@@ -220,18 +270,15 @@ input[type="checkbox"] {
  */
 
 
-.tfs-filter-form-inner {
-    padding: 10px;
-    overflow: hidden;
-}
 
-.tfs-filter-form-inner .tfs-filter-form-options {
+.tfs-filter-form-inner {
+    padding: 0 10px;
+    overflow: hidden;
     clear: both;
-    padding-top: 10px;
 }
 
 .tfs-filter-form-inner .tfs-filter-column {
-    margin: 20px 20px 20px 0;
+    margin: 10px 10px 10px 0;
     border-left: 1px solid #ccc;
     border-top: 1px solid #ccc;
     padding: 10px 0 0 10px;
@@ -599,8 +646,14 @@ span.dl-on {
     width: 90%;
     height: 2em;
 }
-#tfs-modal-pop-up .save, #tfs-modal-pop-up .load, #tfs-modal-pop-up .tfs-current-favourites {display: none!important;}
- #tfs-modal-pop-up td .load {display: block!important;}
+
+#tfs-modal-pop-up .save, #tfs-modal-pop-up .load, #tfs-modal-pop-up .tfs-current-favourites {
+    display: none!important;
+}
+
+#tfs-modal-pop-up td .load {
+    display: block!important;
+}
 
 @media screen and (min-width: 550px) {
     #tfs-modal-pop-up .field {
@@ -618,7 +671,7 @@ span.dl-on {
 
 @media screen and (min-width: 550px) and (max-width: 949px) {
     .tfs-filter-form-holder .tfs-filter-column {
-        width: calc(33% - 30px);
+        width: calc(33% - 20px);
         float: left;
     }
 
@@ -633,7 +686,7 @@ span.dl-on {
 
 @media screen and (min-width: 950px) {
     .tfs-filter-form-holder .tfs-filter-column {
-        width: calc(20% - 30px);
+        width: calc(20% - 20px);
         float: left;
     }
 
