@@ -716,6 +716,7 @@ span.dl-on {
 
 .loading p {
     text-align: center;
+    color: #555;
 }
 
 .load-bar {

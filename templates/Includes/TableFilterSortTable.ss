@@ -3,7 +3,7 @@
     <thead>
         <tr>
             <th scope="col">
-                <a href="#" class="sortable" data-sort-field="Created" data-sort-direction="asc" data-sort-type="number" data-sort-only="true">Created</a>
+                <a href="#" class="sortable" data-sort-field="Created" data-sort-direction="desc" data-sort-type="number" data-sort-only="true">Created</a>
             </th>
             <th scope="col">
                 <a href="#" class="sortable" data-sort-field="Title" data-sort-direction="asc" data-sort-type="string">Title</a>
