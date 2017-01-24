@@ -1768,7 +1768,7 @@ jQuery(document).ready(
                                                 var keywords = vtm.split(' ');
                                                 var matches = true;
                                                 for(var i = 0; i < keywords.length; i++) {
-                                                    var keyword = keywords[i].trim();
+                                                    var keyword = keywords[i].trim().toLowerCase();
                                                     if(rowText.indexOf(keyword) === -1) {
                                                         matches = false;
                                                         break;
