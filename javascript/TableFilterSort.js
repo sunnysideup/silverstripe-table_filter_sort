@@ -2290,8 +2290,8 @@ jQuery(document).ready(
              */
             retrieveDataFromGetVar: function()
             {
+                console.debug('retrieveDataFromGetVar');
                 var qd = {};
-                var hasServerConnection = false;
                 if(typeof location.search !== 'undefined' && location.search && location.search.length > 0) {
                     location.search.substr(1).split("&").forEach(
                         function(item) {
@@ -2303,9 +2303,12 @@ jQuery(document).ready(
                         }
                     );
                 }
+                console.debug(qd)
                 if(typeof qd.load !== 'undefined') {
-                    if(typeof qd.load === 'string' && qd.load.length > 0) {
-                        myob.urlToLoad = ql.load;
+                    if(typeof qd.load[0] !== 'undefined') {
+                        if(typeof qd.load[0] === 'string' && qd.load.length > 0) {
+                            myob.urlToLoad = qd.load;
+                        }
                     }
                 }
             },
@@ -2313,6 +2316,7 @@ jQuery(document).ready(
             processRetrievedData: function(forceFavs)
             {
                 if(myob.urlToLoad !== '') {
+                    console.debug('processRetrievedData');
                     var url = myob.serverConnectionURL + 'load/' + myob.urlToLoad + '/';
                     myob.urlToLoad = '';
                     jQuery.getJSON(
