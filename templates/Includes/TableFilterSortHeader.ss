@@ -1,5 +1,5 @@
 <div class="loading-screen">
-    <h3 class="loader">please be patient while we are loadig content ...</h3>
+    <p class="loader">loading...</p>
     <div class="load-bar">
         <div class="bar"></div>
         <div class="bar"></div>

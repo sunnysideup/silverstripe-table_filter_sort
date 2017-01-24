@@ -714,7 +714,9 @@ span.dl-on {
 }
 
 
-
+.loading p {
+    text-align: center;
+}
 
 .load-bar {
   position: relative;
