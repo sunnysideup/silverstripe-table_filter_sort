@@ -1,9 +1,15 @@
 <% if MyList %>
-<table class="tableFilterSortTable">
+<table class="tfs-table">
     <thead>
         <tr>
             <th scope="col">
+                <a href="#" class="sortable" data-sort-field="Created" data-sort-direction="asc" data-sort-type="number" data-sort-only="true">Created</a>
+            </th>
+            <th scope="col">
                 <a href="#" class="sortable" data-sort-field="Title" data-sort-direction="asc" data-sort-type="string">Title</a>
+            </th>
+            <th scope="col">
+                Author
             </th>
             <th scope="col">
                 Description
@@ -18,14 +24,19 @@
 
 <tbody>
     <% loop MyList %>
-<tr class="tfsRow hide" id="tfs$ID">
+<tr class="tfstr hide" id="tfs$ID">
+<td>$Created.Ago<span data-filter="Created" style="display: none;">$Created.Format(U)</span></td>
 <td>
     <a href="$URLSegment" class="load">
         <span data-filter="Title">$Title</span>
     </a>
 </td>
+<td>
+    <span data-filter="Author" class="dl">$Author</span>
+</td>
 <td>$Description</td>
-<td><% loop Tags %><span data-filter="Tags">$Title</span><% end_loop %></td>
+<td><% if Tags %><% loop Tags %><% if $Last && $First = false %> and <% end_if %><span data-filter="Tags" class="dl">$Title</span><% if Last %>.<% else %>, <% end_if %><% end_loop %><% else %><span data-filter="Tags">$Title</span><% end_if %></td>
+
 </tr>
     <% end_loop %>
 </tbody>
@@ -34,5 +45,6 @@
 </table>
 
 <% else %>
-    <p>Sorry, no data is currently available.</p>
+    <p class="no-matches-message">Sorry, no data is currently available.</p>
 <% end_if %>
+<p class="message warning no-matches-message">No entries match your filter</p>

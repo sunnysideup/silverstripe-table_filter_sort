@@ -1,4 +1,8 @@
-/* sort */
+
+.hidden {display: none;}
+/***********************************************
+ *sort
+ */
 .sort-asc:after {
     content: " △";
 }
@@ -7,52 +11,92 @@
     content: " ▽";
 }
 
-/* no matches */
+
+
+/***********************************************
+ * no matches
+ */
 .no-matches-message {
     display: none;
 }
 
-/* direct links */
+
+
+/***********************************************
+ * direct links
+ */
 span.dl {
     cursor: pointer;
 }
 
-/* table */
+
+
+/***********************************************
+ * table
+ */
 table {
     table-layout: fixed;
 }
-/* table word-wrap */
+
 td, th {
     word-wrap: break-word;
 }
 
-
-/* hidden data */
-tr.hide, tr.no-match {
+table, thead, tbody {
+    border-collapse: collapse;
+}
+/***********************************************
+ * hidden data
+ */
+tr.hide, tr.no-match, table.hide {
     display: none!important;
 }
 
-/* loading we give it plenty of height ... */
+
+
+/***********************************************
+ * loading
+ */
 .loading {
-    height: 5000px!important;
+    position: relative;
 }
 
-.loading * {
+.loading-screen {
     display: none;
 }
 
-.opened {
-    visibility: visible;
+.loading .loading-screen {
+    display: block;
+    position: absolute;
+    background-color: #fff;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 99999;
 }
 
-/* fixed header */
-.fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder,
-.fixed-header.tableFilterSortFilterInUse table thead {
+
+
+
+
+/***********************************************
+ * fixed header
+ */
+.fixed-header.tfs-filter-in-use .tfs-filter-form-holder,
+.fixed-header.tfs-filter-in-use table thead {
     position: fixed;
     top: 0;
 }
 
-.fixed-header.tableFilterSortFilterInUse #tfspushdowndiv {
+.fixed-header.tfs-filter-in-use.filter-is-open .tfs-filter-form-holder {
+    position: relative;
+}
+
+.tfspushdowndiv {
+    display: none;
+}
+.fixed-header .tfspushdowndiv {
     display: block;
     padding: 0;
     margin: 0;
@@ -60,11 +104,11 @@ tr.hide, tr.no-match {
     border: none;
 }
 
-.fixed-header.tableFilterSortFilterInUse .tableFilterSortFilterFormHolder {
+.fixed-header.tfs-filter-in-use .tfs-filter-form-holder {
     z-index: 10;
 }
 
-.fixed-header.tableFilterSortFilterInUse table thead {
+.fixed-header.tfs-filter-in-use table thead {
     z-index: 9;
-    display: table;
+    display: table-header-group;
 }

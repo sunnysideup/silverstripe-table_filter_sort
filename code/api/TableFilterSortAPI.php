@@ -4,6 +4,7 @@
 class TableFilterSortAPI extends Object
 {
     private static $js = array(
+        'table_filter_sort/javascript/jsurl.js',
         'table_filter_sort/javascript/js.cookies.js',
         'table_filter_sort/javascript/jquery.simplemodal-1.4.5.js',
         'table_filter_sort/javascript/awesomplete.js',
@@ -25,7 +26,7 @@ class TableFilterSortAPI extends Object
      * @param  boolean $includeInPage     if you like to include jQuery then add link here...
      */
     public static function include_requirements(
-        $tableSelector = '.tableFilterSortHolder',
+        $tableSelector = '.tfs-holder',
         $blockArray = array(),
         $jqueryLocation = '',
         $includeInPage = true
@@ -80,7 +81,7 @@ class TableFilterSortAPI extends Object
                     }
                 }
                 if( ! $hasBeenIncluded) {
-                    Requirements::themedCSS($link);
+                    Requirements::themedCSS($link, 'table_filter_sort');
                 }
             }
             Requirements::customCSS($allCss, 'table_filter_sort_css');

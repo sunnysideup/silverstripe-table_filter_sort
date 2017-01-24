@@ -1,30 +1,76 @@
-<div class="tableFilterSortFilterFormHolder" data-title="Filter Table Below" data-title-clear-button="Clear" data-title-close-and-apply="Apply Your Selection"></div>
-<p class="tableFilterSortMoreEntries paginationTop">
-    <span class="line">
-        <strong>Select Page:</strong> <span class="pagination"></span>
-    </span>
-</p>
-<p class="tableFilterSortMoreEntriesAlwaysShow">
-    <span class="line">
-        <span class="match-row-number">0</span> /
-        <span class="total-row-number">0</span>.
-    </span>
-</p>
+<div class="loading-screen">
+    <h3 class="loader">please be patient while we are loadig content ...</h3>
+    <div class="load-bar">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+    </div>
+</div>
+<div class="tfs-filter-form-holder">
+    <div class="tfs-filter-form-holder-section top left">
+        <ul>
+            <li class="tfs-open-filter-form tfs-action open-filter">
+                <a href="#">Create Filter</a>
+            </li>
+            <li class="tfs-save-and-load load filters tfs-action">
+                <a href="#">Load Filter</a>
+            </li>
+        </ul>
+    </div>
+    <div class="tfs-filter-form-holder-section top right">
+        <ul>
 
-<div class="tableFilterSortCommonContentHolder" data-title="Common Info"></div>
+            <li class="tfs-save-and-load save filters tfs-action">
+                <a href="#">Save Filter</a>
+            </li>
 
-<p class="tableFilterSortMoreEntries">
+            <li class="tfs-current-search-holder" data-no-filter-text="No filter selected"></li>
+            <li class="tfs-match-count-holder">
+                <strong>Results:</strong>
+                <span class="match-row-number">0</span> /
+                <span class="total-row-number">0</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="tfs-filter-form-inner"></div>
+
+    <div class="tfs-filter-form-holder-section bottom left">
+        <ul>
+            <li class="tfs-clear tfs-action">
+                <a href="#">Clear Filter</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="tfs-filter-form-holder-section bottom right">
+        <ul>
+            <li class="tfs-open-filter-form tfs-action">
+                <a href="#">Close and Apply</a>
+            </li>
+        </ul>
+    </div>
+
+</div>
+
+<div class="tfs-more-entries pagination-top">
     <span class="line">
-        <strong>Filtered:</strong>
-        <span class="match-row-number">0</span> /
-        <span class="total-row-number">0</span>.
+        <span class="pagination"></span>
     </span>
-    <span class="line">
-        <strong>Currently Shown:</strong> <span class="total-showing-row-number">0</span>
-        (<span class="min-row-number">0</span>
-        - <span class="max-row-number">0</span>).
-    </span>
-    <span class="line">
-        <strong>Select Page:</strong> <span class="pagination"></span>
-    </span>
-</p>
+</div>
+
+<div class="tfs-common-content-holder" data-title="Common Info"></div>
+
+<div class="tfs-current-favourites">
+    <ul>
+        <li class="tfs-show-favourites filter-for-favourites tfs-action">
+            <a href="#">Show Favourites</a>
+        </li>
+        <li class="tfs-save-and-load load favourites tfs-action">
+            <a href="#">Load Favourites</a>
+        </li>
+        <li class="tfs-save-and-load save favourites tfs-action">
+            <a href="#">Save Favourites</a>
+        </li>
+    </ul>
+</div>

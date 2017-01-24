@@ -1,14 +1,13 @@
-<p class="tableFilterSortMoreEntries">
+<div class="tfs-more-entries">
     <span class="line">
-        <span class="match-row-number">0</span> /
-        <span class="total-row-number">0</span>.
+        <strong>Currently Shown:</strong>
+        <span class="total-showing-row-number">0</span>
+        (<span class="min-row-number">0</span> - <span class="max-row-number">0</span>)
     </span>
+</div>
+
+<div class="tfs-more-entries pagination-bottom">
     <span class="line">
-        <strong>Currently Shown:</strong> <span class="total-showing-row-number">0</span>
-        (<span class="min-row-number">0</span>
-        - <span class="max-row-number">0</span>).
+        <span class="pagination"></span>
     </span>
-    <span class="line">
-        <strong>Select Page:</strong> <span class="pagination"></span>
-    </span>
-</p>
+</div>

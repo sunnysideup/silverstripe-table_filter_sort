@@ -7,6 +7,8 @@
 </head>
 
 <body id="tfs-modal-pop-up">
+<h1>$Title</h1>
+<div id="wrapper">
 <% if $AddForm %>
 
     $AddForm
@@ -14,14 +16,16 @@
 <% else_if $ShareLink  %>
 
 <% else %>
-    <div class="tableFilterSortHolder">
+    <main class="tfs-holder loading">
+
     <% include TableFilterSortHeader %>
 
     <% include TableFilterSortTable %>
 
     <% include TableFilterSortFooter %>
-    </div>
-<% end_if %>
+    </main>
 
+<% end_if %>
+    </div>
 </body>
 </html>

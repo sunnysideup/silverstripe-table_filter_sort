@@ -85,7 +85,11 @@ class TableFilterSortServerSaver_Controller extends Controller
 
     function Title()
     {
-        return $this->request->param('Action');
+        if($this->myTitle) {
+            return $this->myTitle;
+        } else {
+            return $this->request->param('Action');
+        }
     }
 
     function index($request)
@@ -104,6 +108,8 @@ class TableFilterSortServerSaver_Controller extends Controller
 
     function find($request)
     {
+        $this->myTitle = 'Find ' . $this->parentPageID . ' ... ';
+
         return $this->renderWith($this->class);
     }
 
@@ -118,7 +124,8 @@ class TableFilterSortServerSaver_Controller extends Controller
 
     function save($request)
     {
-        if(session::get('TableFilterSortPostData')) {
+        if($this->dataToSave()) {
+            $this->myTitle = 'Save ' . $this->parentPageID . ' ... ';
             return $this->renderWith($this->class);
         }
         return 'NO DATA TO BE SAVED ...';
@@ -133,6 +140,7 @@ class TableFilterSortServerSaver_Controller extends Controller
                 $obj = TableFilterSortServerSaver::find_or_create($title, $this->parentPageID);
                 $obj->Data = json_encode($dataToSave);
                 $obj->Description = Convert::raw2sql($data["Description"]);
+                $obj->Author = Convert::raw2sql($data["Author"]);
                 $obj->write();
                 $tags = array();
                 foreach($data['TagsTempField'] as $tag) {
@@ -193,6 +201,9 @@ class TableFilterSortServerSaver_Controller extends Controller
                 TextField::create('Title', $fieldLabels['Title'])
                     ->setMaxLength(50)
                     ->setAttribute('placeholder',  $fieldLabels['Title']),
+                TextField::create('Author', $fieldLabels['Author'])
+                    ->setMaxLength(50)
+                    ->setAttribute('placeholder',  $fieldLabels['Author']),
                 TextareaField::create('Description', $fieldLabels['Description'])
                     ->setAttribute('placeholder',  $fieldLabels['Description'])
             );
@@ -207,7 +218,7 @@ class TableFilterSortServerSaver_Controller extends Controller
             $actionList = FieldList::create(
                 FormAction::create('dosave', $actionTitle)
             );
-            $requireFields = RequiredFields::create(array('Title', 'Description'));
+            $requireFields = RequiredFields::create(array('Title'));
             return Form::create($this, 'AddForm', $fieldList, $actionList, $requireFields);
         }
     }
