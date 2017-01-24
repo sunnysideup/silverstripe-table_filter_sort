@@ -846,12 +846,9 @@ jQuery(document).ready(
                     myob.myTableHead.find('tr:first th:visible').each(
                         function(colNumber, cell) {
                             var cell = jQuery(cell);
-                            var myWidth = cell.width();
-                            var myWidthPX = myWidth + 'px'
                             var myOuterWidth = cell.outerWidth();
                             var myOuterWidthPX = myOuterWidth + "px";
                             html += '<col width="'+myOuterWidth+'" style="width: '+myOuterWidthPX+'; " clas="col'+(colNumber+1)+'" />';
-                            cell.css('width', myWidthPX);
                         }
                     );
                     html +=  '</colgroup>';
@@ -1172,7 +1169,6 @@ jQuery(document).ready(
                         var myEl = jQuery(this);
                         myob.csr.sdi = myEl.attr("data-sort-direction");
                         myob.csr.sct = myEl.attr("data-sort-field");
-                        myob.myTable.addClass(myob.hideClass);
                         myob.runCurrentSort();
                     }
                 );
@@ -1369,7 +1365,6 @@ jQuery(document).ready(
                     '.' + myob.saveAndLoadClass + ' a',
                     function(event){
                         event.preventDefault();
-                        myob.myTableBody.hide();
                         var myEl = jQuery(this);
                         var myParent = myEl.closest('.' + myob.saveAndLoadClass);
                         //get connection type details
@@ -1422,7 +1417,6 @@ jQuery(document).ready(
                                             jQuery.modal.close();
                                             myob.retrieveDataFromGetVar();
                                             myob.processRetrievedData();
-                                            myob.myTableBody.hide();
                                         }
                                     }
                                 );
@@ -1431,7 +1425,6 @@ jQuery(document).ready(
                         ).fail(
                             function() {
                                 alert('ERROR!');
-                                myob.myTable.removeClass(myob.hideClass);
                             }
                         );
                         return false;
@@ -1960,8 +1953,7 @@ jQuery(document).ready(
                 myob.myTable.addClass(myob.hideClass);
 
                 myob.myTableHolder.find(myob.moreRowEntriesSelector).hide();
-                //hide the table
-                myob.myTable.addClass(myob.hideClass);
+
                 //hide all the rows
                 myob.myRows.each(
                     function(i, el) {
@@ -2321,7 +2313,6 @@ jQuery(document).ready(
             processRetrievedData: function(forceFavs)
             {
                 if(myob.urlToLoad !== '') {
-                    myob.myTableBody.hide();
                     var url = myob.serverConnectionURL + 'load/' + myob.urlToLoad + '/';
                     myob.urlToLoad = '';
                     jQuery.getJSON(
@@ -2340,12 +2331,10 @@ jQuery(document).ready(
                                 }
                             }
                             myob.processRetrievedData(forceFavs);
-                            myob.myTable.removeClass(myob.hideClass);
                         }
                     ).fail(
                         function(){
                             myob.processRetrievedData(false);
-                            myob.myTable.removeClass(myob.hideClass);
                         }
                     );
                 } else {

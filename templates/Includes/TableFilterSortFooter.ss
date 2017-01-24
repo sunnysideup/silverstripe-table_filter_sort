@@ -1,3 +1,5 @@
+<p class="message warning no-matches-message">No entries match your filter</p>
+
 <div class="tfs-more-entries">
     <span class="line">
         <strong>Currently Shown:</strong>
