@@ -760,9 +760,6 @@ jQuery(document).ready(
                             if(myob.debug) { console.profileEnd();}
                             window.setTimeout(
                                 function() {
-                                    //set table width
-                                    if(myob.debug) { console.profileEnd();console.profile('setTableWidth');}
-                                    myob.setTableWidth();
                                     //now we can hide table ...
 
                                     //MASSAGE DATA AND FIND SORT
@@ -813,6 +810,12 @@ jQuery(document).ready(
 
                                     //we are now ready!
                                     myob.myTableHolder.removeClass(myob.loadingClass);
+
+                                    //set table width
+                                    if(myob.debug) {console.profile('setTableWidth');}
+                                    myob.setTableWidth();
+                                    if(myob.debug) {console.profileEnd();}
+
                                     myob.canPushState = true;
                                 },
                                 myob.millisecondsBetweenActions
@@ -838,12 +841,12 @@ jQuery(document).ready(
                 if(myob.fixedHeaderClass) {
                     //just in case ...
                     myob.myTable.css('table-layout', 'fixed');
+                    myob.myTableHead.width(myob.myTable.width());
                     var html = '<colgroup>';
                     myob.myTableHead.find('tr:first th:visible').each(
                         function(colNumber, cell) {
                             var cell = jQuery(cell);
                             var myWidth = cell.width();
-                            myWidth += 1;
                             var myWidthPX = myWidth + 'px'
                             var myOuterWidth = cell.outerWidth();
                             var myOuterWidthPX = myOuterWidth + "px";
@@ -853,7 +856,14 @@ jQuery(document).ready(
                     );
                     html +=  '</colgroup>';
                     myob.myTable.prepend(html);
-                    myob.myTableHead.width(myob.myTable.width());
+                    myob.myTableHead.find('tr:first th:visible').each(
+                        function(colNumber, cell) {
+                            var cell = jQuery(cell);
+                            var myWidth = cell.width();
+                            var myWidthPX = myWidth + 'px'
+                            cell.css('width', myWidthPX);
+                        }
+                    );
                     //add push down div ...
                     myob.myTableHolder
                         .find('.tfspushdowndiv')
