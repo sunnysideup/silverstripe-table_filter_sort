@@ -228,7 +228,7 @@ $html = create_test();
             data-favourites-parent-page-id="Test Favourites"
         >
             <div class="loading-screen">
-                <h3 class="loader">please be patient while we are loadig content ...</h3>
+                <p class="loader">loading ...</p>
                 <div class="load-bar">
                     <div class="bar"></div>
                     <div class="bar"></div>
@@ -243,6 +243,9 @@ $html = create_test();
                         </li>
                         <li class="tfs-save-and-load load filters tfs-action">
                             <a href="#">Load Filter</a>
+                        </li>
+                        <li class="quick-keyword tfs-action">
+                            <input name="QuickKeyword" placeholder="Quick Search ..." />
                         </li>
                     </ul>
                 </div>
@@ -362,8 +365,16 @@ $html = create_test();
 
             <div class="tfs-more-entries pagination-bottom">
                 <span class="line">
+                    <span class="pagination"></span>
+                </span>
+            </div>
+
+            <div class="tfs-more-entries-always-show">
+                <span class="line">
                     <strong>Currently Shown:</strong>
-                    <span class="total-showing-row-number">0</span>
+                    <span class="total-showing-row-number">
+                        <input type="number" min="1" max="10000" step="50" name="VisibleRowCount" class="visible-row-count" />
+                    </span>
                     (<span class="min-row-number">0</span> - <span class="max-row-number">0</span>)
                 </span>
             </div>

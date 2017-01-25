@@ -218,7 +218,7 @@ jQuery(document).ready(
              * rows to show
              * @type {integer}
              */
-            visibleRowCount: 50,
+            visibleRowCount: 10,
 
             /**
              * rows to show
@@ -386,9 +386,10 @@ jQuery(document).ready(
 
             /**
              * class for an element that shows the number of rows visible
+             * this should be an input field
              * @type {string}
              */
-            visibleRowCountSelector: ".total-showing-row-number",
+            visibleRowCountSelector: ".total-showing-row-number input",
 
             /**
              * class for an element that holds the pagination
@@ -684,6 +685,12 @@ jQuery(document).ready(
              * @type {string}
              */
             groupLabelClass: 'tfs-group-label',
+
+            /**
+             * selector for a quick keyword search input
+             * @type {string}
+             */
+            quickKeywordFilterSelector: 'input[name="QuickKeyword"]',
 
             /**
              *
@@ -1153,6 +1160,17 @@ jQuery(document).ready(
                     }
                 );
 
+                myob.myFilterFormHolder.on(
+                    'input paste change',
+                    myob.quickKeywordFilterSelector,
+                    function(e) {
+                        var val = jQuery(this).val();
+                        myob.myFilterFormInner.find('input[name="Keywords"]')
+                            .val(val)
+                            .change();
+                    }
+                )
+
             },
 
 
@@ -1185,6 +1203,32 @@ jQuery(document).ready(
                         var pageNumber = jQuery(this).attr('data-page');
                         myob.gotoPage(pageNumber);
                         return false;
+                    }
+                );
+                myob.myTableHolder.on(
+                    'input paste change',
+                    myob.visibleRowCountSelector,
+                    function () {
+                        if(typeof t !== "undefined"){
+                            window.clearTimeout(t);
+                        }
+                        var t = window.setTimeout(
+                            function() {
+                                var input = myob.myTableHolder.find(myob.visibleRowCountSelector);
+                                var val = input.val();
+                                val = myob.visibleRowCountValidator(val)
+                                if(val !== false) {
+                                    if(myob.visibleRowCount !== val) {
+                                        myob.visibleRowCount = val;
+                                        if(typeof Cookies !== 'undefined') {
+                                            Cookies.set('visibleRowCount', myob.visibleRowCount, {path: myob.baseURL, expires: 180});
+                                        }
+                                        myob.gotoPage(0, true);
+                                    }
+                                }
+                            },
+                            1500
+                        );
                     }
                 );
             },
@@ -1858,11 +1902,11 @@ jQuery(document).ready(
              * switch to a different page
              * @param  {int} page [description]
              */
-            gotoPage: function(page)
+            gotoPage: function(page, force)
             {
                 var newSFR = page * myob.visibleRowCount;
                 myob.pge = page;
-                if(newSFR !== myob.sfr) {
+                if(newSFR !== myob.sfr || force) {
                     myob.sfr = newSFR;
                     myob.startRowManipulation();
                     myob.endRowManipulation();
@@ -2054,7 +2098,7 @@ jQuery(document).ready(
                 myob.myTableHolder.find(myob.maxRowSelector).text(maxRow);
                 myob.myTableHolder.find(myob.matchRowCountSelector).text(matchCount);
                 myob.myTableHolder.find(myob.totalRowCountSelector).text(totalRowCount);
-                myob.myTableHolder.find(myob.visibleRowCountSelector).text(actualVisibleRowCount);
+                myob.myTableHolder.find(myob.visibleRowCountSelector).val(actualVisibleRowCount);
                 myob.myTableHolder.find(myob.paginationSelector).html(pageHTML);
                 myob.myTable.show();
 
@@ -2255,6 +2299,11 @@ jQuery(document).ready(
                     } else {
                         myob.serverDataToApply['mfv'] = true;
                     }
+                    var v = Cookies.getJSON('visibleRowCount');
+                    visibleRowCount = myob.visibleRowCountValidator(v);
+                    if(visibleRowCount !== false) {
+                        myob.visibleRowCount = v;
+                    }
                 }
             },
 
@@ -2290,7 +2339,6 @@ jQuery(document).ready(
              */
             retrieveDataFromGetVar: function()
             {
-                console.debug('retrieveDataFromGetVar');
                 var qd = {};
                 if(typeof location.search !== 'undefined' && location.search && location.search.length > 0) {
                     location.search.substr(1).split("&").forEach(
@@ -2303,7 +2351,6 @@ jQuery(document).ready(
                         }
                     );
                 }
-                console.debug(qd)
                 if(typeof qd.load !== 'undefined') {
                     if(typeof qd.load[0] !== 'undefined') {
                         if(typeof qd.load[0] === 'string' && qd.load.length > 0) {
@@ -2316,7 +2363,6 @@ jQuery(document).ready(
             processRetrievedData: function(forceFavs)
             {
                 if(myob.urlToLoad !== '') {
-                    console.debug('processRetrievedData');
                     var url = myob.serverConnectionURL + 'load/' + myob.urlToLoad + '/';
                     myob.urlToLoad = '';
                     jQuery.getJSON(
@@ -2454,6 +2500,20 @@ jQuery(document).ready(
                     }
                 }
                 return newObject;
+            },
+
+            visibleRowCountValidator: function(val)
+            {
+                val = parseInt(val);
+                if (isNaN(val)) {
+                    //do nothing
+                }
+                else if((val | 0) === val) {
+                    if(val > 0 && val < 10000) {
+                        return val;
+                    }
+                }
+                return false;
             },
 
             /**
