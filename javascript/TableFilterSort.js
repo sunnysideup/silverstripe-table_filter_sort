@@ -275,6 +275,12 @@ jQuery(document).ready(
             millisecondsBetweenActions: 10,
 
             /**
+             *
+             * @type {boolean}
+             */
+            scrollToTop: false,
+
+            /**
              * a variable that holds setTimeout
              * @type {function}
              */
@@ -1922,15 +1928,16 @@ jQuery(document).ready(
              * show the form button when it table is in view OR when it is form is open
              * do this every second
              */
-
              scrollToTopOfHolder: function()
              {
-                 jQuery('html, body').animate(
-                     {
-                         scrollTop: myob.myTableHolder.position().top
-                     },
-                     200
-                 );
+                 if(myob.scrollToTop) {
+                     jQuery('html, body').animate(
+                         {
+                             scrollTop: myob.myTableHolder.position().top
+                         },
+                         200
+                     );
+                 }
              },
 
             fixTableHeader: function()
