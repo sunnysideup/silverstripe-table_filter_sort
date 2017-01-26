@@ -1,23 +1,3 @@
-/**
- * http://stackoverflow.com/questions/9132347/iterating-through-table-cells-using-jquery
- * http://stackoverflow.com/questions/3065342/how-do-i-iterate-through-table-rows-and-cells-in-javascript
- * to do:
- * - change URL
- * - tagle field
- * - not all field values are clickable...
- *
- */
-jQuery(document).ready(
-    function() {
-        if(typeof TableFilterSortTableList !== 'undefined') {
-            var i = 0;
-            for(i = 0; i < TableFilterSortTableList.length; i++) {
-                TableFilterSortTableList[i] = jQuery(TableFilterSortTableList[i]).tableFilterSort();
-            }
-        }
-    }
-);
-
 
 
 (function( $ ) {
@@ -82,6 +62,7 @@ jQuery(document).ready(
 
             /**
              * can we update the URL
+             * this also doubles as init completed.
              * @type {boolean}
              */
             canPushState: false,
@@ -275,16 +256,16 @@ jQuery(document).ready(
             millisecondsBetweenActions: 10,
 
             /**
+             * storing setTimeout so that we can cancel them
+             * @type {boolean}
+             */
+            windowTimeoutStore: {},
+
+            /**
              *
              * @type {boolean}
              */
-            scrollToTop: false,
-
-            /**
-             * a variable that holds setTimeout
-             * @type {function}
-             */
-            setTableWidthInFuture: null,
+            scrollToTopAtPageOpening: true,
 
             /**
              * @type {array}
@@ -1079,14 +1060,15 @@ jQuery(document).ready(
 
             fixTableHeaderListener: function() {
                 if(myob.fixedHeaderClass) {
-                    jQuery(window).on(
+                    jQuery(window).delayedOn(
                         "load scroll",
                         function(e) {
                             myob.fixTableHeader();
                         },
                         myob.millisecondsBetweenActions
                     );
-                    jQuery(window).on(
+                    //note that we use a delay here !
+                    jQuery(window).delayedOn(
                         "resize",
                         function(e) {
                             myob.myTableHolder.removeClass(myob.fixedHeaderClass);
@@ -1095,8 +1077,10 @@ jQuery(document).ready(
                             myob.myTable
                                 .find('thead tr:first th')
                                 .css({"width": "", "min-width": "", "max-width": ""});
-                            window.clearTimeout(myob.setTableWidthInFuture);
-                            myob.setTableWidthInFuture = window.setTimeout(
+                            if(typeof myob.windowTimeoutStore['setTableWidthInFuture'] !== 'undefined') {
+                                window.clearTimeout(myob.windowTimeoutStore['setTableWidthInFuture']);
+                            }
+                            myob.windowTimeoutStore['setTableWidthInFuture'] = window.setTimeout(
                                 function() {
                                     myob.setTableWidth();
                                     myob.fixTableHeader();
@@ -1165,7 +1149,8 @@ jQuery(document).ready(
                     }
                 );
 
-                myob.myFilterFormHolder.on(
+                //set actual keyword field and trigger change
+                myob.myFilterFormHolder.delayedOn(
                     'input paste change',
                     myob.quickKeywordFilterSelector,
                     function(e) {
@@ -1173,8 +1158,21 @@ jQuery(document).ready(
                         myob.myFilterFormInner.find('input[name="Keywords"]')
                             .val(val)
                             .change();
+                    },
+                    400
+                );
+
+                //update faux keyword field
+                myob.myFilterFormInner.on(
+                    'input paste change',
+                    'input[name="Keywords"]',
+                    function(e) {
+                        var val = jQuery(this).val();
+                        myob.myFilterFormHolder
+                            .find(myob.quickKeywordFilterSelector)
+                            .val(val);
                     }
-                )
+                );
 
             },
 
@@ -1214,10 +1212,10 @@ jQuery(document).ready(
                     'input paste change',
                     myob.visibleRowCountSelector,
                     function () {
-                        if(typeof t !== "undefined"){
-                            window.clearTimeout(t);
+                        if(typeof myob.windowTimeoutStore['visibleRowCount'] !== "undefined"){
+                            window.clearTimeout(myob.windowTimeoutStore['visibleRowCount']);
                         }
-                        var t = window.setTimeout(
+                        myob.windowTimeoutStore['visibleRowCount'] = window.setTimeout(
                             function() {
                                 var input = myob.myTableHolder.find(myob.visibleRowCountSelector);
                                 var val = input.val();
@@ -1232,7 +1230,7 @@ jQuery(document).ready(
                                     }
                                 }
                             },
-                            1500
+                            1200
                         );
                     }
                 );
@@ -1556,6 +1554,11 @@ jQuery(document).ready(
 
                     //FINALISE!
                     myob.myFilterFormInner.html(content);
+
+                    if(myob.hasKeywords) {
+                        var keywordVal = myob.myFilterFormInner.find('input[name="Keywords"]').val();
+                        myob.myFilterFormHolder.find(myob.quickKeywordFilterSelector).val(keywordVal);
+                    }
                     var i = 0;
                     var input;
                     for(i = 0; i < awesompleteFields.length; i++) {
@@ -1929,13 +1932,16 @@ jQuery(document).ready(
              */
              scrollToTopOfHolder: function()
              {
-                 if(myob.scrollToTop) {
+                 if(myob.canPushState || myob.scrollToTopAtPageOpening) {
                      jQuery('html, body').animate(
                          {
                              scrollTop: myob.myTableHolder.position().top
                          },
                          200
                      );
+                 } else {
+                     //fire scroll event in any case ...
+                     window.scrollTo(window.scrollX, window.scrollY);
                  }
              },
 
@@ -2104,7 +2110,7 @@ jQuery(document).ready(
                 myob.myTableHolder.find(myob.maxRowSelector).text(maxRow);
                 myob.myTableHolder.find(myob.matchRowCountSelector).text(matchCount);
                 myob.myTableHolder.find(myob.totalRowCountSelector).text(totalRowCount);
-                myob.myTableHolder.find(myob.visibleRowCountSelector).val(actualVisibleRowCount);
+                myob.myTableHolder.find(myob.visibleRowCountSelector).val(myob.visibleRowCount);
                 myob.myTableHolder.find(myob.paginationSelector).html(pageHTML);
                 myob.myTable.show();
 
@@ -2710,6 +2716,7 @@ jQuery.fn.isOnScreen = function(){
 /*!
  * jquery.unevent.js 0.2
  * https://github.com/yckart/jquery.unevent.js
+ * use jquery.on with timeout
  *
  * Copyright (c) 2013 Yannick Albert (http://yckart.com)
  * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php).
@@ -2717,22 +2724,29 @@ jQuery.fn.isOnScreen = function(){
 **/
 ;(function ($) {
     var on = $.fn.on, timer;
-    $.fn.on = function () {
+    $.fn.delayedOn = function () {
         var args = Array.apply(null, arguments);
         var last = args[args.length - 1];
-
-        if (isNaN(last) || (last === 1 && args.pop())) return on.apply(this, args);
-
+        //there is no delay
+        if (isNaN(last) || (last === 1 && args.pop())) {
+            return on.apply(this, args);
+        }
+        //get delay
         var delay = args.pop();
         var fn = args.pop();
-
-        args.push(function () {
-            var self = this, params = arguments;
-            clearTimeout(timer);
-            timer = setTimeout(function () {
-                fn.apply(self, params);
-            }, delay);
-        });
+        //add function
+        args.push(
+            function () {
+                var self = this, params = arguments;
+                clearTimeout(timer);
+                timer = setTimeout(
+                    function () {
+                        fn.apply(self, params);
+                    },
+                    delay
+                );
+            }
+        );
 
         return on.apply(this, args);
     };
