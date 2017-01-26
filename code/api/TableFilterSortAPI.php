@@ -23,23 +23,26 @@ class TableFilterSortAPI extends Object
      * @param  string $tableSelector      e.g. #MyTableHolder
      * @param  array $blockArray          files not to include (both CSS and JS)
      * @param  string $jqueryLocation     if you like to include jQuery then add link here...
-     * @param  boolean $includeInPage     if you like to include jQuery then add link here...
+     * @param  boolean $includeInPage     would you like to include the css / js on the page or as externals?
+     * @param  string $jsSettings         add JS snippet for settings ...
      */
     public static function include_requirements(
         $tableSelector = '.tfs-holder',
         $blockArray = array(),
         $jqueryLocation = '',
-        $includeInPage = true
+        $includeInPage = false,
+        $jsSettings = '{}'
     ) {
         //this must come first
         if($tableSelector) {
             //this must come first
             Requirements::customScript(
                 '
-                    if(typeof TableFilterSortTableList === "undefined") {
-                        var TableFilterSortTableList = [];
-                    }
-                    TableFilterSortTableList.push("'.$tableSelector.'")
+                    jQuery(document).ready(
+                        function() {
+                            jQuery("'.str_replace('"', '\\"', $tableSelector).'").tableFilterSort('.$jsSettings.');
+                        }
+                    );
                 ',
                 'table_filter_sort'
             );
