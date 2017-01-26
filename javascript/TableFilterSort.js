@@ -869,9 +869,8 @@ jQuery(document).ready(
                     myob.myTableHead.find('tr:first th:visible').each(
                         function(colNumber, cell) {
                             var cell = jQuery(cell);
-                            var myWidth = cell.width();
-                            var myWidthPX = myWidth + 'px'
-                            cell.css('width', myWidthPX);
+                            var myWidth = cell.width() + 1;
+                            cell.css('width', myWidth);
                         }
                     );
                     //add push down div ...

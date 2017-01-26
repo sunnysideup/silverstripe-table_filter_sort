@@ -15,6 +15,9 @@
             <li class="tfs-save-and-load load filters tfs-action">
                 <a href="#">Load Filter</a>
             </li>
+            <li class="quick-keyword tfs-action">
+                <input name="QuickKeyword" placeholder="Quick Search ..." />
+            </li>            
         </ul>
     </div>
     <div class="tfs-filter-form-holder-section top right">
