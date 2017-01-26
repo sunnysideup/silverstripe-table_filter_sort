@@ -29,9 +29,12 @@
 
             <li class="tfs-current-search-holder" data-no-filter-text="No filter selected"></li>
             <li class="tfs-match-count-holder">
-                <strong>Filtered:</strong>
                 <span class="match-row-number">0</span> /
                 <span class="total-row-number">0</span>
+                rows match filter
+            </li>
+            <li class="tfs-no-match-count-holder">
+                <span class="total-row-number">0</span> rows
             </li>
         </ul>
     </div>

@@ -384,9 +384,17 @@
              */
             paginationSelector: ".pagination",
 
+            /**
+             * holder for filtered
+             * @type {string}
+             */
+            filteredCountHolder: ".tfs-match-count-holder",
 
-
-
+            /**
+             * class for an element that holds the pagination
+             * @type {string}
+             */
+            unfilteredCountHolder: ".tfs-no-match-count-holder",
 
             /**
              *
@@ -2106,6 +2114,13 @@
                      myob.myTableHolder.find(myob.moreRowEntriesSelector).show();
                 }
                 minRow++;
+                if(totalRowCount === matchCount) {
+                    myob.myTableHolder.find(myob.filteredCountHolder).hide();
+                    myob.myTableHolder.find(myob.unfilteredCountHolder).show();
+                } else {
+                    myob.myTableHolder.find(myob.unfilteredCountHolder).hide();
+                    myob.myTableHolder.find(myob.filteredCountHolder).show();
+                }
                 myob.myTableHolder.find(myob.minRowSelector).text(minRow);
                 myob.myTableHolder.find(myob.maxRowSelector).text(maxRow);
                 myob.myTableHolder.find(myob.matchRowCountSelector).text(matchCount);
