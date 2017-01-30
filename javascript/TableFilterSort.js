@@ -311,6 +311,7 @@ jQuery(document).ready(
             startRowFX2: null,
             endRowFX1: null,
             endRowFX2: null,
+            moreDetailsFX: null,
 
             /**
              *
@@ -1258,6 +1259,9 @@ jQuery(document).ready(
                                     moreDetailsItem.toggleClass(myob.openedClass);
                                 }
                             );
+                        if(typeof myob.moreDetailsFX === 'function') {
+                            myob.moreDetailsFX(myob);
+                        }
                     }
                 );
             },
