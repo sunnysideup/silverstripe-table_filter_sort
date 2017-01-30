@@ -262,6 +262,10 @@ $html = create_test();
                             <span class="match-row-number">0</span> /
                             <span class="total-row-number">0</span>
                         </li>
+                        <li class="tfs-no-match-count-holder">
+                            <strong>Total Rows:</strong>
+                            <span class="total-row-number">0</span>
+                        </li>                        
                     </ul>
                 </div>
 

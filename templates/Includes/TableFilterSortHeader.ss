@@ -17,7 +17,7 @@
             </li>
             <li class="quick-keyword tfs-action">
                 <input name="QuickKeyword" placeholder="Quick Search ..." />
-            </li>            
+            </li>
         </ul>
     </div>
     <div class="tfs-filter-form-holder-section top right">
@@ -29,9 +29,12 @@
 
             <li class="tfs-current-search-holder" data-no-filter-text="No filter selected"></li>
             <li class="tfs-match-count-holder">
-                <strong>Results:</strong>
                 <span class="match-row-number">0</span> /
                 <span class="total-row-number">0</span>
+                rows match filter
+            </li>
+            <li class="tfs-no-match-count-holder">
+                <span class="total-row-number">0</span> rows
             </li>
         </ul>
     </div>
