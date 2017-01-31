@@ -392,7 +392,7 @@ input[type="checkbox"] {
 }
 
 .tfs-current-search-holder ul li span:after {
-    content: '\\00a0|\\00a0';
+    content: '\00a0|\00a0';
 }
 
 .tfs-current-search-holder ul li span:last-child:after {
@@ -472,7 +472,7 @@ td span.dl {
 }
 
 span.dl-on {
-    color: #fff!important;
+    color: #000!important;
     border-bottom: none!important;
     font-weight: bold;
 }
