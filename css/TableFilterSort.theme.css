@@ -223,6 +223,12 @@ a:active {
     display: none;
 }
 
+.tfs-filter-form-holder-section.bottom.left{
+    clear: left;
+}
+.tfs-filter-form-holder-section.bottom.right {
+    clear: right;
+}
 
 /* list items */
 
@@ -301,7 +307,7 @@ input[type="checkbox"] {
 
 .tfs-filter-form-inner {
     padding: 0 10px;
-    overflow: hidden;
+    overflow: visible;
     clear: both;
 }
 
