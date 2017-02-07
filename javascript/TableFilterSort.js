@@ -2395,6 +2395,7 @@
             {
                 if(myob.urlToLoad !== '') {
                     var url = myob.serverConnectionURL + 'load/' + myob.urlToLoad + '/';
+                    console.debug(url);
                     myob.urlToLoad = '';
                     jQuery.getJSON(
                         url,
