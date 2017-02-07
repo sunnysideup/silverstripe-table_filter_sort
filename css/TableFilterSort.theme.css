@@ -4,7 +4,7 @@
  */
 
 body {
-    padding: 2em;
+    padding: 0px;
 }
 
 * {
@@ -235,6 +235,10 @@ a:active {
 /* list items */
 
 .tfs-filter-form-holder-section li {
+    display: none;
+}
+
+.tfs-filter-form-holder-section .tfs-open-filter-form {
     display: inline-block;
 }
 
@@ -263,7 +267,17 @@ li.tfs-save-and-load.save.filters,
     display: block;
 }
 
-
+.tfs-filter-form-holder-section.bottom.left .tfs-clear {
+    float: left;
+    vertical-align: bottom;
+}
+.tfs-no-match-count-holder, .tfs-match-count-holder {
+    padding: 7px;
+    color: #777;
+}
+.tfs-no-match-count-holder *, .tfs-match-count-holder * {
+    color: #777;
+}
 /* show load unless filter is open */
 
 .filter-is-open .tfs-filter-form-holder-section.top li.tfs-save-and-load.load.filters, .filter-is-open .tfs-filter-form-holder-section.top.right li.tfs-current-search-holder, .tfs-filter-form-holder-section.bottom.left .tfs-clear, .tfs-current-favourites {
@@ -427,10 +441,11 @@ table th, table td {
     vertical-align: top;
 }
 
-table th {
+table thead th {
     background-color: crimson;
     color: #fff;
 }
+
 
 
 /*
@@ -471,8 +486,12 @@ tr.hide, tr.no-match {
  */
 
 table th a, th span.dl {
-    color: white;
-    border-bottom: 1px dotted #fff;
+    border-bottom: 1px dotted #222;
+}
+
+
+table thead th a {
+    color: #fff;
 }
 
 td span.dl {
@@ -679,66 +698,6 @@ span.dl-on {
 
 
 
-
-@media screen and (min-width: 550px) {
-    #tfs-modal-pop-up .field {
-        width: 50%;
-        float: left;
-    }
-}
-
-
-/*
- * **********************************************
- * MEDIA QUERIES
- */
-
-@media screen and (min-width: 550px) and (max-width: 949px) {
-    .tfs-filter-form-holder .tfs-filter-column {
-        width: calc(33% - 20px);
-        float: left;
-    }
-
-    .tfs-filter-form-holder .tfs-filter-column:nth-child(3n) {
-        margin-right: 0px;
-    }
-
-    .tfs-filter-form-holder .tfs-filter-column:nth-child(3n+1) {
-        clear: left;
-    }
-}
-
-@media screen and (min-width: 950px) {
-    .tfs-filter-form-holder .tfs-filter-column {
-        width: calc(20% - 20px);
-        float: left;
-    }
-
-    .tfs-filter-form-holder .tfs-filter-column:nth-child(5n) {
-        margin-right: 0px;
-    }
-
-    .tfs-filter-form-holder .tfs-filter-column:nth-child(5n+1) {
-        clear: left;
-    }
-}
-
-
-/** just adding 1 PX to header cells to make it perfect! */
-
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  /* CSS Statements that only apply on webkit-based browsers (Chrome, Safari, etc.) */
-    .fixed-header .tfs-table thead tr: first {
-        padding-left: 13px!important;
-    }
-}
-
-@-moz-document url-prefix() {
-    .fixed-header .tfs-table thead {
-        margin-left: -1px;
-    }
-}
-
 .loading p {
     text-align: center;
     color: #555;
@@ -822,5 +781,89 @@ span.dl-on {
     to {
         left: 0;
         width: 100%;
+    }
+}
+
+
+
+/*
+ * **********************************************
+ * MEDIA QUERIES
+ */
+
+ @media screen and (min-width: 550px) {
+     .tfs-filter-form-holder-section li {
+         display: inline-block;
+     }
+     #tfs-modal-pop-up .field {
+         width: 50%;
+         float: left;
+     }
+ }
+
+
+@media screen and (min-width: 550px) and (max-width: 949px) {
+    body {
+        padding: 1em;
+    }
+    .tfs-filter-form-holder .tfs-filter-column {
+        width: calc(33% - 20px);
+        float: left;
+    }
+
+    .tfs-filter-form-holder .tfs-filter-column:nth-child(3n) {
+        margin-right: 0px;
+    }
+
+    .tfs-filter-form-holder .tfs-filter-column:nth-child(3n+1) {
+        clear: left;
+    }
+}
+
+@media screen and (min-width: 950px) {
+    body {
+        padding: 2em;
+    }
+    .tfs-filter-form-holder .tfs-filter-column {
+        width: calc(20% - 20px);
+        float: left;
+    }
+
+    .tfs-filter-form-holder .tfs-filter-column:nth-child(5n) {
+        margin-right: 0px;
+    }
+
+    .tfs-filter-form-holder .tfs-filter-column:nth-child(5n+1) {
+        clear: left;
+    }
+}
+
+
+
+
+
+/** just adding 1 PX to header cells to make it perfect! */
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  /* CSS Statements that only apply on webkit-based browsers (Chrome, Safari, etc.) */
+    .fixed-header .tfs-table thead tr: first {
+        padding-left: 13px!important;
+    }
+}
+
+@-moz-document url-prefix() {
+    .fixed-header .tfs-table thead {
+        margin-left: -1px;
+    }
+}
+
+
+
+@media screen and (max-width: 750px) {
+    #tfs-modal-pop-up th, #tfs-modal-pop-up td {
+        display: none;
+    }
+    #tfs-modal-pop-up th:nth-child(2), #tfs-modal-pop-up td:nth-child(2) {
+        display: table-cell;
     }
 }
