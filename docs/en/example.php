@@ -265,7 +265,7 @@ $html = create_test();
                         <li class="tfs-no-match-count-holder">
                             <strong>Total Rows:</strong>
                             <span class="total-row-number">0</span>
-                        </li>                        
+                        </li>
                     </ul>
                 </div>
 
@@ -387,15 +387,14 @@ $html = create_test();
         </main>
 
         <script src="https://code.jquery.com/jquery-git.min.js"></script>
-        <script type="text/javascript">
-            var TableFilterSortTableList = []
-            TableFilterSortTableList.push('.tfs-holder');
-        </script>
         <script src="../../javascript/jsurl.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/jquery.simplemodal-1.4.5?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/js.cookies.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/awesomplete.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/TableFilterSort.js?x=<?php echo rand(0,9999999999) ?>"></script>
+        <script type="text/javascript">
+            jQuery('.tfs-holder').tableFilterSort();
+        </script>
         <script>
             var html = jQuery('.tfs-holder').first().clone();
             var firstRow = html.find('table tbody tr').get(0).outerHTML;
