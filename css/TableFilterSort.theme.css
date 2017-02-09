@@ -677,8 +677,14 @@ span.dl-on {
     display: none!important;
 }
 
-#tfs-modal-pop-up td .load {
+#tfs-modal-pop-up td .load, #tfs-modal-pop-up td .load span {
     display: block!important;
+    color: #3498db!important;
+    font-weight: bold;
+    text-decoration: none;
+}
+#tfs-modal-pop-up td .load span:after {
+    content: ' »';
 }
 
 #simplemodal-overlay:before {
