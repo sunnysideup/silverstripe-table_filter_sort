@@ -253,13 +253,15 @@ a:active {
 /* hide save unless filter is open */
 
 li.tfs-save-and-load.save.filters,
-.filter-is-open .quick-keyword {
+.filter-is-open .quick-keyword,
+.tfs-has-filter .quick-keyword {
     display: none;
 }
 
 .filter-is-open.tfs-has-filter li.tfs-save-and-load.save.filters {
     display: list-item;
 }
+
 
 .filter-is-open .tfs-filter-form-holder-section.bottom,
 .filter-is-open.tfs-has-filter .tfs-filter-form-holder-section.bottom.left .tfs-clear,
@@ -273,18 +275,25 @@ li.tfs-save-and-load.save.filters,
 }
 .tfs-no-match-count-holder, .tfs-match-count-holder {
     padding: 7px;
-    color: #777;
+    color: #555;
 }
 .tfs-no-match-count-holder *, .tfs-match-count-holder * {
-    color: #777;
+    color: #555;
 }
 /* show load unless filter is open */
 
-.filter-is-open .tfs-filter-form-holder-section.top li.tfs-save-and-load.load.filters, .filter-is-open .tfs-filter-form-holder-section.top.right li.tfs-current-search-holder, .tfs-filter-form-holder-section.bottom.left .tfs-clear, .tfs-current-favourites {
+.tfs-has-filter li.tfs-save-and-load.load.filters,
+.filter-is-open li.tfs-current-search-holder,
+.tfs-filter-form-holder-section.bottom.left .tfs-clear,
+.tfs-current-favourites {
     display: none;
 }
 
-
+.tfs-save-and-load.save.filters.tfs-action,
+.tfs-save-and-load.load.filters.tfs-action {
+    clear: none;
+    margin-right: 1em;
+}
 /*
  * **********************************************
  * FORM STUFF
@@ -305,6 +314,9 @@ input[type="checkbox"] {
     width: auto;
     vertical-align: top;
     margin-left: 10px;
+    position: absolute;
+    display: block!important;
+    width: 210px;
 }
 
 .quick-keyword input {
@@ -313,9 +325,24 @@ input[type="checkbox"] {
     border-radius: 3px;
     border: 1px solid #ccc;
     background-color: transparent;
+    width: 200px;
+    color: #555;
 }
 
-
+.quick-keyword input::-webkit-input-placeholder { /* Chrome */
+  color: crimson;
+}
+.quick-keyword input:-ms-input-placeholder { /* IE 10+ */
+  color: crimson;
+}
+.quick-keyword input::-moz-placeholder { /* Firefox 19+ */
+  color: crimson;
+  opacity: 1;
+}
+.quick-keyword input:-moz-placeholder { /* Firefox 4 - 18 */
+  color: crimson;
+  opacity: 1;
+}
 /*
  * **********************************************
  * FILTER FORM INNER
@@ -407,12 +434,16 @@ input[type="checkbox"] {
 
 .tfs-current-search-holder .category {
     clear: right;
-}
 
+}
+.tfs-current-search-holder,
+.tfs-current-search-holder .category strong,
 .tfs-current-search-holder ul li span {
-    display: inline-block;
+    color: #555;
 }
-
+.tfs-current-search-holder {
+    margin-top: 0.5em;
+}
 .tfs-current-search-holder ul li span:after {
     content: '\00a0|\00a0';
 }

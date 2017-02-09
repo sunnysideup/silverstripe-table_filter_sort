@@ -9,12 +9,6 @@
 <div class="tfs-filter-form-holder">
     <div class="tfs-filter-form-holder-section top left">
         <ul>
-            <li class="tfs-save-and-load load filters tfs-action">
-                <a href="#">Load Filter</a>
-            </li>
-            <li class="tfs-save-and-load save filters tfs-action">
-                <a href="#">Save Filter</a>
-            </li>
             <li class="quick-keyword tfs-action">
                 <input name="QuickKeyword" placeholder="Quick Search ..." />
             </li>
@@ -26,6 +20,9 @@
                 <a href="#">Create Filter</a>
             </li>
 
+            <li class="tfs-save-and-load load filters tfs-action">
+                <a href="#">Load Filter</a>
+            </li>
             <li class="tfs-current-search-holder" data-no-filter-text="No filter selected"></li>
 
         </ul>
@@ -42,7 +39,7 @@
                 <span class="match-row-number">0</span> /
                 <span class="total-row-number">0</span>
                 rows match filter
-            </li>  
+            </li>
             <li class="tfs-clear tfs-action">
                 <a href="#">Clear Filter</a>
             </li>
@@ -54,6 +51,9 @@
         <ul>
             <li class="tfs-open-filter-form tfs-action">
                 <a href="#">Close and Apply</a>
+            </li>
+            <li class="tfs-save-and-load save filters tfs-action">
+                <a href="#">Save Filter</a>
             </li>
         </ul>
     </div>
