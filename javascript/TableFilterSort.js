@@ -199,7 +199,7 @@
              * rows to show
              * @type {integer}
              */
-            visibleRowCount: 10,
+            visibleRowCount: 100,
 
             /**
              * rows to show
@@ -211,13 +211,7 @@
              * maximum number of checkboxes in the filter before it becomes a text filter
              * @type {integer}
              */
-            maximumNumberOfFilterOptions: 30,
-
-            /**
-             * number of milliseconds to check if filter is in use ...
-             * @type {integer}
-             */
-            intervalForFilterCheck: 1000,
+            maximumNumberOfFilterOptions: 12,
 
             /**
              *
@@ -828,6 +822,8 @@
                         },
                         myob.millisecondsBetweenActions
                     );
+                } else {
+                    myob.myTableHolder.removeClass(myob.loadingClass);
                 }
             },
 
