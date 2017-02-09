@@ -4,12 +4,13 @@
  */
 
 body {
-    padding: 2em;
+    padding: 0px;
 }
 
 * {
     font-family: sans-serif;
     font-size: 13px!important;
+    color: #222;
 }
 
 h1 {
@@ -110,9 +111,10 @@ a:active {
     color: #fff;
 }
 
-.tfs-common-content-holder h3 {
+.tfs-common-content-holder * {
     padding: 0;
     margin: 0;
+    color: #fff;
 }
 
 .no-matches-message {
@@ -223,10 +225,20 @@ a:active {
     display: none;
 }
 
+.tfs-filter-form-holder-section.bottom.left{
+    clear: left;
+}
+.tfs-filter-form-holder-section.bottom.right {
+    clear: right;
+}
 
 /* list items */
 
 .tfs-filter-form-holder-section li {
+    display: none;
+}
+
+.tfs-filter-form-holder-section .tfs-open-filter-form {
     display: inline-block;
 }
 
@@ -255,7 +267,17 @@ li.tfs-save-and-load.save.filters,
     display: block;
 }
 
-
+.tfs-filter-form-holder-section.bottom.left .tfs-clear {
+    float: left;
+    vertical-align: bottom;
+}
+.tfs-no-match-count-holder, .tfs-match-count-holder {
+    padding: 7px;
+    color: #777;
+}
+.tfs-no-match-count-holder *, .tfs-match-count-holder * {
+    color: #777;
+}
 /* show load unless filter is open */
 
 .filter-is-open .tfs-filter-form-holder-section.top li.tfs-save-and-load.load.filters, .filter-is-open .tfs-filter-form-holder-section.top.right li.tfs-current-search-holder, .tfs-filter-form-holder-section.bottom.left .tfs-clear, .tfs-current-favourites {
@@ -301,7 +323,7 @@ input[type="checkbox"] {
 
 .tfs-filter-form-inner {
     padding: 0 10px;
-    overflow: hidden;
+    overflow: visible;
     clear: both;
 }
 
@@ -392,7 +414,7 @@ input[type="checkbox"] {
 }
 
 .tfs-current-search-holder ul li span:after {
-    content: '\\00a0|\\00a0';
+    content: '\00a0|\00a0';
 }
 
 .tfs-current-search-holder ul li span:last-child:after {
@@ -419,10 +441,11 @@ table th, table td {
     vertical-align: top;
 }
 
-table th {
+table thead th {
     background-color: crimson;
     color: #fff;
 }
+
 
 
 /*
@@ -449,8 +472,7 @@ table th {
 tr.match {
 }
 
-tr.show {
-}
+
 
 tr.hide, tr.no-match {
     display: none!important;
@@ -463,8 +485,12 @@ tr.hide, tr.no-match {
  */
 
 table th a, th span.dl {
-    color: white;
-    border-bottom: 1px dotted #fff;
+    border-bottom: 1px dotted #222;
+}
+
+
+table thead th a {
+    color: #fff;
 }
 
 td span.dl {
@@ -472,7 +498,7 @@ td span.dl {
 }
 
 span.dl-on {
-    color: #fff!important;
+    color: #000!important;
     border-bottom: none!important;
     font-weight: bold;
 }
@@ -654,64 +680,22 @@ span.dl-on {
     display: block!important;
 }
 
-@media screen and (min-width: 550px) {
-    #tfs-modal-pop-up .field {
-        width: 50%;
-        float: left;
-    }
+#simplemodal-overlay:before {
+    content: '×';
+    position: fixed;
+    right: 10px;
+    top: 10px;
+    color: #fff;
+    font-size: 50px;
+    line-height: 0.5;
+    display: block;
+    cursor: pointer;
 }
 
 
-/*
- * **********************************************
- * MEDIA QUERIES
- */
-
-@media screen and (min-width: 550px) and (max-width: 949px) {
-    .tfs-filter-form-holder .tfs-filter-column {
-        width: calc(33% - 20px);
-        float: left;
-    }
-
-    .tfs-filter-form-holder .tfs-filter-column:nth-child(3n) {
-        margin-right: 0px;
-    }
-
-    .tfs-filter-form-holder .tfs-filter-column:nth-child(3n+1) {
-        clear: left;
-    }
-}
-
-@media screen and (min-width: 950px) {
-    .tfs-filter-form-holder .tfs-filter-column {
-        width: calc(20% - 20px);
-        float: left;
-    }
-
-    .tfs-filter-form-holder .tfs-filter-column:nth-child(5n) {
-        margin-right: 0px;
-    }
-
-    .tfs-filter-form-holder .tfs-filter-column:nth-child(5n+1) {
-        clear: left;
-    }
-}
 
 
-/** just adding 1 PX to header cells to make it perfect! */
 
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  /* CSS Statements that only apply on webkit-based browsers (Chrome, Safari, etc.) */
-    .fixed-header .tfs-table thead tr: first {
-        padding-left: 13px!important;
-    }
-}
-
-@-moz-document url-prefix() {
-    .fixed-header .tfs-table thead {
-        margin-left: -1px;
-    }
-}
 
 .loading p {
     text-align: center;
@@ -796,5 +780,89 @@ span.dl-on {
     to {
         left: 0;
         width: 100%;
+    }
+}
+
+
+
+/*
+ * **********************************************
+ * MEDIA QUERIES
+ */
+
+ @media screen and (min-width: 550px) {
+     .tfs-filter-form-holder-section li {
+         display: inline-block;
+     }
+     #tfs-modal-pop-up .field {
+         width: 50%;
+         float: left;
+     }
+ }
+
+
+@media screen and (min-width: 550px) and (max-width: 949px) {
+    body {
+        padding: 1em;
+    }
+    .tfs-filter-form-holder .tfs-filter-column {
+        width: calc(33% - 20px);
+        float: left;
+    }
+
+    .tfs-filter-form-holder .tfs-filter-column:nth-child(3n) {
+        margin-right: 0px;
+    }
+
+    .tfs-filter-form-holder .tfs-filter-column:nth-child(3n+1) {
+        clear: left;
+    }
+}
+
+@media screen and (min-width: 950px) {
+    body {
+        padding: 2em;
+    }
+    .tfs-filter-form-holder .tfs-filter-column {
+        width: calc(20% - 20px);
+        float: left;
+    }
+
+    .tfs-filter-form-holder .tfs-filter-column:nth-child(5n) {
+        margin-right: 0px;
+    }
+
+    .tfs-filter-form-holder .tfs-filter-column:nth-child(5n+1) {
+        clear: left;
+    }
+}
+
+
+
+
+
+/** just adding 1 PX to header cells to make it perfect! */
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  /* CSS Statements that only apply on webkit-based browsers (Chrome, Safari, etc.) */
+    .fixed-header .tfs-table thead tr: first {
+        padding-left: 13px!important;
+    }
+}
+
+@-moz-document url-prefix() {
+    .fixed-header .tfs-table thead {
+        margin-left: -1px;
+    }
+}
+
+
+
+@media screen and (max-width: 750px) {
+    #tfs-modal-pop-up th, #tfs-modal-pop-up td {
+        display: none;
+    }
+    #tfs-modal-pop-up th:nth-child(2), #tfs-modal-pop-up td:nth-child(2) {
+        display: table-cell;
     }
 }
