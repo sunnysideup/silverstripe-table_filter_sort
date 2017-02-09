@@ -472,8 +472,7 @@ table thead th {
 tr.match {
 }
 
-tr.show {
-}
+
 
 tr.hide, tr.no-match {
     display: none!important;

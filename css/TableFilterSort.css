@@ -52,7 +52,9 @@ tr.hide, tr.no-match, table.hide {
     display: none!important;
 }
 
-
+tr.show {
+    display: table-row!important;
+}
 
 /***********************************************
  * loading
