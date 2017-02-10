@@ -23,7 +23,7 @@
             <li class="tfs-save-and-load load filters tfs-action">
                 <a href="#">Load Filter</a>
             </li>
-            <li class="tfs-current-search-holder" data-no-filter-text="No filter selected"></li>
+            <li class="tfs-current-search-holder" data-no-filter-text="Unfiltered"></li>
 
         </ul>
     </div>
