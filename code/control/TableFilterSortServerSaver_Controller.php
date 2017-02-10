@@ -71,13 +71,20 @@ class TableFilterSortServerSaver_Controller extends Controller
                         \'a.load\',
                         function(event) {
                             event.preventDefault();
-                            var baseURL = window.top.location.protocol + "//" + window.top.location.host + window.top.location.pathname;
-                            var url = baseURL + "?load=" + jQuery(this).attr("href");
+                            var url = jQuery(this).attr("href");
                             window.top.history.pushState(null, null, url);
                             window.top.jQuery.modal.close();
                             return false;
                         }
-                    )
+                    );
+                    jQuery(\'a.load\').each(
+                        function(i, el) {
+                            var myEl = jQuery(el);
+                            var baseURL = window.top.location.protocol + "//" + window.top.location.host + window.top.location.pathname;
+                            var url = baseURL + "?load=" + jQuery(myEl).attr("href");
+                            jQuery(myEl).attr("href", url);
+                        }
+                    );
                 }
             )
         ');
