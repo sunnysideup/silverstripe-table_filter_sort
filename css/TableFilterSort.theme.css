@@ -299,48 +299,40 @@ li.tfs-save-and-load.save.filters,
  * FORM STUFF
  */
 
-input[type='submit'] {
+.tfs-filter-form-holder input[type='submit'] {
     display: block;
     margin: 10px auto;
     border: none!important;
 }
 
-input[type="checkbox"] {
+.tfs-filter-form-holder input[type="checkbox"] {
     vertical-align: middle;
 }
 
-.quick-keyword {
+.tfs-filter-form-holder .quick-keyword {
     height: 24px;
     width: auto;
     vertical-align: top;
-    margin-left: 10px;
+    margin-left: 0px;
     position: absolute;
     display: block!important;
-    width: 210px;
+    width: 210px!important;
 }
 
-.quick-keyword input {
-    height: 18px;
-    padding: 3px;
-    border-radius: 3px;
-    border: 1px solid #ddd;
-    background-color: transparent;
-    width: 200px;
-    color: #555;
-}
 
-.quick-keyword input::-webkit-input-placeholder { /* Chrome */
-  color: crimson;
+
+.tfs-filter-form-holder .quick-keyword input::-webkit-input-placeholder { /* Chrome */
+  color: #555;
 }
-.quick-keyword input:-ms-input-placeholder { /* IE 10+ */
-  color: crimson;
+.tfs-filter-form-holder .quick-keyword input:-ms-input-placeholder { /* IE 10+ */
+  color: #555;
 }
-.quick-keyword input::-moz-placeholder { /* Firefox 19+ */
-  color: crimson;
+.tfs-filter-form-holder .quick-keyword input::-moz-placeholder { /* Firefox 19+ */
+  color: #555;
   opacity: 1;
 }
-.quick-keyword input:-moz-placeholder { /* Firefox 4 - 18 */
-  color: crimson;
+.tfs-filter-form-holder .quick-keyword input:-moz-placeholder { /* Firefox 4 - 18 */
+  color: #555;
   opacity: 1;
 }
 /*
@@ -377,7 +369,10 @@ input[type="checkbox"] {
     display: block;
 }
 
-.tfs-filter-form-inner .tfs-filter-column input.awesomplete, .tfs-filter-form-inner .tfs-filter-column input.keyword {
+.tfs-filter-form-inner .tfs-filter-column input.awesomplete,
+.tfs-filter-form-inner .tfs-filter-column input.keyword,
+.tfs-filter-form-holder .quick-keyword input
+ {
     display: block;
     padding: 5px;
     background: #ccc;
@@ -612,6 +607,9 @@ span.dl-on {
     display: block;
 }
 
+.tfs-more-entries-always-show * {
+    color: #555;
+}
 
 /*
  * **********************************************
