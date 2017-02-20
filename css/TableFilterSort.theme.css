@@ -363,7 +363,8 @@ li.tfs-save-and-load.save.filters,
     display: block
 }
 
-.tfs-filter-form-inner .tfs-filter-column ul, .tfs-filter-form-inner .tfs-filter-column ul li {
+.tfs-filter-form-inner .tfs-filter-column ul,
+.tfs-filter-form-inner .tfs-filter-column ul li {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -914,4 +915,9 @@ li.tfs-save-and-load.save.filters,
     #tfs-modal-pop-up th:nth-child(2), #tfs-modal-pop-up td:nth-child(2) {
         display: table-cell;
     }
+    #simplemodal-overlay:before {
+        right: 0px;
+        top: 0px;
+    }
+
 }
