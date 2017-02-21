@@ -10,8 +10,9 @@
 <h1>$Title</h1>
 <div id="wrapper">
 <% if $AddForm %>
-
+<div class="tfs-add-form">
     $AddForm
+</div>
 
 <% else_if $ShareLink  %>
 

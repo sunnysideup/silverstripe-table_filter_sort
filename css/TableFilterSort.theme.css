@@ -555,7 +555,8 @@ li.tfs-save-and-load.save.filters,
  */
 
 .tfs-holder .button,
-.tfs-holder input[type='submit'] {
+.tfs-holder input[type='submit'],
+.tfs-add-form input[type='submit'] {
     display: inline-block;
     background: #3498db;
     background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
