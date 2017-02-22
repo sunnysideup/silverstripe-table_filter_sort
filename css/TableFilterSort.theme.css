@@ -747,9 +747,9 @@ li.tfs-save-and-load.save.filters,
 
 
 
-.tfs-holder.loading p {
+body .loading p {
     text-align: center;
-    color: #555;
+    color: #222;
 }
 
 .tfs-holder .load-bar {
