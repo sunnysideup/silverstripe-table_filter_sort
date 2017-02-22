@@ -2211,8 +2211,8 @@
                             categoryHolder.find('input').each(
                                 function(i, input) {
                                     input = jQuery(input);
-                                    var ivl = input.val();
-                                    var vtm = ivl.toLowerCase().trim();
+                                    var ivl = input.val().raw2safe();
+                                    var vtm = ivl.toLowerCase().trim().raw2safe();
                                     switch(fieldType) {
                                         case 'keyword':
                                             if(vtm.length > 1) {
@@ -2612,7 +2612,9 @@
 
 
 
-
+String.prototype.raw2safe = function(){
+    return this.replace(/\W+/g, " ");
+}
 
 /**
  * source: http://stackoverflow.com/questions/7753448/how-do-i-escape-quotes-in-html-attribute-values

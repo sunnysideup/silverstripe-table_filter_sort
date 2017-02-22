@@ -64,7 +64,7 @@
 /***********************************************
  * loading
  */
-.tfs-holder .loading {
+.tfs-holder.loading {
     position: relative;
 }
 
@@ -72,7 +72,7 @@
     display: none;
 }
 
-.tfs-holder .loading .loading-screen {
+.tfs-holder.loading .loading-screen {
     display: block;
     position: absolute;
     background-color: #fff;
