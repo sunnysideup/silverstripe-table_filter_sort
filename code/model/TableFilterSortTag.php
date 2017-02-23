@@ -18,15 +18,6 @@ class TableFilterSortTag extends DataObject {
         return Config::inst()->get('TableFilterSortTag', 'plural_name');
     }
 
-    /**
-     * returns list of fields as they are exported
-     * @return array
-     * Field => Label
-     */
-    // public function getExportFields();
-
-
-
     private static $db = array(
         'Title' => 'Varchar(50)'
     );

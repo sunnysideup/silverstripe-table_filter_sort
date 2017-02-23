@@ -18,14 +18,6 @@ class TableFilterSortServerSaver extends DataObject {
         return Config::inst()->get('TableFilterSortServerSaver', 'plural_name');
     }
 
-    /**
-     * returns list of fields as they are exported
-     * @return array
-     * Field => Label
-     */
-    // public function getExportFields();
-
-
 
     private static $db = array(
         'URLSegment' => 'Varchar(50)',
