@@ -2613,7 +2613,7 @@
 
 
 String.prototype.raw2safe = function(){
-    return this.replace(/\W+/g, " ");
+    return this.replace(/[^a-z0-9*._\-,\s]/gi, " ");
 }
 
 /**
