@@ -101,6 +101,5 @@ class TableFilterSortAPI extends Object
             }
             Requirements::customScript($allJS, 'table_filter_sort_js');
         }
-
     }
 }

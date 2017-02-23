@@ -72,7 +72,7 @@
     display: none;
 }
 
-.tfs-holder.loading .loading-screen {
+body.loading .loading-screen {
     display: block;
     position: absolute;
     background-color: #fff;
