@@ -56,7 +56,7 @@ class TableFilterSortAPI extends Object
             $js = array_diff($js, $blockArray);
             $css = array_diff($css, $blockArray);
         }
-        if(Director::isDev()) {
+        if(Director::isDev() && ! $includeInPage) {
             foreach($css as $link) {
                 Requirements::themedCSS($link, 'table_filter_sort');
             }
@@ -78,6 +78,7 @@ class TableFilterSortAPI extends Object
                     foreach($testFiles as $testFile) {
                         $testFile = $base . $testFile.'.css';
                         if(file_exists($testFile)) {
+                            $hasBeenIncluded = true;
                             $allCss .= file_get_contents($testFile);
                             break;
                         }
