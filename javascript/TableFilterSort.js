@@ -545,7 +545,7 @@
              * selector used to identify add to favourite Links
              * @type {string}
              */
-            favouriteLinkSelector: 'a.addFav',
+            favouriteLinkSelector: 'a.adf',
 
 
             /**
@@ -1450,8 +1450,8 @@
                             url,
                             data,
                             function(returnedURL) {
-                                var width = Math.round(jQuery(window).width() * 0.91);
-                                var height = Math.round(jQuery(window).height() * 0.91);
+                                var width = Math.round(jQuery(window).width() * 0.97);
+                                var height = Math.round(jQuery(window).height() * 0.97);
                                 jQuery.modal(
                                     '<iframe src="'+returnedURL+'" width="'+width+'"height="'+height+'" style="border:0" id="tfs-pop-up-i-frame" name="tfs-pop-up-i-frame">',
                                     {
@@ -1460,8 +1460,8 @@
                                             backgroundColor:"#fff",
                                             borderColor:"#fff",
                                             padding:0,
-                                            width: width,
-                                            height: height
+                                            width:width,
+                                            height:height
 
                                         },
                                         opacity: 75,

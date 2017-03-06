@@ -169,7 +169,7 @@ function create_test()
         <tr class="tfstr hide" id="tfs'.$i.'">
             <td>
                 <a href="#" class="more">+</a>
-                <a href="#" class="addFav" title="Add to Favourites">♥</a>
+                <a href="#" class="adf" title="Add to Favourites">♥</a>
                 <span data-filter="SKU">'.($i+1).'</span><br />
                 <p style="display: none;" class="hidden">
                     Some more content goes here.
