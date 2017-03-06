@@ -1450,8 +1450,8 @@
                             url,
                             data,
                             function(returnedURL) {
-                                var width = Math.round(jQuery(window).width() * 0.97);
-                                var height = Math.round(jQuery(window).height() * 0.97);
+                                var width = Math.round(jQuery(window).width() * 0.93);
+                                var height = Math.round(jQuery(window).height() * 0.93);
                                 jQuery.modal(
                                     '<iframe src="'+returnedURL+'" width="'+width+'"height="'+height+'" style="border:0" id="tfs-pop-up-i-frame" name="tfs-pop-up-i-frame">',
                                     {
