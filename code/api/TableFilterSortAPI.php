@@ -78,6 +78,7 @@ class TableFilterSortAPI extends Object
                     foreach($testFiles as $testFile) {
                         $testFile = $base . $testFile.'.css';
                         if(file_exists($testFile)) {
+                            $hasBeenIncluded = true;
                             $allCss .= file_get_contents($testFile);
                             break;
                         }
