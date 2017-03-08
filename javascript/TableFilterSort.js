@@ -545,7 +545,7 @@
              * selector used to identify add to favourite Links
              * @type {string}
              */
-            favouriteLinkSelector: 'a.addFav',
+            favouriteLinkSelector: 'a.adf',
 
 
             /**
@@ -1460,8 +1460,8 @@
                                             backgroundColor:"#fff",
                                             borderColor:"#fff",
                                             padding:0,
-                                            width: width,
-                                            height: height
+                                            width:width,
+                                            height:height
 
                                         },
                                         opacity: 75,
@@ -2211,8 +2211,8 @@
                             categoryHolder.find('input').each(
                                 function(i, input) {
                                     input = jQuery(input);
-                                    var ivl = input.val();
-                                    var vtm = ivl.toLowerCase().trim();
+                                    var ivl = input.val().raw2safe();
+                                    var vtm = ivl.toLowerCase().trim().raw2safe();
                                     switch(fieldType) {
                                         case 'keyword':
                                             if(vtm.length > 1) {
@@ -2612,7 +2612,9 @@
 
 
 
-
+String.prototype.raw2safe = function(){
+    return this.replace(/[^a-z0-9*._\-,\s]/gi, " ");
+}
 
 /**
  * source: http://stackoverflow.com/questions/7753448/how-do-i-escape-quotes-in-html-attribute-values

@@ -1,13 +1,13 @@
 
-.hidden {display: none;}
+.tfs-holder .hidden {display: none;}
 /***********************************************
  *sort
  */
-.sort-asc:after {
+.tfs-holder .sort-asc:after {
     content: " △";
 }
 
-.sort-desc:after {
+.tfs-holder .sort-desc:after {
     content: " ▽";
 }
 
@@ -16,7 +16,7 @@
 /***********************************************
  * no matches
  */
-.no-matches-message {
+.tfs-holder .no-matches-message {
     display: none;
 }
 
@@ -25,7 +25,7 @@
 /***********************************************
  * direct links
  */
-span.dl {
+.tfs-holder span.dl {
     cursor: pointer;
 }
 
@@ -34,40 +34,45 @@ span.dl {
 /***********************************************
  * table
  */
-table {
+.tfs-holder table {
     table-layout: fixed;
 }
 
-td, th {
+.tfs-holder td,
+.tfs-holder th {
     word-wrap: break-word;
 }
 
-table, thead, tbody {
+.tfs-holder table,
+.tfs-holder thead,
+.tfs-holder tbody {
     border-collapse: collapse;
 }
 /***********************************************
  * hidden data
  */
-tr.hide, tr.no-match, table.hide {
+.tfs-holder tr.hide,
+.tfs-holder tr.no-match,
+.tfs-holder table.hide {
     display: none!important;
 }
 
-tr.show {
+.tfs-holder tr.show {
     display: table-row!important;
 }
 
 /***********************************************
  * loading
  */
-.loading {
+.tfs-holder.loading {
     position: relative;
 }
 
-.loading-screen {
+.tfs-holder .loading-screen {
     display: none;
 }
 
-.loading .loading-screen {
+body.loading .loading-screen {
     display: block;
     position: absolute;
     background-color: #fff;

@@ -14,4 +14,7 @@ class TableFilterSortModelAdmin extends ModelAdmin
     private static $url_segment = 'table-filter-sort';
 
     private static $menu_title = 'Filters / Sorts';
+
+    private static $menu_icon = 'table_filter_sort/images/treeicons/TableFilterSortModelAdmin.png';    
+
 }
