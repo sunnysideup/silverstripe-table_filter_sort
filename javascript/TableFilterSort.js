@@ -1,6 +1,5 @@
 (function( $ ) {
 
-
     $.fn.tableFilterSort = function(options){
 
         var holderNumber = 0;
