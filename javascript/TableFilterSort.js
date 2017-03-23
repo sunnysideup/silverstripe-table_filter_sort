@@ -1805,7 +1805,6 @@
                                 if(stillLookingForCategory) {
                                     //lets not assume there is anything
                                     var rowMatchesForFilterGroup = false;
-
                                     //values selected in category
                                     var stillLookingForValue = true;
                                     for(var j = 0; j < myob.cfi[categoryToMatch].length; j++) {
@@ -1838,7 +1837,7 @@
                                                 row.find('span[data-filter="' + categoryToMatch + '"]').each(
                                                     function(innerI, innerEl) {
                                                         innerEl = jQuery(innerEl);
-                                                        var rowValue = innerEl.text().toLowerCase().trim();
+                                                        var rowValue = innerEl.text().toLowerCase().raw2safe().trim();
                                                         switch(myob.dataDictionary[categoryToMatch]['DataType']) {
                                                             case 'date':
                                                                 //to do ....
