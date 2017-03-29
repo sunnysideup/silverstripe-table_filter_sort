@@ -64,15 +64,26 @@
 /***********************************************
  * loading
  */
+
+
+
 .tfs-holder.loading {
     position: relative;
 }
+
+.tfs-holder.loading > div,
+.tfs-holder.loading > table,
+.tfs-holder.loading > form
+{
+    display: none;
+}
+
 
 .tfs-holder .loading-screen {
     display: none;
 }
 
-body.loading .loading-screen {
+.tfs-holder.loading .loading-screen {
     display: block;
     position: absolute;
     background-color: #fff;
