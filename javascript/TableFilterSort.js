@@ -125,9 +125,9 @@
              *    CanSort: false
              *    DataType: number | string | date
              *    Options: [A,B,C]
-             * @type {array}
+             * @type {object}
              */
-            dataDictionary:[],
+            dataDictionary:{},
 
             /**
              * variables that determine the filter and sort
