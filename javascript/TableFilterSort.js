@@ -120,14 +120,17 @@
              *    CanSort: false
              *    DataType: number | string | date
              *    Options: [A,B,C]
+             *    Rows: [0: [RowID1,RowID2,RowID3], 1: [RowID7,RowID8,RowID9]]
              * MyFieldB:
              *    CanFilter: true
              *    CanSort: false
              *    DataType: number | string | date
              *    Options: [A,B,C]
+             *    Rows: [0: [RowID1,RowID2,RowID3], 1: [RowID7,RowID8,RowID9]]
+             * Options To Row save the RowIDs for each row with the index number of the value...
              * @type {object}
              */
-            dataDictionary:{},
+            dataDictionary: {},
 
             /**
              * variables that determine the filter and sort
@@ -876,6 +879,7 @@
                 //for each table with specific class ...
                 var value = '';
                 var category = '';
+                var rowID = '';
                 myob.myRows.each(
                     function(i, row) {
                         jQuery(row).find(myob.filterItemSelector).each(
@@ -883,6 +887,7 @@
                                 el = jQuery(el);
                                 value = el.text();
                                 category = el.attr('data-filter');
+                                rowID = el.attr('id');
                                 if(value.trim().length > 0) {
                                     if(typeof myob.dataDictionary[category] === "undefined") {
                                         myob.dataDictionary[category] = {};
@@ -891,7 +896,18 @@
                                         myob.dataDictionary[category]['Options'] = [];
                                     }
                                     if(myob.dataDictionary[category]['Options'].indexOf(value) === -1) {
+                                        //push value
                                         myob.dataDictionary[category]['Options'].push(value);
+                                        //add to row options
+                                        if(typeof rowID !== 'undefined') {
+                                            if(typeof myob.dataDictionary[category]['Rows'] === "undefined") {
+                                                myob.dataDictionary[category]['Rows'] = {};
+                                            }
+                                            if(typeof myob.dataDictionary[category]['Rows'][value] === "undefined") {
+                                                myob.dataDictionary[category]['Rows'][value] = [];
+                                            }
+                                            myob.dataDictionary[category]['Rows'][value].push(rowID);
+                                        }
                                     }
                                 }
                             }
@@ -964,8 +980,8 @@
 
             /**
              * ensures that all the dataDictionary data is available
-             * and validates it.
-             * @return {[type]} [description]
+             * and validates it.  It does this mainly through looking at the
+             * sort options provided
              */
             dataDictionaryCollector: function()
             {
