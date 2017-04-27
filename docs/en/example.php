@@ -379,8 +379,8 @@ $html = create_test();
                     <span class="total-showing-row-number">
                         <input type="number" min="1" max="10000" step="50" name="VisibleRowCount" class="visible-row-count" />
                     </span> -
-                    <strong>Currently Shown Entries:</strong>
-                    <span class="min-row-number">0</span> - <span class="max-row-number">0</span>
+                    <strong>Currently Showing:</strong>
+                    <span class="min-row-number">0</span> - <span class="max-row-number">0</span> of <span class="total-row-number">0</span>
                 </span>
             </div>
 
