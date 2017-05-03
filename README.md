@@ -15,7 +15,7 @@
 
  * [Developer Docs](docs/en/INDEX.md)
  * [User Guide](docs/en/userguide.md)
- * [API Docs](http://docs.ssmods.com/sunnysideup/table_filter_sort)
+ * [API Docs](http://docs.ssmods.com/sunnysideup/table_filter_sort/classes.xhtml)
 
 ## Requirements
 
