@@ -60,7 +60,11 @@ class TableFilterSortTag extends DataObject {
             return TableFilterSortTag::create();
         }
         $filter = array('Title' => $title);
-        $obj = DataObject::get_one('TableFilterSortTag', $filter);
+        $obj = DataObject::get_one(
+            'TableFilterSortTag',
+            $filter,
+            $cacheDataObjectGetOne = false
+        );
         if ($obj) {
             $obj = TableFilterSortTag::create($filter);
         }

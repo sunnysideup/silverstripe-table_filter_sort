@@ -80,7 +80,8 @@ class TableFilterSortServerSaver extends DataObject {
         }
         $obj = DataObject::get_one(
             $className,
-            'LOWER("Title") =\''.Convert::raw2sql($titleToLower).'\' AND ParentPageID = \''.Convert::raw2sql($parentPageID).'\''
+            'LOWER("Title") =\''.Convert::raw2sql($titleToLower).'\' AND ParentPageID = \''.Convert::raw2sql($parentPageID).'\'',
+            $cacheDataObjectGetOne = false
         );
         if ($obj) {
             $obj = $className::create();
