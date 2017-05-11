@@ -173,9 +173,10 @@ class TableFilterSortServerSaver_Controller extends Controller
     {
         $this->getResponse()->addHeader('Content-Type', 'application/json');
         $urlSegment = Convert::raw2sql($request->param('ID'));
-        $obj = TableFilterSortServerSaver::get()
-            ->filter(array('URLSegment' => $urlSegment))
-            ->first();
+        $obj = DataObject::get_one(
+            'TableFilterSortServerSaver',
+            array('URLSegment' => $urlSegment)
+        );
         if($obj) {
             return json_encode(
                 array(
