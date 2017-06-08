@@ -1583,7 +1583,7 @@
                     var i = 0;
                     var input;
                     for(i = 0; i < awesompleteFields.length; i++) {
-                        category = awesompleteFields[i];
+                        var category = awesompleteFields[i];
                         var jQueryInput = myob.myFilterFormInner.find('input[name="'+category+'"].awesomplete').first();
                         var id = jQuery(jQueryInput).attr('id');
                         var input = document.getElementById(id);
@@ -2095,9 +2095,9 @@
                             dotCount = 0;
                             pageHTML += '<span>['+(i+1)+']</span>';
                         } else {
-                            test1 = (i > startOfPaginator && i < endOfPaginator);
-                            test2 = (i >= (pageCount - 1));
-                            test3 = (i < (0 + 1));
+                            var test1 = (i > startOfPaginator && i < endOfPaginator);
+                            var test2 = (i >= (pageCount - 1));
+                            var test3 = (i < (0 + 1));
                             if(test1 || test2 || test3) {
                                 classes = [];
                                 dotCount = 0;
