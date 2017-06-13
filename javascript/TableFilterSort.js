@@ -711,7 +711,8 @@
              * startup
              *
              */
-            init: function(holderNumber){
+            init: function(holderNumber)
+            {
                 //get the holders
                 myob.holderNumber = holderNumber;
                 myob.myTableHolder = myTableHolder;
@@ -836,7 +837,8 @@
                 myob.myRows = myob.myTable.find(myob.rowSelector);
             },
 
-            setTableWidth: function() {
+            setTableWidth: function()
+            {
                 if(myob.fixedHeaderClass) {
                     //just in case ...
                     myob.myTable.css('table-layout', 'fixed');
@@ -1076,7 +1078,8 @@
             // LISTENERS
             //===================================================================
 
-            fixTableHeaderListener: function() {
+            fixTableHeaderListener: function()
+            {
                 if(myob.fixedHeaderClass) {
                     jQuery(window).delayedOn(
                         "load scroll",
@@ -1598,7 +1601,10 @@
                                 replace: function(text) {
                                     // var before = this.input.value.match(/^.+,\s*|/)[0];
                                     // this.input.value = before + text + ', ';
-                                    myob.makeCheckboxSection(this.input, text.value);
+                                    myob.makeCheckboxSection(
+                                        this.input,
+                                        text.value
+                                    );
                                     this.input.value = '';
                                     Awesomplete.blackList.push(text.value);
                                     myob.runCurrentFilter();
@@ -1720,7 +1726,7 @@
             {
                 input = jQuery(input);
                 var category = input.attr('name');
-                tabIndex = input.attr('tabindex');
+                var tabIndex = input.attr('tabindex');
                 var html = myob.makeFieldForForm('checkbox', category, tabIndex, valueIndex);
                 if(html.length > 5) {
                     html = html.replace('<input ', '<input checked="checked" ');
@@ -2227,6 +2233,8 @@
                                     input = jQuery(input);
                                     var ivl = input.val().raw2safe();
                                     var vtm = ivl.toLowerCase().trim().raw2safe();
+                                    var innerInputVal = '';
+                                    var innerValueToMatch = '';
                                     switch(fieldType) {
                                         case 'keyword':
                                             if(vtm.length > 1) {
@@ -2627,7 +2635,10 @@
 
 
 String.prototype.raw2safe = function(){
-    return this.replace(/[^a-z0-9*._\-,\s]/gi, " ");
+    var tmp = document.createElement("DIV");
+    tmp.innerHTML = this;
+    return tmp.textContent || tmp.innerText || "";
+    // return this.replace(/[^a-z0-9*._\-,\s]/gi, " ");
 }
 
 /**
@@ -2767,7 +2778,7 @@ jQuery.fn.isOnScreen = function(){
         args.push(
             function () {
                 var self = this, params = arguments;
-                clearTimeout(timer);
+                window.clearTimeout(timer);
                 timer = setTimeout(
                     function () {
                         fn.apply(self, params);
