@@ -71,6 +71,13 @@
             holderNumber: 0,
 
             /**
+             * fixed header to keep into consideration
+             * when scrolling to top.
+             * @type {Number}
+             */
+            sizeOfFixedHeader: 0,
+
+            /**
              * selector for outer holder
              *
              * @type {jQuery}
@@ -1959,9 +1966,13 @@
              scrollToTopOfHolder: function()
              {
                  if(myob.canPushState || myob.scrollToTopAtPageOpening) {
+                     var exactPosition = myob.myTableHolder.position().top;
+                     if(myob.sizeOfFixedHeader) {
+                         exactPosition = exactPosition - myob.sizeOfFixedHeader;
+                     }
                      jQuery('html, body').animate(
                          {
-                             scrollTop: myob.myTableHolder.position().top
+                             scrollTop: exactPosition
                          },
                          200
                      );
