@@ -170,7 +170,7 @@
     background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%233498db" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');
 }
 
-.tfs-action {
+.tfs-holder .tfs-action {
     padding-top: 0!important;
     padding-bottom: 0!important;
     margin-top: 0!important;
@@ -180,7 +180,7 @@
     line-height: 1!important;
 }
 
-.tfs-action a {
+.tfs-holder .tfs-action a {
     background-repeat: no-repeat;
     background-position: top left;
     display: inline-block;
@@ -188,9 +188,11 @@
     width: 24px;
     color: transparent!important;
     outline: 0;
+    text-indent: -9999px;
+    text-align: left;
 }
 
-.tfs-action a:hover {
+.tfs-holder .tfs-action a:hover {
     background-position: 0 -1px;
 }
 
