@@ -690,7 +690,7 @@
             quickKeywordFilterSelector: 'input[name="QuickKeyword"]',
 
             /**
-             * the class that is applied to the select all icon in each inner filter
+             * the class that is applied to the inverse selection icon in each inner filter
              * @type {string}
              */
             inverseSelectionFilterClass: 'inverse-selection',
@@ -2631,6 +2631,12 @@
                 }
                 if (testA === testB) {
                     return 0;
+                }
+                if (isNaN(testA)) {
+                    return 1;
+                }
+                if (isNaN(testB)) {
+                    return -1;
                 }
                 else {
                     return (testA < testB) ? -1 : 1;
