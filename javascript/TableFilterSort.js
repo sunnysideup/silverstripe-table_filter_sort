@@ -690,6 +690,12 @@
             quickKeywordFilterSelector: 'input[name="QuickKeyword"]',
 
             /**
+             * the class that is applied to the select all icon in each inner filter
+             * @type {string}
+             */
+            inverseSelectionFilterClass: 'inverse-selection',
+
+            /**
              *
              *
              * TABLE HEADER SELECTORS AND CLASSES
@@ -1202,6 +1208,23 @@
                     }
                 );
 
+                myob.myFilterFormInner.on(
+                    'click',
+                    '.' +  myob.inverseSelectionFilterClass,
+                    function (e) {
+                        jQuery(this).parent().find('input[type="checkbox"]').each(function(idx, element) {
+                            if (jQuery(element).prop('checked')) {
+                                jQuery(element).prop('checked', false);
+                            } else {
+                                jQuery(element).prop('checked', true);
+                            }
+                        });
+                        window.setTimeout(function(){
+                            myob.runCurrentFilter();
+                        }, 50);
+                    }
+                )
+
             },
 
 
@@ -1628,9 +1651,13 @@
             {
                 var myClass = type + myob.sectionFilterClassAppendix;
                 var cleanCategory = category.replace(/\W/g, '');
-                return '<div class="' + myob.filterGroupClass + ' ' + myClass + '" field-type="'+type+'" data-to-filter="' + category.raw2attr() + '">' +
-                        '<label class="'+myob.groupLabelClass+'">' + myob.replaceAll(category, '-', ' ') + '</label>' +
-                        '<ul>';
+                var html =  '<div class="' + myob.filterGroupClass + ' ' + myClass + '" field-type="'+type+'" data-to-filter="' + category.raw2attr() + '">' +
+                        '<label class="'+myob.groupLabelClass+'">' + myob.replaceAll(category, '-', ' ') + '</label>';
+                if (type === 'checkbox') {
+                    html += '<span class="' + myob.inverseSelectionFilterClass + '"><i class="material-icons">done_all</i></span>';
+                }
+                html += '<ul>';
+                return html;
             },
 
             makeFieldForForm: function(type, category, tabIndex, valueIndex)
