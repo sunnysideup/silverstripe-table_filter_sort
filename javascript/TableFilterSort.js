@@ -741,25 +741,24 @@
                 myob.myTable = myob.myTableHolder.find(myob.tableSelector).first();
                 myob.myTableHead = myob.myTableHolder.find("table thead");
                 myob.myTableBody = myob.myTable.find(" > tbody");
-                //get the rows
-                myob.resetObjects();
-
                 //base URL
                 myob.baseURL = location.protocol + '//' + location.host + location.pathname;
 
+                //get the rows
+                myob.resetObjects();
+
                 if(myob.myRows.length > 0){
+                    myob.myTableHolder.find(myob.matchRowCountSelector).html('...');
+                    myob.myTableHolder.find(myob.totalRowCountSelector).html('...');
+
+                    myob.myTableHolder.addClass(myob.loadingClass);
                     window.setTimeout(
                         function() {
-                            var img = '<img src="'+myob.loadingImageURL+'" />';
-                            myob.myTableHolder.find(myob.matchRowCountSelector).html('...');
-                            myob.myTableHolder.find(myob.totalRowCountSelector).html('...');
-
-                            myob.myTableHolder.addClass(myob.loadingClass);
-                            //COLLECT AND FIX
-                            // get the rows .
-                            //collect filter items
+                            // COLLECT AND FIX
+                            // what needs to be done
                             if(myob.debug) { console.profile('whatIsIncluded');}
                             myob.whatIsIncluded();
+                            //collect filter items
                             if(myob.debug) { console.profile('filterItemCollector');}
                             myob.filterItemCollector();
                             //look for cols that are the same
@@ -896,14 +895,6 @@
                 if(typeof myob.filtersParentPageID === 'string' && myob.filtersParentPageID.length > 0) {
                     myob.hasFilterSaving = true;
                 }
-                myob.hasFavourites = myob.myTableBody.find(myob.favouriteLinkSelector).first().length > 0;
-                var html = myob.myTableBody.html();
-                if(
-                    hmtl.indexOf('<select') ||
-                    hmtl.indexOf('<input')
-                    hmtl.indexOf('<textarea')
-                )
-                myob.hasFormElements = myob.myTableBody.find('input, select, textarea').first().length > 0;
             },
 
             /**
@@ -919,37 +910,65 @@
                     function(i, row) {
                         var row = jQuery(row);
                         rowID = jQuery.attr('id');
+                        if(i === 0) {
+                            myob.hasFavourites = row.find(myob.favouriteLinkSelector).length > 0 ? true : false;
+                            var formFieldSelector = 'input['+myob.filterItemAttribute+'], select['+myob.filterItemAttribute+'], textarea['+myob.filterItemAttribute+']';
+                            myob.hasFormElements = row.find(formFieldSelector).length > 0 ? true : false;
+                        }
                         row.find('[' + myob.filterItemAttribute + ']').each(
                             function(j, el) {
                                 el = jQuery(el);
                                 value = myob.findValueOfObject(el);
                                 category = el.attr(myob.filterItemAttribute);
+                                myob.addOptioToCategory(category, value);
                                 if(value.length > 0) {
-                                    if(typeof myob.dataDictionary[category] === "undefined") {
-                                        myob.dataDictionary[category] = {};
+                                    //add to row options
+                                    if(typeof myob.dataDictionary[category]['Rows'] === "undefined") {
+                                        myob.dataDictionary[category]['Rows'] = {};
                                     }
-                                    if(typeof myob.dataDictionary[category]['Options'] === "undefined") {
-                                        myob.dataDictionary[category]['Options'] = [];
+                                    if(typeof myob.dataDictionary[category]['Rows'][value] === "undefined") {
+                                        myob.dataDictionary[category]['Rows'][value] = [];
                                     }
-                                    if(myob.dataDictionary[category]['Options'].indexOf(value) === -1) {
-                                        //push value
-                                        myob.dataDictionary[category]['Options'].push(value);
-                                        //add to row options
-                                        if(typeof rowID !== 'undefined') {
-                                            if(typeof myob.dataDictionary[category]['Rows'] === "undefined") {
-                                                myob.dataDictionary[category]['Rows'] = {};
-                                            }
-                                            if(typeof myob.dataDictionary[category]['Rows'][value] === "undefined") {
-                                                myob.dataDictionary[category]['Rows'][value] = [];
-                                            }
-                                            myob.dataDictionary[category]['Rows'][value].push(rowID);
-                                        }
-                                    }
+                                    myob.dataDictionary[category]['Rows'][value].push(rowID);
                                 }
                             }
                         );
                     }
                 );
+            },
+
+            /**
+             * check if Option has been added to category and add if needed...
+             * @param string category
+             * @param mixed value
+             */
+            addOptioToCategory: function(category, value)
+            {
+                if(typeof myob.dataDictionary[category] === "undefined") {
+                    myob.dataDictionary[category] = {};
+                }
+                if(typeof myob.dataDictionary[category]['Options'] === "undefined") {
+                    myob.dataDictionary[category]['Options'] = [];
+                }
+                if(myob.dataDictionary[category]['Options'].indexOf(value) === -1) {
+                    //push value
+                    myob.dataDictionary[category]['Options'].push(value);
+                }
+            },
+
+            /**
+             * check if Option has been added to category and add if needed...
+             * @param string category
+             * @param mixed value
+             */
+            removeOptionFromCategory: function(category, value)
+            {
+                var index = myob.dataDictionary[category]['Options'].indexOf(value);
+                if(index === -1) {
+                    //push value
+                    return;
+                }
+                myob.dataDictionary[category]['Options'].splice(index, 1);
             },
 
             /**
@@ -1075,23 +1094,31 @@
                         if(jQuery.inArray( myob.dataDictionary[category]['DataType'], myob.validDataTypes ) === false) {
                             console.debug('ERROR: invalid DataType for'+category+': '+myob.dataDictionary[category]['DataType'])
                         }
-                        //sort options
-                        switch(myob.dataDictionary[category]['DataType']) {
-                            case 'number':
-                                myob.dataDictionary[category]['Options'].sort(
-                                    function(a,b){
-                                        a = parseFloat(a.replace(/[^0-9.]/g,''));
-                                        b = parseFloat(b.replace(/[^0-9.]/g,''));
-                                        return a - b
-                                    }
-                                );
-                                break;
-                            case 'string':
-                            default:
-                                myob.dataDictionary[category]['Options'].sort();
-                        }
+                        myob.dataDictionarySorter(category, 'Options');
                     }
                 );
+            },
+
+            dataDictionarySorter: function(category, fieldName)
+            {
+                if(typeof fieldName === 'undefined') {
+                    fieldName = 'Options';
+                }
+                //sort options
+                switch(myob.dataDictionary[category]['DataType']) {
+                    case 'number':
+                        myob.dataDictionary[category][fieldName].sort(
+                            function(a,b){
+                                a = parseFloat(a.replace(/[^0-9.]/g,''));
+                                b = parseFloat(b.replace(/[^0-9.]/g,''));
+                                return a - b
+                            }
+                        );
+                        break;
+                    case 'string':
+                    default:
+                        myob.dataDictionary[category][fieldName].sort();
+                }
             },
 
             findDefaultSort: function()
@@ -1440,9 +1467,44 @@
                         function(event){
                             // update tfs-data
                             var el = jQuery(this);
+                            var category = el.attr(myob.filterItemAttribute);
+                            // update data dictionary
+                            if(typeof category !== 'undefined') {
+                                if(typeof myob.dataDictionary[category] !== 'undefined') {
+                                    var oldValue = el.attr('data-tfsvalue');
+                                    var newValue = el.val();
+
+                                    // 1. add to Rows ...
+                                    var rowID = el.closest('tr').attr('id');
+                                    var swapDone = false;
+                                    if(typeof oldValue !== 'undefined') {
+                                        var tempIndex = myob.dataDictionary[category]['Rows'][oldValue].indexOf(rowID);
+                                        if(tempIndex !== -1) {
+                                            myob.dataDictionary[category]['Rows'][oldValue].arraySplice(tempIndex, 1);
+                                            myob.dataDictionary[category]['Rows'][newValue].push(rowID);
+                                            swapDone = true;
+                                        }
+                                    }
+                                    if(swapDone === false){
+                                        Object.keys(myob.dataDictionary[category]['Rows']).forEach(
+                                            function(tempValue) {
+                                                var tempIndex = tempValue.indexOf(rowID);
+                                                if(tempIndex !== -1) {
+                                                    oldValue = value;
+                                                    myob.dataDictionary[category]['Rows'][oldValue].arraySplice(tempIndex, 1);
+                                                    myob.dataDictionary[category]['Rows'][newValue].push(rowID);
+                                                }
+                                            }
+                                        );
+                                    }
+                                    // 2. remove and add to Options
+                                    myob.removeOptionFromCategory(category, oldValue);
+                                    myob.addOptioToCategory(category, newValue);
+
+                                }
+                            }
                             el.removeAttr('data-tfsvalue');
                             myob.findValueOfObject(el);
-                            // update data dictionary
                         }
                     );
 
