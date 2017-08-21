@@ -127,13 +127,13 @@
              *    CanSort: false
              *    DataType: number | string | date
              *    Options: [A,B,C]
-             *    Rows: [0: [RowID1,RowID2,RowID3], 1: [RowID7,RowID8,RowID9]]
+             *    Rows: [0: [RowID1,RowID2,RowID3], 1: [RowID7,RowID8,RowID9], 3: [RowID34, RowID23]]
              * MyFieldB:
              *    CanFilter: true
              *    CanSort: false
              *    DataType: number | string | date
              *    Options: [A,B,C]
-             *    Rows: [0: [RowID1,RowID2,RowID3], 1: [RowID7,RowID8,RowID9]]
+             *    Rows: ['myValueB': [RowID1,RowID2,RowID3], 'xx': [RowID7,RowID8,RowID9], 'myOtherValue': [RowID34, RowID23]]
              * Options To Row save the RowIDs for each row with the index number of the value...
              * @type {object}
              */
@@ -233,10 +233,17 @@
             hasKeywords: true,
 
             /**
-             *
+             * can favourites be selected by user?
              * @type {boolean}
              */
             hasFavourites: false,
+
+            /**
+             * are their form elements the user can edit
+             * and filter with ...
+             * @type {boolean}
+             */
+            hasFormElements: false,
 
             /**
              *
@@ -245,7 +252,7 @@
             hasFavouritesSaving: false,
 
             /**
-             *
+             * can filters be saved?
              * @type {boolean}
              */
             hasFilterSaving: false,
@@ -538,7 +545,7 @@
              * items that can be filtered / sorted for ...
              * @type {string}
              */
-            filterItemSelector: 'span[data-filter]',
+            filterItemAttribute: 'data-filter',
 
             /**
              * @type {string}
@@ -737,18 +744,6 @@
                 //get the rows
                 myob.resetObjects();
 
-                //are we saving favourites?
-                myob.favouritesParentPageID = myob.myTableHolder.attr("data-favourites-parent-page-id");
-                if(typeof myob.favouritesParentPageID === 'string' && myob.favouritesParentPageID.length > 0) {
-                    myob.hasFavouritesSaving = true;
-                }
-
-                //are we saving filter?
-                myob.filtersParentPageID = myob.myTableHolder.attr("data-filters-parent-page-id");
-                if(typeof myob.filtersParentPageID === 'string' && myob.filtersParentPageID.length > 0) {
-                    myob.hasFilterSaving = true;
-                }
-
                 //base URL
                 myob.baseURL = location.protocol + '//' + location.host + location.pathname;
 
@@ -763,6 +758,8 @@
                             //COLLECT AND FIX
                             // get the rows .
                             //collect filter items
+                            if(myob.debug) { console.profile('whatIsIncluded');}
+                            myob.whatIsIncluded();
                             if(myob.debug) { console.profile('filterItemCollector');}
                             myob.filterItemCollector();
                             //look for cols that are the same
@@ -781,8 +778,6 @@
                                     if(myob.debug) { console.profileEnd();console.profile('findDefaultSort');}
                                     myob.findDefaultSort();
 
-
-
                                     //LISTENERS ...
                                     if(myob.debug) { console.profileEnd();console.profile('fixTableHeaderListener');}
                                     myob.fixTableHeaderListener();
@@ -800,6 +795,8 @@
                                     myob.favouriteLinkListener();
                                     if(myob.debug) { console.profileEnd();console.profile('directFilterLinkListener');}
                                     myob.directFilterLinkListener();
+                                    if(myob.debug) { console.profileEnd();console.profile('formElementsListener');}
+                                    myob.formElementsListener();
                                     if(myob.debug) { console.profileEnd();console.profile('addURLChangeListener');}
                                     myob.addURLChangeListener();
 
@@ -886,6 +883,29 @@
             // COLLECTORS
             //===================================================================
 
+            whatIsIncluded: function()
+            {
+                //are we saving favourites?
+                myob.favouritesParentPageID = myob.myTableHolder.attr("data-favourites-parent-page-id");
+                if(typeof myob.favouritesParentPageID === 'string' && myob.favouritesParentPageID.length > 0) {
+                    myob.hasFavouritesSaving = true;
+                }
+
+                //are we saving filter?
+                myob.filtersParentPageID = myob.myTableHolder.attr("data-filters-parent-page-id");
+                if(typeof myob.filtersParentPageID === 'string' && myob.filtersParentPageID.length > 0) {
+                    myob.hasFilterSaving = true;
+                }
+                myob.hasFavourites = myob.myTableBody.find(myob.favouriteLinkSelector).first().length > 0;
+                var html = myob.myTableBody.html();
+                if(
+                    hmtl.indexOf('<select') ||
+                    hmtl.indexOf('<input')
+                    hmtl.indexOf('<textarea')
+                )
+                myob.hasFormElements = myob.myTableBody.find('input, select, textarea').first().length > 0;
+            },
+
             /**
              * find the filters ...
              */
@@ -897,13 +917,14 @@
                 var rowID = '';
                 myob.myRows.each(
                     function(i, row) {
-                        jQuery(row).find(myob.filterItemSelector).each(
+                        var row = jQuery(row);
+                        rowID = jQuery.attr('id');
+                        row.find('[' + myob.filterItemAttribute + ']').each(
                             function(j, el) {
                                 el = jQuery(el);
-                                value = el.text();
-                                category = el.attr('data-filter');
-                                rowID = el.attr('id');
-                                if(value.trim().length > 0) {
+                                value = myob.findValueOfObject(el);
+                                category = el.attr(myob.filterItemAttribute);
+                                if(value.length > 0) {
                                     if(typeof myob.dataDictionary[category] === "undefined") {
                                         myob.dataDictionary[category] = {};
                                     }
@@ -953,31 +974,38 @@
                             commonContentExists = true;
                             var commonContentAdded = false;
                             //remove text from span
-                            jQuery('span[data-filter="' + category + '"]').each(
+                            myob.myRows.find('['+myob.filterItemAttribute+'="' + category + '"]').each(
                                 function(i, el) {
                                     el = jQuery(el);
                                     if(!commonContentAdded) {
-                                        if(el.html() !== "" && !el.hasClass('ignore-content')){
+                                        if(el.html() === "" || el.hasClass('ignore-content')){
+                                            // do nothing
+                                        } else {
                                             commonContent += "<li><strong>"+category + ":</strong> <span>" + el.html() + "</span></li>";
                                             commonContentAdded = true;
                                         }
                                     }
-                                    var spanParent = el.parent();
-                                    el.remove();
+                                    // is select, input, textarea
+                                    if(el.is(':input')) {
+                                        // do nothing
+                                    } else {
+                                        var spanParent = el.parent();
+                                        el.remove();
 
-                                    if(spanParent.is("li")){
-                                        spanParent.hide();
-                                    }
-                                    //if td is empty then remove td and correspoding th
-                                    else if(spanParent.is("td")){
-                                        if(spanParent.children().length === 0) {
-                                            //get column number of td
-                                            //get related table header
-                                            if(i === 0) {
-                                                var colNumber = spanParent.parent("tr").children("td").index(spanParent);
-                                                myob.myTable.find('th').eq(colNumber).remove();
+                                        if(spanParent.is("li")){
+                                            spanParent.hide();
+                                        }
+                                        //if td is empty then remove td and correspoding th
+                                        else if(spanParent.is("td")){
+                                            if(spanParent.children().length === 0) {
+                                                //get column number of td
+                                                //get related table header
+                                                if(i === 0) {
+                                                    var colNumber = spanParent.parent("tr").children("td").index(spanParent);
+                                                    myob.myTable.find('th').eq(colNumber).remove();
+                                                }
+                                                spanParent.remove();
                                             }
-                                            spanParent.remove();
                                         }
                                     }
                                 }
@@ -1212,16 +1240,23 @@
                     'click',
                     '.' +  myob.inverseSelectionFilterClass,
                     function (e) {
-                        jQuery(this).parent().find('input[type="checkbox"]').each(function(idx, element) {
-                            if (jQuery(element).prop('checked')) {
-                                jQuery(element).prop('checked', false);
-                            } else {
-                                jQuery(element).prop('checked', true);
+                        jQuery(this).parent().find('input[type="checkbox"]').each(
+                            function(i, el) {
+                                el = jQuery(el);
+                                if (el[0].checked === true) {
+                                    el.prop('checked', false);
+                                } else {
+                                    el.prop('checked', true);
+                                }
                             }
-                        });
-                        window.setTimeout(function(){
-                            myob.runCurrentFilter();
-                        }, 50);
+                        );
+                        //release DOM
+                        window.setTimeout(
+                            function(){
+                                myob.runCurrentFilter();
+                            },
+                            50
+                        );
                     }
                 )
 
@@ -1346,12 +1381,12 @@
             {
                 myob.myTableBody.on(
                     'click',
-                    myob.filterItemSelector + '.' + myob.directLinkClass,
+                    '[' + myob.filterItemAttribute + '].' + myob.directLinkClass,
                     function(event){
                         event.preventDefault();
                         var myEl = jQuery(this);
-                        var category = myEl.attr('data-filter');
-                        var filterValue = myEl.text().trim();
+                        var category = myEl.attr(myob.filterItemAttribute);
+                        var filterValue = myob.findValueOfObject(myEl);
                         var filterHolder = myob.myFilterFormInner
                             .find('.'+myob.filterGroupClass+'[data-to-filter="'+category+'"]');
                         var fieldType = filterHolder.attr('field-type');
@@ -1377,7 +1412,7 @@
                         }
                         var onClass = myob.directLinkClass+'-on';
                         myob.myRows
-                            .find('span[data-filter="'+category+'"].'+myob.directLinkClass).each(
+                            .find('['+myob.filterItemAttribute+'="'+category+'"].'+myob.directLinkClass).each(
                                 function(i, el) {
                                     var myEl = jQuery(el);
                                     if(myEl.text().trim() === filterValue) {
@@ -1396,8 +1431,25 @@
                 );
             },
 
+            formElementsListener: function()
+            {
+                if(myob.hasFormElements) {
+                    myob.myTableBody.on(
+                        'change',
+                        'input[' + myob.filterItemAttribute + '], select[' + myob.filterItemAttribute + '], textarea[' + myob.filterItemAttribute + ']',
+                        function(event){
+                            // update tfs-data
+                            var el = jQuery(this);
+                            el.removeAttr('data-tfsvalue');
+                            myob.findValueOfObject(el);
+                            // update data dictionary
+                        }
+                    );
+
+                }
+            },
+
             favouriteLinkListener: function(){
-                myob.hasFavourites = myob.myTableBody.find(myob.favouriteLinkSelector).length > 0;
                 if(myob.hasFavourites) {
                     //favouite links in table
                     myob.myTableBody.on(
@@ -1651,11 +1703,11 @@
             {
                 var myClass = type + myob.sectionFilterClassAppendix;
                 var cleanCategory = category.replace(/\W/g, '');
-                var html =  '<div class="' + myob.filterGroupClass + ' ' + myClass + '" field-type="'+type+'" data-to-filter="' + category.raw2attr() + '">' +
-                        '<label class="'+myob.groupLabelClass+'">' + myob.replaceAll(category, '-', ' ') + '</label>';
+                var html =  '<div class="' + myob.filterGroupClass + ' ' + myClass + '" field-type="'+type+'" data-to-filter="' + category.raw2attr() + '">';
                 if (type === 'checkbox') {
-                    html += '<span class="' + myob.inverseSelectionFilterClass + '"><i class="material-icons">done_all</i></span>';
+                    html += '<span class="' + myob.inverseSelectionFilterClass + '"><i class="material-icons">flip</i></span>';
                 }
+                html += '<label class="'+myob.groupLabelClass+'">' + myob.replaceAll(category, '-', ' ') + '</label>';
                 html += '<ul>';
                 return html;
             },
@@ -1791,9 +1843,9 @@
                     myob.myRows.each(
                         function(i, el) {
                             var row = jQuery(el);
-                            var dataValue = row.find('[data-filter="' + myob.csr.sct + '"]').text();
+                            var dataElement = row.find('['+myob.filterItemAttribute+'="' + myob.csr.sct + '"]');
+                            var dataValue = myob.findValueOfObject(dataElement).toLowerCase();
                             if(dataValue !== 'undefined') {
-                                dataValue = dataValue.trim();
                                 if(type === "number") {
                                     dataValue = dataValue.replace(/[^\d.-]/g, '');
                                     dataValue = parseFloat(dataValue);
@@ -1855,6 +1907,8 @@
 
                         var stillLookingForCategory = true;
 
+                        var rowID = row.attr('id');
+
                         //check for each category
                         Object.keys(myob.cfi).forEach(
                             function(categoryToMatch, categoryToMatchIndex) {
@@ -1868,7 +1922,7 @@
                                         //what is the value .. if it matches, the row is OK and we can go to next category ...
                                         if(stillLookingForValue) {
                                             if(categoryToMatch === myob.favouritesCategoryTitle) {
-                                                var rowID = row.attr('id');
+
                                                 if(typeof rowID !== 'undefined' && rowID.length > 0) {
                                                     if(myob.mfv.indexOf(rowID) > -1) {
                                                         rowMatchesForFilterGroup = true;
@@ -1890,10 +1944,10 @@
                                                     rowMatchesForFilterGroup = true;
                                                 }
                                             } else {
-                                                row.find('span[data-filter="' + categoryToMatch + '"]').each(
+                                                row.find('['+myob.filterItemAttribute+'="' + categoryToMatch + '"]').each(
                                                     function(innerI, innerEl) {
                                                         innerEl = jQuery(innerEl);
-                                                        var rowValue = innerEl.text().toLowerCase().raw2safe().trim();
+                                                        var rowValue = myob.findValueOfObject(innerEl).toLowerCase();
                                                         switch(myob.dataDictionary[categoryToMatch]['DataType']) {
                                                             case 'date':
                                                                 //to do ....
@@ -2503,8 +2557,8 @@
                         }
                         delete myob.serverDataToApply['mfv']
                     }
+                    myob.createFilterForm();
                     if(typeof myob.serverDataToApply['cfi'] !== 'undefined' && myob.serverDataToApply['cfi'] === true) {
-                        myob.createFilterForm();
                         myob.runCurrentFilter();
                         delete myob.serverDataToApply['cfi'];
                     }
@@ -2530,7 +2584,51 @@
             //===================================================================
             // HELPER FUNCTIONS
             //===================================================================
+            //
+            findValueOfObject: function(myObject)
+            {
+                var val = ''
+                var mytype = myObject.prop('nodeName').toUpperCase();
+                var quickInputFind = false;
+                switch(mytype) {
+                    case 'INPUT':
+                    case 'SELECT':
+                    case 'TEXTAREA':
+                        val = myObject.attr('data-tfsvalue');
+                        if(typeof val !== 'undefined') {
+                            quickInputFind = true;
+                        }
+                        break;
+                    default:
+                        quickInputFind = true;
+                        val = myObject.text().trim();
+                }
+                if(quickInputFind === false) {
+                    switch(mytype) {
+                        case 'INPUT':
+                            var inputType = myObject.attr('type');
+                            if(inputType === 'checkbox') {
+                                val = myObject[0].checked ? 'YES' : 'NO';
+                            } else {
+                                val = myObject.val();
+                            }
+                            break;
+                        case 'SELECT':
+                            val = myObject.find("option:selected" ).text();
+                            break;
+                        case 'TEXTAREA':
+                            val = myObject.val();
+                            break;
+                        default:
+                            //do nothing....
+                    }
+                }
+                val = val.trim();
+                val = val.raw2safe();
+                myObject.attr('data-tfsvalue', val);
 
+                return val;
+            },
 
             replaceAll: function(string, search, replacement)
             {

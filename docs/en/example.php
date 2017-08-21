@@ -167,14 +167,14 @@ function create_test()
     for($i = 0; $i < $limit; $i++) {
         $html .= '
         <tr class="tfstr hide" id="tfs'.$i.'">
-            <td>
+            <th scope="row">
                 <a href="#" class="more">+</a>
                 <a href="#" class="adf" title="Add to Favourites">♥</a>
                 <span data-filter="SKU">'.($i+1).'</span><br />
                 <p style="display: none;" class="hidden">
                     Some more content goes here.
                 </p>
-            </td>
+            </th>
             <td><span data-filter="Type">'.$type.'</span></td>
             <td><span data-filter="Original Producer">'.$producer.'</span></td>
             <td><span data-filter="Colour" class="dl">'.$colours[rand(0, count($colours)-1)].'</span></td>
@@ -192,6 +192,7 @@ function create_test()
                     </ul>
                 </div>
             </td>
+            <td>your rating: <input name="your rating" data-filter="text input" type="text" value="aaaaaa'.$colours[rand(0, count($colours)-1)].'" />
         </tr>';
     }
     return $html;
@@ -211,6 +212,7 @@ $html = create_test();
         <link rel="stylesheet" type="text/css" href="../../css/awesomplete.theme.css?x=<?php echo rand(0,9999999999) ?>">
         <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.css?x=<?php echo rand(0,9999999999) ?>">
         <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.theme.css?x=<?php echo rand(0,9999999999) ?>">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     </head>
     <body>
 
@@ -358,6 +360,7 @@ $html = create_test();
                             >Rating</a>
                         </th>
                         <th scope="col">Description</th>
+                        <th scope="col">User Input</th>
                     </tr>
                 </thead>
                 <tbody>
