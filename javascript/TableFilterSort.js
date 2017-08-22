@@ -2667,7 +2667,14 @@
             findValueOfObject: function(myObject)
             {
                 var val = ''
-                var mytype = myObject.prop('nodeName').toUpperCase();
+                if(typeof myObject === 'undefined') {
+                    return '';
+                }
+                var nodeName = myObject.prop('nodeName');
+                if(typeof nodeName === 'undefined') {
+                    nodeName = 'SPAN';
+                }
+                var mytype = nodeName.toUpperCase();
                 var quickInputFind = false;
                 switch(mytype) {
                     case 'INPUT':
