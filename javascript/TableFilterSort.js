@@ -920,7 +920,7 @@
                                 el = jQuery(el);
                                 value = myob.findValueOfObject(el);
                                 category = el.attr(myob.filterItemAttribute);
-                                myob.addOptioToCategory(category, value);
+                                myob.addOptionToCategory(category, value);
                                 if(value.length > 0) {
                                     //add to row options
                                     if(typeof myob.dataDictionary[category]['Rows'] === "undefined") {
@@ -930,6 +930,9 @@
                                         myob.dataDictionary[category]['Rows'][value] = [];
                                     }
                                     myob.dataDictionary[category]['Rows'][value].push(rowID);
+                                    if (el.is(':input')) {
+                                        myob.dataDictionary[category]['isEditable'] = true;
+                                    }
                                 }
                             }
                         );
@@ -942,7 +945,7 @@
              * @param string category
              * @param mixed value
              */
-            addOptioToCategory: function(category, value)
+            addOptionToCategory: function(category, value)
             {
                 if(typeof myob.dataDictionary[category] === "undefined") {
                     myob.dataDictionary[category] = {};
@@ -989,7 +992,9 @@
                 Object.keys(myob.dataDictionary).forEach(
                     function(category, categoryIndex) {
                         if(myob.dataDictionary[category]['Options'].length === 1) {
-                            delete myob.dataDictionary[category];
+                            if (!myob.dataDictionary[category]['isEditable']) {
+                                delete myob.dataDictionary[category];
+                            }
                             commonContentExists = true;
                             var commonContentAdded = false;
                             //remove text from span
@@ -1021,7 +1026,8 @@
                                                 //get related table header
                                                 if(i === 0) {
                                                     var colNumber = spanParent.parent("tr").children("td").index(spanParent);
-                                                    myob.myTable.find('th').eq(colNumber).remove();
+                                                    myob.myTable.find('thead tr td').eq(colNumber).remove();
+                                                    myob.myTable.find('thead tr th').eq(colNumber).remove();
                                                 }
                                                 spanParent.remove();
                                             }
@@ -1060,7 +1066,7 @@
                             if(sortLink && sortLink.attr('data-sort-only') == 'true') {
                                 myob.dataDictionary[category]['CanFilter'] = false;
                             } else {
-                                myob.dataDictionary[category]['CanFilter'] = myob.dataDictionary[category]['Options'].length > 1
+                                myob.dataDictionary[category]['CanFilter'] = myob.dataDictionary[category]['Options'].length > 1 || myob.dataDictionary[category]['isEditable'];
                             }
                         }
 
@@ -1458,6 +1464,7 @@
                 );
             },
 
+
             formElementsListener: function()
             {
                 if(myob.hasFormElements) {
@@ -1476,30 +1483,12 @@
 
                                     // 1. add to Rows ...
                                     var rowID = el.closest('tr').attr('id');
-                                    var swapDone = false;
-                                    if(typeof oldValue !== 'undefined') {
-                                        var tempIndex = myob.dataDictionary[category]['Rows'][oldValue].indexOf(rowID);
-                                        if(tempIndex !== -1) {
-                                            myob.dataDictionary[category]['Rows'][oldValue].arraySplice(tempIndex, 1);
-                                            myob.dataDictionary[category]['Rows'][newValue].push(rowID);
-                                            swapDone = true;
-                                        }
-                                    }
-                                    if(swapDone === false){
-                                        Object.keys(myob.dataDictionary[category]['Rows']).forEach(
-                                            function(tempValue) {
-                                                var tempIndex = tempValue.indexOf(rowID);
-                                                if(tempIndex !== -1) {
-                                                    oldValue = value;
-                                                    myob.dataDictionary[category]['Rows'][oldValue].arraySplice(tempIndex, 1);
-                                                    myob.dataDictionary[category]['Rows'][newValue].push(rowID);
-                                                }
-                                            }
-                                        );
-                                    }
+                                    myob.updateDataDictionaryRow(category, rowID, oldValue, newValue);
                                     // 2. remove and add to Options
-                                    myob.removeOptionFromCategory(category, oldValue);
-                                    myob.addOptioToCategory(category, newValue);
+                                    if(myob.dataDictionary[category]['Rows'][oldValue].length === 0) {
+                                        myob.removeOptionFromCategory(category, oldValue);
+                                    }
+                                    myob.addOptionToCategory(category, newValue);
 
                                 }
                             }
@@ -1508,6 +1497,34 @@
                         }
                     );
 
+                }
+            },
+
+            /**
+             * find the oldValue entry in the dataDictionary
+             * removes the rowID
+             * and adds the rowID to the new Value
+             */
+            updateDataDictionaryRow: function(category, rowID, oldValue, newValue)
+            {
+                var tempIndex = null;
+                if(typeof oldValue !== 'undefined'){
+                    if(typeof myob.dataDictionary[category]['Rows'][oldValue] !== 'undefined') {
+                        tempIndex = myob.dataDictionary[category]['Rows'][oldValue].indexOf(rowID);
+                        if(tempIndex !== -1) {
+                            console.log("removed old value");
+                            myob.dataDictionary[category]['Rows'][oldValue].splice(tempIndex, 1);
+                        }
+                    }
+                }
+                if(typeof newValue !== 'undefined'){
+                    if(typeof myob.dataDictionary[category]['Rows'][newValue] === 'undefined') {
+                        myob.dataDictionary[category]['Rows'][newValue] = [];
+                    }
+                    tempIndex = myob.dataDictionary[category]['Rows'][newValue].indexOf(rowID);
+                    if(tempIndex === -1) {
+                        myob.dataDictionary[category]['Rows'][newValue].push(rowID);
+                    }
                 }
             },
 
@@ -1676,7 +1693,7 @@
                                 var cleanedValues = [];
                                 var count = 0;
                                 var optionCount = myob.dataDictionary[category]['Options'].length;
-                                if(optionCount > 1 && optionCount <= myob.maximumNumberOfFilterOptions) {
+                                if(optionCount <= myob.maximumNumberOfFilterOptions) {
                                     content += myob.makeSectionHeaderForForm(
                                         'checkbox',
                                         category
@@ -2676,7 +2693,7 @@
                             }
                             break;
                         case 'SELECT':
-                            val = myObject.find("option:selected" ).text();
+                            val = myObject.find("option:selected").text();
                             break;
                         case 'TEXTAREA':
                             val = myObject.val();
