@@ -2667,7 +2667,14 @@
             findValueOfObject: function(myObject)
             {
                 var val = ''
-                var mytype = myObject.prop('tagName').toUpperCase();
+                if(typeof myObject === 'undefined') {
+                    return '';
+                }
+                var nodeName = myObject.prop('nodeName');
+                if(typeof nodeName === 'undefined') {
+                    nodeName = 'SPAN';
+                }
+                var mytype = nodeName.toUpperCase();
                 var quickInputFind = false;
                 switch(mytype) {
                     case 'INPUT':
@@ -2806,7 +2813,7 @@
                 if(typeof testB === 'string'){
                     testB = testB.toLowerCase();
                 }
-                if (testA == testB) {
+                if (testA === testB) {
                     return 0;
                 }
                 if (isNaN(testA)) {
