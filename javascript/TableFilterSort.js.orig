@@ -1946,7 +1946,7 @@
                     myob.myTableBody.empty();
 
                     //sort
-                    arr.sort(myob.getSortComparator(type));
+                    arr.sort();
 
                     //show direction
                     var sortLinkSelection = myob.myTableHead
@@ -1968,21 +1968,6 @@
                         }
                     );
                     myob.endRowManipulation();
-                }
-            },
-
-            /**
-             * * @param {string} type [description]
-             */
-            getSortComparator: function(type)
-            {
-                switch (type) {
-                    case 'number':
-                        return myob.numberComparator;
-                    case 'string':
-                        return myob.stringComparator;
-                    default:
-                        return myob.stringComparator;
                 }
             },
 
@@ -2682,6 +2667,9 @@
             findValueOfObject: function(myObject)
             {
                 var val = ''
+<<<<<<< HEAD
+                var mytype = myObject.prop('tagName').toUpperCase();
+=======
                 if(typeof myObject === 'undefined') {
                     return '';
                 }
@@ -2690,6 +2678,7 @@
                     nodeName = 'SPAN';
                 }
                 var mytype = nodeName.toUpperCase();
+>>>>>>> 9dc78877fed2ace0f1b3aed13951ac78cffc842b
                 var quickInputFind = false;
                 switch(mytype) {
                     case 'INPUT':
@@ -2816,25 +2805,31 @@
             },
 
             /**
-             * String sorting function
+             * array sorter function ...
              */
-            stringComparator: function(a, b)
+            sortMultiDimensionalArray: function(a, b)
             {
-                return a[0].toLowerCase() - b[0].toLowerCase();
-            },
-            /**
-             * Number sorting function
-             */
-            numberComparator: function(a, b)
-            {
-                if (isNaN(a[0])) {
+                var testA = a[0];
+                if(typeof testA === 'string'){
+                    testA = testA.toLowerCase();
+                }
+                var testB = b[0];
+                if(typeof testB === 'string'){
+                    testB = testB.toLowerCase();
+                }
+                if (testA == testB) {
+                    return 0;
+                }
+                if (isNaN(testA)) {
                     return 1;
                 }
-                if (isNaN(b[0])) {
+                if (isNaN(testB)) {
                     return -1;
                 }
-                return (a[0]- b[0])
-            },
+                else {
+                    return (testA < testB) ? -1 : 1;
+                }
+            }
 
         };
 
