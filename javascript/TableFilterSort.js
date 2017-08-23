@@ -1924,7 +1924,7 @@
                             var row = jQuery(el);
                             var dataElement = row.find('['+myob.filterItemAttribute+'="' + myob.csr.sct + '"]');
                             var dataValue = myob.findValueOfObject(dataElement).toLowerCase();
-                            if(dataValue !== 'undefined') {
+                            if(typeof dataValue !== 'undefined') {
                                 if(type === "number") {
                                     dataValue = dataValue.replace(/[^\d.-]/g, '');
                                     dataValue = parseFloat(dataValue);
@@ -1946,7 +1946,7 @@
                     myob.myTableBody.empty();
 
                     //sort
-                    arr.sort(myob.sortMultiDimensionalArray);
+                    arr.sort();
 
                     //show direction
                     var sortLinkSelection = myob.myTableHead
@@ -2667,7 +2667,7 @@
             findValueOfObject: function(myObject)
             {
                 var val = ''
-                var mytype = myObject.prop('nodeName').toUpperCase();
+                var mytype = myObject.prop('tagName').toUpperCase();
                 var quickInputFind = false;
                 switch(mytype) {
                     case 'INPUT':
@@ -2806,7 +2806,7 @@
                 if(typeof testB === 'string'){
                     testB = testB.toLowerCase();
                 }
-                if (testA === testB) {
+                if (testA == testB) {
                     return 0;
                 }
                 if (isNaN(testA)) {

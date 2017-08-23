@@ -192,7 +192,13 @@ function create_test()
                     </ul>
                 </div>
             </td>
-            <td>your rating: <input name="your rating" data-filter="text input" type="text" value="aaaaaa'.$colours[rand(0, count($colours)-1)].'" />
+            <td>
+                your description: <input name="rating" data-filter="your description" type="text" value="" />
+                your selected: <select name="selection" data-filter="your selection">
+                    <option value="yes">yes</option>
+                    <option value="no">no</option>
+                    <option value="maybe">maybe</option>
+                </select>
         </tr>';
     }
     return $html;
@@ -360,7 +366,14 @@ $html = create_test();
                             >Rating</a>
                         </th>
                         <th scope="col">Description</th>
-                        <th scope="col">User Input</th>
+                        <th scope="col">User Input
+                            <a href="#"
+                                class="sortable"
+                                data-sort-field="Your Selection"
+                                data-sort-direction="asc"
+                                data-sort-type="string"
+                            >Sel?</a>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
