@@ -1479,7 +1479,7 @@
                             if(typeof category !== 'undefined') {
                                 if(typeof myob.dataDictionary[category] !== 'undefined') {
                                     var oldValue = el.attr('data-tfsvalue');
-                                    var newValue = el.val();
+                                    var newValue = myob.findCurrentValueOfObject(el);
 
                                     // 1. add to Rows ...
                                     var rowID = el.closest('tr').attr('id');
@@ -2705,30 +2705,39 @@
                         val = myObject.text().trim();
                 }
                 if(quickInputFind === false) {
-                    switch(mytype) {
-                        case 'INPUT':
-                            var inputType = myObject.attr('type');
-                            if(inputType === 'checkbox') {
-                                val = myObject[0].checked ? 'YES' : 'NO';
-                            } else {
-                                val = myObject.val();
-                            }
-                            break;
-                        case 'SELECT':
-                            val = myObject.find("option:selected").text();
-                            break;
-                        case 'TEXTAREA':
-                            val = myObject.val();
-                            break;
-                        default:
-                            //do nothing....
-                    }
+                    val = myob.findCurrentValueOfObject(myObject, mytype);
                 }
                 val = val.trim();
                 val = val.raw2safe();
                 myObject.attr('data-tfsvalue', val);
 
                 return val;
+            },
+
+            findCurrentValueOfObject: function(element, elementType = 'undefined')
+            {
+                if (elementType === 'undefined') {
+                    var nodeName = element.prop('nodeName');
+                    if(typeof nodeName === 'undefined') {
+                        nodeName = 'SPAN';
+                    }
+                    var elementType = nodeName.toUpperCase();
+                }
+
+                switch(elementType) {
+                    case 'INPUT':
+                        var inputType = element.attr('type');
+                        if(inputType === 'checkbox') {
+                            return element[0].checked ? 'YES' : 'NO';
+                        }
+                        return element.val();
+                    case 'SELECT':
+                        return element.find("option:selected").text();
+                    case 'TEXTAREA':
+                        return element.val();
+                    default:
+                        return '';
+                }
             },
 
             replaceAll: function(string, search, replacement)
