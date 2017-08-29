@@ -369,10 +369,16 @@ $html = create_test();
                         <th scope="col">User Input
                             <a href="#"
                                 class="sortable"
-                                data-sort-field="Your Selection"
+                                data-sort-field="your selection"
                                 data-sort-direction="asc"
                                 data-sort-type="string"
-                            >Sel?</a>
+                            >Selection?</a>
+                            <a href="#"
+                                class="sortable"
+                                data-sort-field="your description"
+                                data-sort-direction="asc"
+                                data-sort-type="string"
+                            >description?</a>
                         </th>
                     </tr>
                 </thead>
