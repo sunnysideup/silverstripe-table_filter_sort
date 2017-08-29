@@ -2829,7 +2829,12 @@
              */
             stringComparator: function(a, b)
             {
-                return a[0].toLowerCase() - b[0].toLowerCase();
+                var strA = a[0].toLowerCase();
+                var strB = b[0].toLowerCase();
+                if (strA == strB) {
+                    return 0;
+                }
+                return strA > strB ? 1 : -1;
             },
             /**
              * Number sorting function
