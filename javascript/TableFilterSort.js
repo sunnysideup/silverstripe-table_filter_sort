@@ -287,6 +287,13 @@
              */
             maxNumberOfValuesToCheck: 500,
 
+
+            /**
+             * if we have more than the rows specified then we do not search for identicals
+             * @type {integer}
+             */
+            maximumRowsForHideIdentical: 500,
+
             /**
              * list of favourites
              * @type {Array}
@@ -980,6 +987,9 @@
              */
             hideIdenticalCols: function()
             {
+                if(myob.myRows.length > myob.maximumRowsForHideIdentical) {
+                    return;
+                }
                 var title = myob.myTableHolder.find('.'+ myob.commonContentHolderClass).attr("data-title");
                 if(typeof title !== "undefined") {
                     title = "<h3>"+title+"</h3>";
