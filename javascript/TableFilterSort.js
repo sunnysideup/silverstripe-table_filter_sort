@@ -2724,9 +2724,9 @@
                 return val;
             },
 
-            findCurrentValueOfObject: function(element, elementType = 'undefined')
+            findCurrentValueOfObject: function(element, elementType)
             {
-                if (elementType === 'undefined') {
+                if (typeof elementType === 'undefined') {
                     var nodeName = element.prop('nodeName');
                     if(typeof nodeName === 'undefined') {
                         nodeName = 'SPAN';
