@@ -838,7 +838,6 @@
                                     if(typeof myob.initFX2 === 'function') {
                                         myob.initFX2();
                                     }
-
                                     myob.canPushState = true;
                                 },
                                 myob.millisecondsBetweenActions
