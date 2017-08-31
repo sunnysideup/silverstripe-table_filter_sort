@@ -309,6 +309,8 @@
              *
              *
              */
+            initFX1: null,
+            initFX2: null,
             startRowFX1: null,
             startRowFX2: null,
             endRowFX1: null,
@@ -755,6 +757,9 @@
                 myob.resetObjects();
 
                 if(myob.myRows.length > 0){
+                    if(typeof myob.initFX1 === 'function') {
+                        myob.initFX1();
+                    }
                     myob.myTableHolder.find(myob.matchRowCountSelector).html('...');
                     myob.myTableHolder.find(myob.totalRowCountSelector).html('...');
 
@@ -829,6 +834,10 @@
                                     if(myob.debug) {console.profile('setTableWidth');}
                                     myob.setTableWidth();
                                     if(myob.debug) {console.profileEnd();}
+
+                                    if(typeof myob.initFX2 === 'function') {
+                                        myob.initFX2();
+                                    }
 
                                     myob.canPushState = true;
                                 },
