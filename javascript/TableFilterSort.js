@@ -1,7 +1,6 @@
 (function( $ ) {
 
     $.fn.tableFilterSort = function(options){
-
         var holderNumber = 0;
 
         var myTableHolder = this;
@@ -261,7 +260,7 @@
              *
              * @type {boolean}
              */
-            millisecondsBetweenActions: 10,
+            millisecondsBetweenActions: 200,
 
             /**
              * storing setTimeout so that we can cancel them
@@ -1176,7 +1175,10 @@
                     jQuery(window).delayedOn(
                         "load scroll",
                         function(e) {
-                            myob.fixTableHeader();
+                            if(typeof myob.windowTimeoutStore['setTableWidthInFuture'] === 'undefined') {
+                                myob.setTableWidth();
+                                myob.fixTableHeader();
+                            }
                         },
                         myob.millisecondsBetweenActions
                     );
