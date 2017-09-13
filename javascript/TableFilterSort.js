@@ -220,6 +220,12 @@
             maximumNumberOfFilterOptions: 12,
 
             /**
+             * maximum number of checkboxes in the filter for a number before it becomes a text filter
+             * @type {integer}
+             */
+            maximumNumberOfNumericFilterOptions: 5,
+
+            /**
              *
              * @type {boolean}
              */
@@ -1713,7 +1719,8 @@
                                 var cleanedValues = [];
                                 var count = 0;
                                 var optionCount = myob.dataDictionary[category]['Options'].length;
-                                if(optionCount <= myob.maximumNumberOfFilterOptions) {
+                                if((myob.dataDictionary[category]['DataType'] != 'number' && optionCount <= myob.maximumNumberOfFilterOptions)
+                                   || (myob.dataDictionary[category]['DataType'] == 'number' && optionCount <= myob.maximumNumberOfNumericFilterOptions)) {
                                     content += myob.makeSectionHeaderForForm(
                                         'checkbox',
                                         category
@@ -1724,7 +1731,7 @@
                                     }
                                     content += myob.makeSectionFooterForForm();
                                 }
-                                else if(optionCount > myob.maximumNumberOfFilterOptions) {
+                                else {
                                     var type = myob.dataDictionary[category]['DataType'];
                                     if(myob.dataDictionary[category]['DataType'] === 'string') {
                                         awesompleteFields.push(category);
