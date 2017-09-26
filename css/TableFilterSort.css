@@ -1,5 +1,15 @@
 
+
+
 .tfs-holder .hidden {display: none;}
+
+/**********************************************
+ * Filters
+ */
+ .tfs-filter-form-inner .tfs-filter-column.tagFilter {
+     overflow: visible;
+ }
+
 /***********************************************
  *sort
  */
@@ -64,8 +74,6 @@
 /***********************************************
  * loading
  */
-
-
 
 .tfs-holder.loading {
     position: relative;
