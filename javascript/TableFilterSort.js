@@ -866,9 +866,15 @@
                 myob.myRows = myob.myTable.find(myob.rowSelector);
             },
 
+            tableWidthToBeSet: true,
+
             setTableWidth: function()
             {
-                if(myob.fixedHeaderClass) {
+                if(myob.fixedHeaderClass && myob.tableWidthToBeSet) {
+                    myob.tableWidthToBeSet = false;
+                    myob.myTableHolder
+                        .find('colgroup')
+                        .remove();
                     //just in case ...
                     myob.myTable.css('table-layout', 'fixed');
                     myob.myTableHead.width(myob.myTable.width());
@@ -1203,6 +1209,7 @@
                             }
                             myob.windowTimeoutStore['setTableWidthInFuture'] = window.setTimeout(
                                 function() {
+                                    myob.tableWidthToBeSet = true;
                                     myob.setTableWidth();
                                     myob.fixTableHeader();
                                 },
@@ -2191,6 +2198,7 @@
                     myob.myTableHolder.addClass(myob.filterInUseClass);
                     myob.myTableHolder.removeClass(myob.filterNotInUseClass);
                     if(myob.hasFixedTableHeader) {
+                        myob.tableWidthToBeSet = true;
                         var addFilterForm = myob.myTableHolder.hasClass(myob.filterIsOpenClass) ? false : true;
                         var relativeMove = myob.myTableHead.outerHeight();
                         if(addFilterForm) {
