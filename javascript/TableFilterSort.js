@@ -12,7 +12,7 @@
              * turn on to see what is going on in console
              * @type {boolean}
              */
-            debug: true,
+            debug: false,
 
             /**
              * turn on to see what is going on in console
