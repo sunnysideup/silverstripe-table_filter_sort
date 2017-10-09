@@ -35,14 +35,15 @@ class TableFilterSortAPI extends Object
     ) {
         //this must come first
         if($tableSelector) {
+            $mySelector = str_replace('"', '\\"', $tableSelector);
             //this must come first
             Requirements::customScript(
                 '
-                    jQuery(document).ready(
-                        function() {
-                            jQuery("'.str_replace('"', '\\"', $tableSelector).'").tableFilterSort('.$jsSettings.');
-                        }
-                    );
+                    if(!Array.isArray(TableFilterSortVars)) {
+                        var TableFilterSortVars = [];
+                    }
+                    TableFilterSortVars.push('.$jsSettings.');
+                    TableFilterSortVars[TableFilterSortVars.length - 1].mySelector = "'.$mySelector.'";
                 ',
                 'table_filter_sort'
             );

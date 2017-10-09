@@ -1,6 +1,7 @@
 (function( $ ) {
 
     $.fn.tableFilterSort = function(options){
+
         var holderNumber = 0;
 
         var myTableHolder = this;
@@ -11,7 +12,13 @@
              * turn on to see what is going on in console
              * @type {boolean}
              */
-            debug: false,
+            debug: true,
+
+            /**
+             * turn on to see what is going on in console
+             * @type {boolean}
+             */
+            useJSON: true,
 
             /**
              * url before the ?
@@ -118,6 +125,12 @@
              * @type {jQuery}
              */
             myRows: null,
+
+            /**
+             * the sortable rows
+             * @type {jQuery}
+             */
+            myRowsLookup: null,
 
             /**
              * to keep field options simple ...
@@ -235,6 +248,12 @@
              *
              * @type {boolean}
              */
+            hasFixedTableHeaderSet: false,
+
+            /**
+             *
+             * @type {boolean}
+             */
             hasKeywords: true,
 
             /**
@@ -266,7 +285,13 @@
              *
              * @type {boolean}
              */
-            millisecondsBetweenActions: 200,
+            millisecondsBetweenActionsShort: 70,
+
+            /**
+             *
+             * @type {boolean}
+             */
+            millisecondsBetweenActionsLong: 700,
 
             /**
              * storing setTimeout so that we can cancel them
@@ -354,13 +379,6 @@
              * @type {string}
              */
             favouritesCategoryTitle: 'Favourites',
-
-            /**
-             *
-             * @type {string}
-             */
-            filtersTitle: 'Filter',
-
 
             /**
              *
@@ -460,12 +478,6 @@
              * @type {string}
              */
             filterIsOpenClass: 'filter-is-open',
-
-            /**
-             * class to show that the form is open
-             * @type {string}
-             */
-            filterIsClosedClass: 'filter-is-closed',
 
             /**
              * class to show that filter form CAN NOT be used
@@ -609,12 +621,6 @@
             openedClass: 'opened',
 
             /**
-             * class for items that are closed (more, filter form, etc..)
-             * @type {string}
-             */
-            closedClass: 'closed',
-
-            /**
              *
              * @type {string}
              */
@@ -651,12 +657,6 @@
              * @type {string}
              */
             saveAndLoadClass: "tfs-save-and-load",
-
-            /**
-             * current filter
-             * @type {string}
-             */
-            currentFilterClass: "tfs-current-filter",
 
             /**
              * element that holds the current filter info
@@ -759,9 +759,11 @@
                 myob.baseURL = location.protocol + '//' + location.host + location.pathname;
 
                 //get the rows
-                myob.resetObjects();
-
-                if(myob.myRows.length > 0){
+                myob.setRowsWithDetails();
+                var length = myob.myRows.length;
+                if(length > 0){
+                    myob.millisecondsBetweenActionsShort = myob.millisecondsBetweenActionsShort * (Math.floor(length / 3000) + 1);
+                    myob.millisecondsBetweenActionsLong = myob.millisecondsBetweenActionsLong * (Math.floor(length / 3000) + 1);
                     if(typeof myob.initFX1 === 'function') {
                         myob.initFX1();
                     }
@@ -773,140 +775,112 @@
                         function() {
                             // COLLECT AND FIX
                             // what needs to be done
-                            if(myob.debug) { console.profile('whatIsIncluded');}
+
                             myob.whatIsIncluded();
                             //collect filter items
-                            if(myob.debug) { console.profile('filterItemCollector');}
                             myob.filterItemCollector();
                             //look for cols that are the same
-                            if(myob.debug) { console.profileEnd();console.profile('hideIdenticalCols');}
                             myob.hideIdenticalCols();
-                            if(myob.debug) { console.profileEnd();}
                             window.setTimeout(
                                 function() {
                                     //now we can hide table ...
 
                                     //MASSAGE DATA AND FIND SORT
                                     //finalise data dictionary
-                                    if(myob.debug) { console.profileEnd();console.profile('dataDictionaryCollector');}
                                     myob.dataDictionaryCollector();
                                     //find defaultSort
-                                    if(myob.debug) { console.profileEnd();console.profile('findDefaultSort');}
                                     myob.findDefaultSort();
 
                                     //LISTENERS ...
-                                    if(myob.debug) { console.profileEnd();console.profile('fixTableHeaderListener');}
                                     myob.fixTableHeaderListener();
-                                    if(myob.debug) { console.profileEnd();console.profile('setupFilterFormListeners');}
                                     myob.setupFilterFormListeners();
-                                    if(myob.debug) { console.profileEnd();console.profile('setupSortListeners');}
                                     myob.setupSortListeners();
-                                    if(myob.debug) { console.profileEnd();console.profile('paginationListeners');}
                                     myob.paginationListeners();
-                                    if(myob.debug) { console.profile('setupMoreDetailsListener');}
                                     myob.setupMoreDetailsListener();
-                                    if(myob.debug) { console.profileEnd();console.profile('openServerModalWindowListener');}
                                     myob.openServerModalWindowListener();
-                                    if(myob.debug) { console.profileEnd();console.profile('favouriteLinkListener');}
                                     myob.favouriteLinkListener();
-                                    if(myob.debug) { console.profileEnd();console.profile('directFilterLinkListener');}
                                     myob.directFilterLinkListener();
-                                    if(myob.debug) { console.profileEnd();console.profile('formElementsListener');}
                                     myob.formElementsListener();
-                                    if(myob.debug) { console.profileEnd();console.profile('addURLChangeListener');}
                                     myob.addURLChangeListener();
 
                                     //LOAD DATA FROM SERVER
                                     //check for data in local cookie
-                                    if(myob.debug) { console.profileEnd();console.profile('retrieveLocalCookie');}
                                     myob.retrieveLocalCookie();
                                     //check for data in local cookie
-                                    if(myob.debug) { console.profileEnd();console.profile('retrieveDataFromFragment');}
                                     myob.retrieveDataFromFragment();
                                     //check for data on server
-                                    if(myob.debug) { console.profileEnd();console.profile('retrieveDataFromGetVar');}
                                     myob.retrieveDataFromGetVar();
                                     //we need to process this here one more time ... in case of the cookie data
-                                    if(myob.debug) { console.profileEnd();console.profile('processRetrievedData');}
                                     myob.processRetrievedData();
-
-                                    if(myob.debug) {console.profileEnd();}
 
                                     //we are now ready!
                                     myob.myTableHolder.removeClass(myob.loadingClass);
 
                                     //set table width
-                                    if(myob.debug) {console.profile('setTableWidth');}
                                     myob.setTableWidth();
-                                    if(myob.debug) {console.profileEnd();}
 
                                     if(typeof myob.initFX2 === 'function') {
                                         myob.initFX2();
                                     }
                                     myob.canPushState = true;
                                 },
-                                myob.millisecondsBetweenActions
+                                myob.millisecondsBetweenActionsShort
                             );
 
                             //ADD SCROLL AND OTHER STUFF ...
 
                         },
-                        myob.millisecondsBetweenActions
+                        myob.millisecondsBetweenActionsShort
                     );
                 } else {
                     myob.myTableHolder.removeClass(myob.loadingClass);
                 }
             },
 
+            setRows: function()
+            {
+                myob.profileStarter('setRows');
+                myob.myRows = myob.myTable.find(myob.rowSelector);
+                myob.profileStarter('setRows');
+            },
+
+
             /**
              * called after row manipulation to reset rows
              */
-            resetObjects: function()
+            setRowsWithDetails: function(hideAll)
             {
-                myob.myRows = myob.myTable.find(myob.rowSelector);
-            },
-
-            tableWidthToBeSet: true,
-
-            setTableWidth: function()
-            {
-                if(myob.fixedHeaderClass && myob.tableWidthToBeSet) {
-                    myob.tableWidthToBeSet = false;
-                    myob.myTableHolder
-                        .find('colgroup')
-                        .remove();
-                    //just in case ...
-                    myob.myTable.css('table-layout', 'fixed');
-                    myob.myTableHead.width(myob.myTable.width());
-                    var html = '<colgroup>';
-                    myob.myTableHead.find('tr:first th:visible').each(
-                        function(colNumber, cell) {
-                            var cell = jQuery(cell);
-                            var myOuterWidth = cell.outerWidth();
-                            var myOuterWidthPX = myOuterWidth + "px";
-                            html += '<col width="'+myOuterWidth+'" style="width: '+myOuterWidthPX+'; " clas="col'+(colNumber+1)+'" />';
+                myob.profileStarter('setRowsWithDetails');
+                myob.setRows();
+                myob.myRowsLookup = [];
+                var id = '';
+                var reload = false;
+                myob.myRows.each(
+                    function(i, el) {
+                        id = jQuery(el).attr('id');
+                        if(typeof id === 'undefined') {
+                            id = 'tfs-row-'+i;
+                            jQuery(el).attr('id', id);
+                            reload = true;
                         }
-                    );
-                    html +=  '</colgroup>';
-                    myob.myTable.prepend(html);
-                    myob.myTableHead.find('tr:first th:visible').each(
-                        function(colNumber, cell) {
-                            var cell = jQuery(cell);
-                            var myWidth = cell.width() + 1;
-                            cell.css('width', myWidth);
+                        myob.myRowsLookup[id] = i;
+                        if(hideAll === true) {
+                            jQuery(el).addClass(myob.hideClass).removeClass(myob.showClass);
                         }
-                    );
-                    //add push down div ...
-                    myob.myTableHolder
-                        .find('.tfspushdowndiv')
-                        .remove();
-                    jQuery('<div class="tfspushdowndiv"></div>').insertBefore(myob.myTable);
+                    }
+                );
+                if(reload === true) {
+                    myob.setRows();
                 }
+                myob.profileEnder('setRowsWithDetails');
             },
 
+
+
+
             //===================================================================
-            // COLLECTORS
-            //===================================================================
+            // SCRIPT SECTION: *** COLLECTORS
+            //=================================================================
 
             whatIsIncluded: function()
             {
@@ -928,6 +902,7 @@
              */
             filterItemCollector: function()
             {
+                myob.profileStarter('filterItemCollector');
                 //for each table with specific class ...
                 var value = '';
                 var category = '';
@@ -935,35 +910,33 @@
                 myob.myRows.each(
                     function(i, row) {
                         var row = jQuery(row);
-                        rowID = jQuery.attr('id');
+                        rowID = jQuery(row).attr('id');
                         if(i === 0) {
                             myob.hasFavourites = row.find(myob.favouriteLinkSelector).length > 0 ? true : false;
-                            var formFieldSelector = 'input['+myob.filterItemAttribute+'], select['+myob.filterItemAttribute+'], textarea['+myob.filterItemAttribute+']';
-                            myob.hasFormElements = row.find(formFieldSelector).length > 0 ? true : false;
                         }
                         row.find('[' + myob.filterItemAttribute + ']').each(
                             function(j, el) {
                                 el = jQuery(el);
                                 value = myob.findValueOfObject(el);
                                 category = el.attr(myob.filterItemAttribute);
-                                myob.addOptionToCategory(category, value);
                                 if(value.length > 0) {
-                                    //add to row options
-                                    if(typeof myob.dataDictionary[category]['Rows'] === "undefined") {
-                                        myob.dataDictionary[category]['Rows'] = {};
-                                    }
-                                    if(typeof myob.dataDictionary[category]['Rows'][value] === "undefined") {
-                                        myob.dataDictionary[category]['Rows'][value] = [];
-                                    }
-                                    myob.dataDictionary[category]['Rows'][value].push(rowID);
-                                    if (el.is(':input')) {
-                                        myob.dataDictionary[category]['isEditable'] = true;
+                                    myob.addOptionToCategory(category, value);
+                                    myob.addRowToValue(category, value, rowID);
+                                    myob.addValueToRow(category, value, rowID);
+                                    if(typeof myob.dataDictionary[category]['isEditable'] === 'undefined' ){
+                                         if(el.is(':input')) {
+                                             myob.dataDictionary[category]['isEditable'] = true;
+                                             myob.hasFormElements = true;
+                                         } else {
+                                             myob.dataDictionary[category]['isEditable'] = false;
+                                         }
                                     }
                                 }
                             }
                         );
                     }
                 );
+                myob.profileEnder('filterItemCollector');
             },
 
             /**
@@ -1000,12 +973,81 @@
                 myob.dataDictionary[category]['Options'].splice(index, 1);
             },
 
+
+            /**
+             * check if Option has been added to category and add if needed...
+             * @param string category
+             * @param mixed value
+             */
+            addRowToValue: function(category, value, rowID)
+            {
+                if(typeof value !== 'undefined') {
+                    if(typeof myob.dataDictionary[category]['Rows'] === "undefined") {
+                        myob.dataDictionary[category]['Rows'] = {};
+                    }
+                    if(typeof myob.dataDictionary[category]['Rows'][value] === "undefined") {
+                        myob.dataDictionary[category]['Rows'][value] = [];
+                    }
+                    myob.dataDictionary[category]['Rows'][value].push(rowID);
+                }
+            },
+
+
+            /**
+             * remove row from a value
+             * @param string category
+             * @param mixed value
+             */
+            removeRowFromValue: function(category, value, rowID)
+            {
+                var index = myob.dataDictionary[category]['Rows'][value].indexOf(rowID);
+                if(index === -1) {
+                    //push value
+                    return;
+                }
+                myob.dataDictionary[category]['Rows'][value].splice(index, 1);
+            },
+
+            /**
+             * check if Option has been added to category and add if needed...
+             * @param string category
+             * @param mixed value
+             */
+            addValueToRow: function(category, value, rowID)
+            {
+                if(typeof value !== 'undefined') {
+                    if(typeof myob.dataDictionary[category]['Values'] === "undefined") {
+                        myob.dataDictionary[category]['Values'] = {};
+                    }
+                    if(typeof myob.dataDictionary[category]['Values'][rowID] === "undefined") {
+                        myob.dataDictionary[category]['Values'][rowID] = [];
+                    }
+                    myob.dataDictionary[category]['Values'][rowID].push(value);
+                }
+            },
+
+            /**
+             * remove value from a row
+             * @param string category
+             * @param mixed value
+             */
+            removeValueFromRow: function(category, value, rowID)
+            {
+                var index = myob.dataDictionary[category]['Values'][rowID].indexOf(rowID);
+                if(index === -1) {
+                    //push value
+                    return;
+                }
+                myob.dataDictionary[category]['Values'][rowID].splice(index, 1);
+            },
+
             /**
              * hide the cells that are all the same
              * and add to common content holder
              */
             hideIdenticalCols: function()
             {
+                myob.profileStarter('hideIdenticalCols');
                 if(myob.myRows.length > myob.maximumRowsForHideIdentical) {
                     return;
                 }
@@ -1021,49 +1063,48 @@
                 Object.keys(myob.dataDictionary).forEach(
                     function(category, categoryIndex) {
                         if(myob.dataDictionary[category]['Options'].length === 1) {
-                            if (!myob.dataDictionary[category]['isEditable']) {
-                                delete myob.dataDictionary[category];
-                            }
-                            commonContentExists = true;
-                            var commonContentAdded = false;
-                            //remove text from span
-                            myob.myRows.find('['+myob.filterItemAttribute+'="' + category + '"]').each(
-                                function(i, el) {
-                                    el = jQuery(el);
-                                    if(!commonContentAdded) {
-                                        if(el.html() === "" || el.hasClass('ignore-content')){
+                            if (myob.dataDictionary[category]['isEditable'] !== true) {
+                                commonContentExists = true;
+                                var commonContentAdded = false;
+                                //remove text from span
+                                myob.myRows.find('['+myob.filterItemAttribute+'="' + category + '"]').each(
+                                    function(i, el) {
+                                        el = jQuery(el);
+                                        if(!commonContentAdded) {
+                                            if(el.html() === "" || el.hasClass('ignore-content')){
+                                                // do nothing
+                                            } else {
+                                                commonContent += "<li><strong>"+category + ":</strong> <span>" + el.html() + "</span></li>";
+                                                commonContentAdded = true;
+                                            }
+                                        }
+                                        // is select, input, textarea
+                                        if(el.is(':input')) {
                                             // do nothing
                                         } else {
-                                            commonContent += "<li><strong>"+category + ":</strong> <span>" + el.html() + "</span></li>";
-                                            commonContentAdded = true;
-                                        }
-                                    }
-                                    // is select, input, textarea
-                                    if(el.is(':input')) {
-                                        // do nothing
-                                    } else {
-                                        var spanParent = el.parent();
-                                        el.remove();
+                                            var spanParent = el.parent();
+                                            el.remove();
 
-                                        if(spanParent.is("li")){
-                                            spanParent.hide();
-                                        }
-                                        //if td is empty then remove td and correspoding th
-                                        else if(spanParent.is("td")){
-                                            if(spanParent.children().length === 0) {
-                                                //get column number of td
-                                                //get related table header
-                                                if(i === 0) {
-                                                    var colNumber = spanParent.parent("tr").children("td").index(spanParent);
-                                                    myob.myTable.find('thead tr td').eq(colNumber).remove();
-                                                    myob.myTable.find('thead tr th').eq(colNumber).remove();
+                                            if(spanParent.is("li")){
+                                                spanParent.hide();
+                                            }
+                                            //if td is empty then remove td and correspoding th
+                                            else if(spanParent.is("td")){
+                                                if(spanParent.children().length === 0) {
+                                                    //get column number of td
+                                                    //get related table header
+                                                    if(i === 0) {
+                                                        var colNumber = spanParent.parent("tr").children("td").index(spanParent);
+                                                        myob.myTable.find('thead tr td').eq(colNumber).remove();
+                                                        myob.myTable.find('thead tr th').eq(colNumber).remove();
+                                                    }
+                                                    spanParent.remove();
                                                 }
-                                                spanParent.remove();
                                             }
                                         }
                                     }
-                                }
-                            );
+                                );
+                            }
                         }
                     }
                 );
@@ -1073,6 +1114,7 @@
                 } else {
                     myob.myTableHolder.find('.' + myob.commonContentHolderClass).remove();
                 }
+                myob.profileEnder('hideIdenticalCols');
             },
 
             /**
@@ -1082,6 +1124,7 @@
              */
             dataDictionaryCollector: function()
             {
+                myob.profileStarter('dataDictionaryCollector');
                 Object.keys(myob.dataDictionary).forEach(
                     function(category, categoryIndex) {
                         //make sure there are options
@@ -1132,8 +1175,14 @@
                         myob.dataDictionarySorter(category, 'Options');
                     }
                 );
+                myob.profileEnder('dataDictionaryCollector');
             },
 
+            /**
+             * sort lists
+             * @param  string category
+             * @param  string fieldName
+             */
             dataDictionarySorter: function(category, fieldName)
             {
                 if(typeof fieldName === 'undefined') {
@@ -1177,48 +1226,37 @@
                 }
             },
 
+
+
+
             //===================================================================
-            // LISTENERS
+            // SCRIPT SECTION: *** LISTENERS
             //===================================================================
 
             fixTableHeaderListener: function()
             {
+                myob.profileStarter('fixTableHeaderListener');
                 if(myob.fixedHeaderClass) {
                     jQuery(window).delayedOn(
                         "load scroll",
                         function(e) {
-                            if(typeof myob.windowTimeoutStore['setTableWidthInFuture'] === 'undefined') {
-                                myob.setTableWidth();
-                                myob.fixTableHeader();
-                            }
+                            myob.setTableWidthAndFixHeader();
                         },
-                        myob.millisecondsBetweenActions
+                        myob.millisecondsBetweenActionsShort
                     );
                     //note that we use a delay here !
                     jQuery(window).delayedOn(
                         "resize",
                         function(e) {
-                            myob.myTableHolder.removeClass(myob.fixedHeaderClass);
-                            myob.myTable.find('colgroup').remove();
-                            myob.myFilterFormHolder.css("width", "");
-                            myob.myTable
-                                .find('thead tr:first th')
-                                .css({"width": "", "min-width": "", "max-width": ""});
-                            if(typeof myob.windowTimeoutStore['setTableWidthInFuture'] !== 'undefined') {
-                                window.clearTimeout(myob.windowTimeoutStore['setTableWidthInFuture']);
-                            }
-                            myob.windowTimeoutStore['setTableWidthInFuture'] = window.setTimeout(
-                                function() {
-                                    myob.tableWidthToBeSet = true;
-                                    myob.setTableWidth();
-                                    myob.fixTableHeader();
-                                },
-                                myob.millisecondsBetweenActions
-                            );
+                            myob.myTableHolder
+                                .find('colgroup')
+                                .remove();
+                            myob.setTableWidthAndFixHeader();
                         },
-                        myob.millisecondsBetweenActions
+                        myob.millisecondsBetweenActionsShort
                     );
                 }
+                myob.profileEnder('fixTableHeaderListener');
             },
 
 
@@ -1227,6 +1265,7 @@
              */
             setupFilterFormListeners: function()
             {
+                myob.profileStarter('setupFilterFormListeners');
                 //set default
                 myob.myFilterFormInner.hide();
                 //open and close form
@@ -1263,7 +1302,13 @@
                         event.preventDefault();
                         myob.cfi = {};
                         myob.createFilterForm();
-                        myob.runCurrentFilter();
+                        myob.windowTimeoutStoreSetter(
+                            'runCurrentFilter',
+                            function() {
+                                myob.runCurrentFilter();
+                            },
+                            myob.millisecondsBetweenActionsLong
+                        );
                         return false;
                     }
                 );
@@ -1273,12 +1318,18 @@
                     'change',
                     'input',
                     function(event) {
-                        myob.runCurrentFilter();
+                        myob.windowTimeoutStoreSetter(
+                            'runCurrentFilter',
+                            function() {
+                                myob.runCurrentFilter();
+                            },
+                            myob.millisecondsBetweenActionsLong
+                        );
                     }
                 );
 
                 //set actual keyword field and trigger change
-                myob.myFilterFormHolder.delayedOn(
+                myob.myFilterFormHolder.on(
                     'input paste change',
                     myob.quickKeywordFilterSelector,
                     function(e) {
@@ -1286,8 +1337,7 @@
                         myob.myFilterFormInner.find('input[name="Keywords"]')
                             .val(val)
                             .change();
-                    },
-                    400
+                    }
                 );
 
                 //update faux keyword field
@@ -1314,18 +1364,14 @@
                                 } else {
                                     el.prop('checked', true);
                                 }
+                                el.change();
                             }
                         );
                         //release DOM
-                        window.setTimeout(
-                            function(){
-                                myob.runCurrentFilter();
-                            },
-                            50
-                        );
+                        //
                     }
-                )
-
+                );
+                myob.profileEnder('setupFilterFormListeners');
             },
 
 
@@ -1364,10 +1410,8 @@
                     'input paste change',
                     myob.visibleRowCountSelector,
                     function () {
-                        if(typeof myob.windowTimeoutStore['visibleRowCount'] !== "undefined"){
-                            window.clearTimeout(myob.windowTimeoutStore['visibleRowCount']);
-                        }
-                        myob.windowTimeoutStore['visibleRowCount'] = window.setTimeout(
+                        myob.windowTimeoutStoreSetter(
+                            'visibleRowCount',
                             function() {
                                 var input = myob.myTableHolder.find(myob.visibleRowCountSelector);
                                 var val = input.val();
@@ -1382,7 +1426,7 @@
                                     }
                                 }
                             },
-                            1200
+                            myob.millisecondsBetweenActionsLong
                         );
                     }
                 );
@@ -1500,6 +1544,7 @@
 
             formElementsListener: function()
             {
+                myob.profileStarter('formElementsListener');
                 if(myob.hasFormElements) {
                     myob.myTableBody.on(
                         'change',
@@ -1512,53 +1557,25 @@
                             if(typeof category !== 'undefined') {
                                 if(typeof myob.dataDictionary[category] !== 'undefined') {
                                     var oldValue = el.attr('data-tfsvalue');
-                                    var newValue = myob.findCurrentValueOfObject(el);
+                                    var newValue = myob.findCurrentValueOfInputObject(el);
 
                                     // 1. add to Rows ...
                                     var rowID = el.closest('tr').attr('id');
-                                    myob.updateDataDictionaryRow(category, rowID, oldValue, newValue);
                                     // 2. remove and add to Options
-                                    if(myob.dataDictionary[category]['Rows'][oldValue].length === 0) {
-                                        myob.removeOptionFromCategory(category, oldValue);
-                                    }
+                                    myob.removeOptionFromCategory(category, oldValue);
                                     myob.addOptionToCategory(category, newValue);
-
+                                    myob.removeValueFromRow(category, oldValue, rowID);
+                                    myob.addValueToRow(category, newValue, rowID);
+                                    myob.removeRowFromValue(category, oldValue, rowID);
+                                    myob.addRowToValue(category, newValue, rowID);
                                 }
                             }
                             el.removeAttr('data-tfsvalue');
                             myob.findValueOfObject(el);
                         }
                     );
-
                 }
-            },
-
-            /**
-             * find the oldValue entry in the dataDictionary
-             * removes the rowID
-             * and adds the rowID to the new Value
-             */
-            updateDataDictionaryRow: function(category, rowID, oldValue, newValue)
-            {
-                var tempIndex = null;
-                if(typeof oldValue !== 'undefined'){
-                    if(typeof myob.dataDictionary[category]['Rows'][oldValue] !== 'undefined') {
-                        tempIndex = myob.dataDictionary[category]['Rows'][oldValue].indexOf(rowID);
-                        if(tempIndex !== -1) {
-                            console.log("removed old value");
-                            myob.dataDictionary[category]['Rows'][oldValue].splice(tempIndex, 1);
-                        }
-                    }
-                }
-                if(typeof newValue !== 'undefined'){
-                    if(typeof myob.dataDictionary[category]['Rows'][newValue] === 'undefined') {
-                        myob.dataDictionary[category]['Rows'][newValue] = [];
-                    }
-                    tempIndex = myob.dataDictionary[category]['Rows'][newValue].indexOf(rowID);
-                    if(tempIndex === -1) {
-                        myob.dataDictionary[category]['Rows'][newValue].push(rowID);
-                    }
-                }
+                myob.profileEnder('formElementsListener');
             },
 
             favouriteLinkListener: function(){
@@ -1695,12 +1712,11 @@
                         return false;
                     }
                 );
-
             },
 
 
             //===================================================================
-            // FILTER FORM
+            // SCRIPT SECTION: *** CREATE FILTER FORM
             //===================================================================
 
             /**
@@ -1710,7 +1726,7 @@
             createFilterForm: function()
             {
                 //create html content and add to top of page
-
+                myob.profileStarter('createFilterForm');
                 if(myob.myFilterFormInner.length > 0) {
                     //clear it so that we can rebuild it ...
                     myob.myFilterFormInner.html("");
@@ -1809,6 +1825,7 @@
                         Awesomplete.blackList = [];
                     }
                 }
+                myob.profileEnder('createFilterForm');
             },
 
 
@@ -1913,7 +1930,6 @@
 
                     }
                 }
-
             },
 
             makeSectionFooterForForm: function()
@@ -1931,16 +1947,30 @@
                     html = html.replace('<input ', '<input checked="checked" ');
                     input.closest('ul').append(html);
                 }
-
             },
 
 
+
+
+
+
+
+
+
+
+
+
+
             //===================================================================
-            // MANIPULATIONS
+            // SCRIPT SECTION: *** MANIPULATIONS
             //===================================================================
 
             runCurrentSort: function()
             {
+                // clear endRowManipulation just because we are going to run it in the end again - anyway ...
+                myob.windowTimeoutStoreSetter('endRowManipulation');
+
+                myob.profileStarter('runCurrentSort');
                 myob.sfr = 0;
                 myob.myTableHead.find(myob.sortLinkSelector)
                     .removeClass(myob.sortAscClass)
@@ -1953,11 +1983,10 @@
                         type = myob.dataDictionary[myob.csr.sct]['DataType'];
                     }
                     var arr = [];
-                    myob.myRows.each(
-                        function(i, el) {
-                            var row = jQuery(el);
-                            var dataElement = row.find('['+myob.filterItemAttribute+'="' + myob.csr.sct + '"]');
-                            var dataValue = myob.findValueOfObject(dataElement).toLowerCase();
+                    var rows = myob.dataDictionary[myob.csr.sct]['Rows'];
+                    for (var dataValue in rows) {
+                        if (rows.hasOwnProperty(dataValue)) {
+                            var rowIDs = rows[dataValue];
                             if(typeof dataValue !== 'undefined') {
                                 if(type === "number") {
                                     dataValue = dataValue.replace(/[^\d.-]/g, '');
@@ -1970,10 +1999,13 @@
                             else {
                                 dataValue = 'zzzzzzzzzzzzzzzzzz';
                             }
-                            var arrayRow = new Array(dataValue, i);
-                            arr.push(arrayRow);
+                            for (var i=0; i < rowIDs.length; i++) {
+                                rowID = rowIDs[i];
+                                var arrayRow = new Array(dataValue, rowID);
+                                arr.push(arrayRow);
+                            }
                         }
-                    );
+                    }
 
                     //start doing stuff
                     //clear table ...
@@ -1998,32 +2030,29 @@
                     }
                     arr.forEach(
                         function(entry) {
-                            myob.myTableBody.append(myob.myRows[entry[1]]);
+                            var indexOfRow = myob.myRowsLookup[entry[1]];
+                            myob.myTableBody.append(myob.myRows[indexOfRow]);
                         }
                     );
-                    myob.endRowManipulation();
+                    myob.windowTimeoutStoreSetter(
+                        'endRowManipulation',
+                        function() {
+                            myob.endRowManipulation();
+                        },
+                        myob.millisecondsBetweenActionsLong
+                    );
                 }
+                myob.profileEnder('runCurrentSort');
             },
 
-            /**
-             * * @param {string} type [description]
-             */
-            getSortComparator: function(type)
-            {
-                switch (type) {
-                    case 'number':
-                        return myob.numberComparator;
-                    case 'string':
-                        return myob.stringComparator;
-                    default:
-                        return myob.stringComparator;
-                }
-            },
 
 
 
             runCurrentFilter: function()
             {
+                myob.profileStarter('runCurrentFilter');
+                // clear endRowManipulation just because we are going to run it in the end again - anyway ...
+                myob.windowTimeoutStoreSetter('endRowManipulation');
                 myob.sfr = 0;
                 myob.workOutCurrentFilter();
                 myob.startRowManipulation();
@@ -2072,10 +2101,10 @@
                                                     rowMatchesForFilterGroup = true;
                                                 }
                                             } else {
-                                                row.find('['+myob.filterItemAttribute+'="' + categoryToMatch + '"]').each(
-                                                    function(innerI, innerEl) {
-                                                        innerEl = jQuery(innerEl);
-                                                        var rowValue = myob.findValueOfObject(innerEl).toLowerCase();
+                                                if(Array.isArray(myob.dataDictionary[categoryToMatch]['Values'][rowID])) {
+                                                    myTempValues = myob.dataDictionary[categoryToMatch]['Values'][rowID];
+                                                    for(var myTempValuesCount = 0; myTempValuesCount < myTempValues.length; myTempValuesCount++) {
+                                                        var rowValue = myTempValues[myTempValuesCount].toLowerCase();
                                                         switch(myob.dataDictionary[categoryToMatch]['DataType']) {
                                                             case 'date':
                                                                 //to do ....
@@ -2120,7 +2149,7 @@
                                                             return false;
                                                         }
                                                     }
-                                                );
+                                                }
                                             }
                                             if(rowMatchesForFilterGroup) {
                                                 stillLookingForValue = false;
@@ -2145,7 +2174,14 @@
                         }
                     }
                 );
-                myob.endRowManipulation();
+                myob.windowTimeoutStoreSetter(
+                    'endRowManipulation',
+                    function() {
+                        myob.endRowManipulation();
+                    },
+                    myob.millisecondsBetweenActionsLong
+                );
+                myob.profileEnder('runCurrentFilter');
             },
 
             /**
@@ -2154,18 +2190,36 @@
              */
             gotoPage: function(page, force)
             {
+                myob.profileStarter('gotoPage');
                 var newSFR = page * myob.visibleRowCount;
                 myob.pge = page;
                 if(newSFR !== myob.sfr || force) {
+                    // clear endRowManipulation just because we are going to run it in the end again - anyway ...
+                    myob.windowTimeoutStoreSetter('endRowManipulation');
                     myob.sfr = newSFR;
                     myob.startRowManipulation();
-                    myob.endRowManipulation();
+                    myob.windowTimeoutStoreSetter(
+                        'endRowManipulation',
+                        function() {
+                            myob.endRowManipulation();
+                        },
+                        myob.millisecondsBetweenActionsLong
+                    );
                 }
+                myob.profileEnder('gotoPage');
             },
 
 
+
+
+
+
+
+
+
+
             //===================================================================
-            // SCROLLING
+            // SCRIPT SECTION: *** SCROLLING
             //===================================================================
 
             /**
@@ -2191,14 +2245,79 @@
                  }
              },
 
+
+             setTableWidthAndFixHeader: function()
+             {
+                 myob.windowTimeoutStoreSetter(
+                     'setTableWidthInFuture',
+                     function() {
+                         myob.setTableWidth();
+                         myob.fixTableHeader();
+                     },
+                     myob.millisecondsBetweenActionsLong
+                 );
+             },
+
+             setTableWidth: function()
+             {
+                 myob.profileStarter('setTableWidth');
+                 if(myob.fixedHeaderClass) {
+                     myob.myTableHolder.removeClass(myob.fixedHeaderClass);
+                     myob.hasFixedTableHeaderSet = false;
+                     if(myob.myTableHolder.find('colgroup').length === 0) {
+                         //just in case ...
+                         if(myob.myTableHolder.isOnScreen()) {
+                             myob.myTable.css('table-layout', 'fixed');
+
+                             var hasVisibleItems = false;
+                             var html = '<colgroup>';
+                             var widthPerCol = [];
+                             totalWidth = 0;
+                             myob.myTableHead.find('tr:first th:visible').each(
+                                 function(colNumber, cell) {
+                                     var cell = jQuery(cell);
+                                     var myOuterWidth = cell.outerWidth();
+                                     totalWidth += myOuterWidth;
+                                     var myOuterWidthPX = myOuterWidth + "px";
+                                     widthPerCol.push(myOuterWidthPX);
+                                     html += '<col width="'+myOuterWidth+'" style="width: '+myOuterWidthPX+'; " clas="col'+(colNumber+1)+'" />';
+                                     hasVisibleItems = true;
+                                 }
+                             );
+                             var tableWidth = myob.myTable.width();
+                             if(totalWidth > tableWidth) {
+                                 tableWidth = totalWidth;
+                             }
+                             myob.myTableHead.width(tableWidth);
+                             html +=  '</colgroup>';
+                             if(hasVisibleItems === true) {
+                                 myob.myTable.prepend(html);
+                                 myob.myTableHead.find('tr:first th:visible').each(
+                                     function(colNumber, cell) {
+                                         var cell = jQuery(cell);
+                                         var myWidth = widthPerCol[colNumber];
+                                         cell.css('width', myWidth);
+                                     }
+                                 );
+                             }
+                         }
+                     }
+                     if(myob.myTableHolder.find('.tfspushdowndiv').length > 0) {
+                         jQuery('<div class="tfspushdowndiv"></div>').insertBefore(myob.myTable);
+                     }
+                 }
+                 myob.profileEnder('setTableWidth');
+             },
+
+
             fixTableHeader: function()
             {
+                myob.profileStarter('fixTableHeader');
                 if(myob.myTableHolder.isOnScreen()) {
                     //show if it is in use / not in use ...
                     myob.myTableHolder.addClass(myob.filterInUseClass);
                     myob.myTableHolder.removeClass(myob.filterNotInUseClass);
                     if(myob.hasFixedTableHeader) {
-                        myob.tableWidthToBeSet = true;
                         var addFilterForm = myob.myTableHolder.hasClass(myob.filterIsOpenClass) ? false : true;
                         var relativeMove = myob.myTableHead.outerHeight();
                         if(addFilterForm) {
@@ -2213,68 +2332,74 @@
                         var showFixedHeader = offset > tableOffset ? true: false;
 
                         //end reset
-                        if(showFixedHeader === true) {
-                            var tableHolderWidth = myob.myTableHolder.width();
+                        if(showFixedHeader === true && myob.hasFixedTableHeaderSet === false) {
+                            myob.hasFixedTableHeaderSet = true;
                             if(addFilterForm) {
-                                myob.myFilterFormHolder.width(tableHolderWidth);
+                                myob.myFilterFormHolder.width(myob.myTableHead.width());
                             }
-                            window.setTimeout(
-                                function() {
-                                    //set width of cells
-                                    myob.myTableHolder.addClass(myob.fixedHeaderClass);
-                                    var top = 0;
-                                    if(addFilterForm) {
-                                        top = myob.myFilterFormHolder.outerHeight();
-                                    }
-                                    myob.myTableHead.css('top', top);
-                                },
-                                myob.millisecondsBetweenActions
-                            );
+                            myob.myTableHolder.addClass(myob.fixedHeaderClass);
+                            var top = 0;
+                            if(addFilterForm) {
+                                top = myob.myFilterFormHolder.outerHeight();
+                            }
+                            myob.myTableHead.css('top', top);
                         } else {
-                            myob.myTableHolder.removeClass(myob.fixedHeaderClass);
+                            if(myob.hasFixedTableHeaderSet === true) {
+                                myob.hasFixedTableHeaderSet = false;
+                                myob.myTableHolder.removeClass(myob.fixedHeaderClass);
+                            }
                         }
                     }
                 } else {
                     myob.myTableHolder.addClass(myob.filterNotInUseClass);
                     myob.myTableHolder.removeClass(myob.filterInUseClass);
                 }
-
+                myob.profileEnder('fixTableHeader');
 
             },
 
+
+
+
+
+
+
+
+
+
             //===================================================================
-            // ROW MANIPULATION: START + END
+            // SCRIPT SECTION: *** ROW MANIPULATION: START + END
             //===================================================================
 
             startRowManipulation: function()
             {
+                myob.profileStarter('startRowManipulation');
                 if(typeof myob.startRowFX1 === 'function') {
                     myob.startRowFX1(myob);
                 }
-                myob.resetObjects();
                 //show the table as loading
                 myob.myTable.addClass(myob.hideClass);
 
                 myob.myTableHolder.find(myob.moreRowEntriesSelector).hide();
 
+                myob.setRowsWithDetails(true);
+
                 //hide all the rows
-                myob.myRows.each(
-                    function(i, el) {
-                        jQuery(el).addClass(myob.hideClass).removeClass(myob.showClass);
-                    }
-                );
+
                 if(typeof myob.startRowFX2 === 'function') {
                     myob.startRowFX2(myob);
                 }
+                myob.profileEnder('startRowManipulation');
             },
 
             endRowManipulation: function()
             {
+                myob.profileStarter('endRowManipulation');
                 if(typeof myob.endRowFX1 === 'function') {
                     myob.endRowFX1(myob);
                 }
                 //crucial!
-                myob.resetObjects();
+                myob.setRows();
                 //get basic numbers
                 var minRow = myob.sfr;
                 var totalRowCount = 0;
@@ -2282,6 +2407,7 @@
                 var actualVisibleRowCount = 0;
                 var noFilter = myob.myTableBody.find('tr.'+myob.notMatchClass).length === 0 ? true : false;
                 var rowMatches = false;
+                //hide and show ...
                 myob.myRows.each(
                     function(i, el) {
                         el = jQuery(el);
@@ -2370,61 +2496,32 @@
 
                 myob.myTable.removeClass(myob.hideClass);
                 if( ! myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
-                    window.setTimeout(
-                        myob.scrollToTopOfHolder(),
-                        myob.millisecondsBetweenActions
+                    myob.windowTimeoutStoreSetter(
+                        'scrollToTopOfHolder',
+                        function() {
+                            myob.scrollToTopOfHolder();
+                        },
+                        myob.millisecondsBetweenActionsShort
                     );
                 }
-                myob.resetObjects();
+                myob.setRowsWithDetails();
                 myob.pushState();
                 if(typeof myob.endRowFX2 === 'function') {
                     myob.endRowFX2(myob);
                 }
-
-            },
-
-            /**
-             * change URL
-             * @param  {boolean} push push the state
-             */
-            pushState: function()
-            {
-                if(myob.canPushState === true) {
-                    history.replaceState(null, null, myob.currentURL());
-                }
+                myob.profileEnder('endRowManipulation');
             },
 
 
-            currentURL: function ()
-            {
-                var urlObject = {};
-                for(var i =0;i < myob.filterAndSortVariables.length; i++) {
-                    var varName = myob.filterAndSortVariables[i];
-                    var tempType = typeof myob[varName];
-                    if(
-                        (tempType === 'number' && myob[varName] !== 0) ||
-                        (tempType === 'string' && myob[varName].length > 0) ||
-                        (tempType === 'boolean') ||
-                        (tempType === 'object' && Object.keys(myob[varName]).length > 0)
-                    ) {
-                        urlObject[varName] = myob[varName];
-                    }
-                }
-                if(typeof JSURL !== 'undefined')  {
-                    var urlpart = JSURL.stringify(urlObject);
-                }
-                else {
-                    var urlpart = "tfs=" + encodeURI(JSON.stringify(urlObject));
-                }
-                return myob.baseURL + '#' + urlpart
-            },
+
 
 
             //===================================================================
-            // CALCULATIONS
+            // SCRIPT SECTION: *** CALCULATIONS
             //===================================================================
 
             workOutCurrentFilter: function(){
+                myob.profileStarter('workOutCurrentFilter');
                 var html = "";
                 var categoryHolder;
                 var category = '';
@@ -2551,11 +2648,52 @@
                     myob.myTableHolder.removeClass(myob.hasFilterClass).addClass(myob.doesNotHaveFilterClass);
                 }
                 targetDomElement.html(html);
+                myob.profileEnder('workOutCurrentFilter');
             },
 
+
+
+
+
             //===================================================================
-            // SERVER, URL, AND COOKIE INTERACTIONS
+            // SCRIPT SECTION: *** URL CHANGES, SERVER, URL, AND COOKIE INTERACTIONS
             //===================================================================
+
+            /**
+             * change URL
+             * @param  {boolean} push push the state
+             */
+            pushState: function()
+            {
+                if(myob.canPushState === true) {
+                    history.replaceState(null, null, myob.currentURL());
+                }
+            },
+
+
+            currentURL: function ()
+            {
+                var urlObject = {};
+                for(var i =0;i < myob.filterAndSortVariables.length; i++) {
+                    var varName = myob.filterAndSortVariables[i];
+                    var tempType = typeof myob[varName];
+                    if(
+                        (tempType === 'number' && myob[varName] !== 0) ||
+                        (tempType === 'string' && myob[varName].length > 0) ||
+                        (tempType === 'boolean') ||
+                        (tempType === 'object' && Object.keys(myob[varName]).length > 0)
+                    ) {
+                        urlObject[varName] = myob[varName];
+                    }
+                }
+                if(typeof JSURL !== 'undefined')  {
+                    var urlpart = JSURL.stringify(urlObject);
+                }
+                else {
+                    var urlpart = "tfs=" + encodeURI(JSON.stringify(urlObject));
+                }
+                return myob.baseURL + '#' + urlpart
+            },
 
             retrieveLocalCookie: function()
             {
@@ -2630,6 +2768,7 @@
 
             processRetrievedData: function(forceFavs)
             {
+                myob.profileStarter('processRetrievedData');
                 if(myob.urlToLoad !== '') {
                     var url = myob.serverConnectionURL + 'load/' + myob.urlToLoad + '/';
                     myob.urlToLoad = '';
@@ -2708,12 +2847,31 @@
                         delete myob.serverDataToApply['pge'];
                     }
                 }
+                myob.profileEnder('processRetrievedData');
             },
 
+
+
             //===================================================================
-            // HELPER FUNCTIONS
+            // SCRIPT SECTION: *** HELPER FUNCTIONS
             //===================================================================
-            //
+
+
+            /**
+             * * @param {string} type [description]
+             */
+            getSortComparator: function(type)
+            {
+                switch (type) {
+                    case 'number':
+                        return myob.numberComparator;
+                    case 'string':
+                        return myob.stringComparator;
+                    default:
+                        return myob.stringComparator;
+                }
+            },
+
             findValueOfObject: function(myObject)
             {
                 var val = ''
@@ -2740,22 +2898,19 @@
                         val = myObject.text().trim();
                 }
                 if(quickInputFind === false) {
-                    val = myob.findCurrentValueOfObject(myObject, mytype);
+                    val = myob.findCurrentValueOfInputObject(myObject, mytype);
+                    myObject.attr('data-tfsvalue', val);
                 }
                 val = val.trim();
                 val = val.raw2safe();
-                myObject.attr('data-tfsvalue', val);
 
                 return val;
             },
 
-            findCurrentValueOfObject: function(element, elementType)
+            findCurrentValueOfInputObject: function(element, elementType)
             {
                 if (typeof elementType === 'undefined') {
                     var nodeName = element.prop('nodeName');
-                    if(typeof nodeName === 'undefined') {
-                        nodeName = 'SPAN';
-                    }
                     var elementType = nodeName.toUpperCase();
                 }
 
@@ -2884,6 +3039,38 @@
                 }
                 return (a[0]- b[0])
             },
+
+            windowTimeoutStoreSetter(name, fx, delay) {
+                if(typeof delay === 'undefined') {
+                    delay = myob.millisecondsBetweenActionsShort;
+                }
+                if(typeof myob.windowTimeoutStore[name] !== 'undefined') {
+                    window.clearTimeout(myob.windowTimeoutStore[name]);
+                }
+                myob.windowTimeoutStore[name] = window.setTimeout(
+                    fx,
+                    delay
+                );
+            },
+
+            profileStarter: function(name)
+            {
+                if(myob.debug) {
+                    console.log('-----------------------');
+                    console.count(name);
+                    console.time(name)
+                    console.profile(name);
+                }
+            },
+
+            profileEnder: function(name)
+            {
+                if(myob.debug) {
+                    console.profileEnd(name);
+                    console.timeEnd(name);
+                    console.log('_______________________');
+                }
+            }
 
         };
 
@@ -3077,3 +3264,17 @@ jQuery.fn.isOnScreen = function(){
         return on.apply(this, args);
     };
 }(jQuery));
+
+
+jQuery(document).ready(
+    function(){
+        if(typeof TableFilterSortVars !== 'undefined') {
+            if(Array.isArray(TableFilterSortVars)) {
+                for(var i = 0; i < TableFilterSortVars.length; i++) {
+                    var vars = TableFilterSortVars[i];
+                    jQuery(vars.mySelector).tableFilterSort(vars);
+                }
+            }
+        }
+    }
+);

@@ -414,7 +414,11 @@ $html = create_test();
         <script src="../../javascript/awesomplete.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/TableFilterSort.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script type="text/javascript">
-            jQuery('.tfs-holder').tableFilterSort();
+            if(! Array.isArray(TableFilterSortVars)) {
+                var TableFilterSortVars = [];
+            }
+            TableFilterSortVars.push({'mySelector: ".tfs-holder"'});
+        );
         </script>
         <script>
             var html = jQuery('.tfs-holder').first().clone();
