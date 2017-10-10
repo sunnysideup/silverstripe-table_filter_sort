@@ -774,6 +774,7 @@
                 myob.myTable = myob.myTableHolder.find(myob.tableSelector).first();
                 myob.myTableHead = myob.myTableHolder.find("table thead");
                 myob.myTableBody = myob.myTable.find(" > tbody");
+                myob.myTable.css('table-layout', 'fixed');
                 //base URL
                 myob.baseURL = location.protocol + '//' + location.host + location.pathname;
 
@@ -1319,15 +1320,7 @@
                     '.' + myob.clearFilterClass + ' a',
                     function(event) {
                         event.preventDefault();
-                        myob.cfi = {};
-                        myob.createFilterForm();
-                        myob.windowTimeoutStoreSetter(
-                            'runCurrentFilter',
-                            function() {
-                                myob.runCurrentFilter();
-                            },
-                            myob.millisecondsBetweenActionsLong
-                        );
+                        myob.resetAll();
                         return false;
                     }
                 );
@@ -1984,6 +1977,18 @@
             // SCRIPT SECTION: *** MANIPULATIONS
             //===================================================================
 
+            resetAll: function(){
+                myob.cfi = {};
+                myob.createFilterForm();
+                myob.windowTimeoutStoreSetter(
+                    'runCurrentFilter',
+                    function() {
+                        myob.runCurrentFilter();
+                    },
+                    myob.millisecondsBetweenActionsLong
+                );
+            },
+
             runCurrentSort: function()
             {
                 // clear endRowManipulation just because we are going to run it in the end again - anyway ...
@@ -2279,19 +2284,16 @@
                  myob.profileStarter('setTableWidth');
                  if(myob.fixedHeaderClass) {
                      myob.resetFixedTableWidth();
-                     if(myob.myTableHolder.find('colgroup').length === 0) {
-                         //just in case ...
-                         if(myob.myTableHolder.isOnScreen()) {
-                             myob.myTable.css('table-layout', 'fixed');
-                             var headerCells = myob.myTableHead.find('tr:first th:visible');
-                             myob.myTableBody.find('tr:first:visible').find('th, td').each(
-                                 function(colNumber, cell) {
-                                     var headerCell = headerCells.eq(colNumber);
-                                     var bodyCell = jQuery(cell);
-                                     headerCell.width((bodyCell).width());
-                                 }
-                             );
-                         }
+                     //just in case ...
+                     if(myob.myTableHolder.isOnScreen()) {
+                         var headerCells = myob.myTableHead.find('tr:visible:first th:visible');
+                         myob.myTableBody.find('tr:visible:first').find('th:visible, td:visible').each(
+                             function(colNumber, cell) {
+                                 var headerCell = headerCells.eq(colNumber);
+                                 var bodyCell = jQuery(cell);
+                                 headerCell.width(bodyCell.width());
+                             }
+                         );
                      }
                      if(myob.myTableHolder.find('.tfspushdowndiv').length > 0) {
                          jQuery('<div class="tfspushdowndiv"></div>').insertBefore(myob.myTable);
@@ -2505,7 +2507,6 @@
                 if(typeof myob.endRowFX2 === 'function') {
                     myob.endRowFX2(myob);
                 }
-                console.debug(myob.dataDictionary);
                 myob.profileEnder('endRowManipulation');
             },
 
@@ -3157,6 +3158,20 @@
             gotoPage: function(pageNumber) {
                 myob.gotoPage(pageNumber);
                 return this;
+            },
+            updateDataDictionary: function(category, rowID, newValue, oldValue){
+                if(typeof oldValue !== 'undefined') {
+                    myob.removeOptionFromCategory(category, oldValue);
+                    myob.removeValueFromRow(category, oldValue, rowID);
+                }
+                myob.addOptionToCategory(category, newValue);
+                myob.addValueToRow(category, newValue, rowID);
+                return this;
+            },
+            resetAll: function()
+            {
+                myob.resetAll();
+                return this;
             }
         };
     }
@@ -3329,7 +3344,7 @@ jQuery(document).ready(
             if(Array.isArray(TableFilterSortVars)) {
                 for(var i = 0; i < TableFilterSortVars.length; i++) {
                     var vars = TableFilterSortVars[i];
-                    jQuery(vars.mySelector).tableFilterSort(vars);
+                    TableFilterSortVars[i].myObject = jQuery(vars.mySelector).tableFilterSort(vars);
                 }
             }
         }
