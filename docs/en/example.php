@@ -30,11 +30,11 @@ $templateRow = '
         </div>
     </td>
     <td>
-        your description: <input name="rating" data-filter="your description" type="text" value="{{your description}}">
-        your selected: <select name="selection" data-filter="your selection">
-            <option value="yes" {{your selection}}>yes</option>
-            <option value="no" {{your selection}}>no</option>
-            <option value="maybe" {{your selection}}>maybe</option>
+        your description: <input name="rating" data-filter="your description" type="text" value="{{your description}}" data-tfsvalue="{{your selection}}">
+        your selected: <select name="selection" data-filter="your selection" data-tfsvalue="{{your selection}}">
+            <option value="yes">yes</option>
+            <option value="no">no</option>
+            <option value="maybe">maybe</option>
         </select>
 </td></tr>
 
@@ -202,31 +202,51 @@ function create_test()
     );
     $html = '';
     $limit = isset($_GET['i']) ? $_GET['i'] : 300;
+    $jsonArray = [];
     for($i = 0; $i < $limit; $i++) {
+        $id = 'tfs'.$i;
+        $jsonArray[$id] = [
+            'SKU' => ($i+1),
+            'Type' => $type,
+            'Producer' => $producer,
+            'Colour' => $colours[rand(0, count($colours)-1)],
+            'Size' => $sizes[rand(0,count($sizes)-1)],
+            'Weight' => rand(1,100),
+            'Price' => (rand(0,99999)/100),
+            'Rating' => rand(1,5),
+            'Tags' => [
+                $veg[rand(0, count($veg)-1)],
+                $veg[rand(0, count($veg)-1)],
+                $veg[rand(0, count($veg)-1)]
+            ],
+            'your description' => 'tba',
+            'your selected' => 'yes'
+        ];
+        $rowData = $jsonArray[$id];
         $html .= '
-        <tr class="tfstr hide" id="tfs'.$i.'">
+        <tr class="tfstr hide" id="'.$id.'">
             <th scope="row">
                 <a href="#" class="more">+</a>
                 <a href="#" class="adf" title="Add to Favourites">♥</a>
-                <span data-filter="SKU">'.($i+1).'</span><br />
+                <span data-filter="SKU">'.$rowData['SKU'].'</span><br />
                 <p style="display: none;" class="hidden">
                     Some more content goes here.
                 </p>
             </th>
             <td><span data-filter="Type">'.$type.'</span></td>
             <td><span data-filter="Original Producer">'.$producer.'</span></td>
-            <td><span data-filter="Colour" class="dl">'.$colours[rand(0, count($colours)-1)].'</span></td>
-            <td><span data-filter="Size">'.$sizes[rand(0,count($sizes)-1)].'</span></td>
-            <td><span data-filter="Weight">'.rand(1,100).'kg.</span></td>
-            <td><span data-filter="Price">$'.(rand(0,99999)/100).'</span></td>
-            <td><span data-filter="Rating">'.rand(1,5).' Stars</span></td>
+            <td><span data-filter="Colour" class="dl">'.$rowData['Colour'].'</span></td>
+            <td><span data-filter="Size">'.$rowData['Size'].'</span></td>
+            <td><span data-filter="Weight">'.$rowData['Weight'].'kg.</span></td>
+            <td><span data-filter="Price">$'.$rowData['Price'].'</span></td>
+            <td><span data-filter="Rating">'.$rowData['Rating'].' Stars</span></td>
             <td>
                 <p>'.$lipsum->sentence().'</p>
                 <div style="display: none;" class="hidden">
                     <ul>
-                        <li><span data-filter="Tags" class="dl">'.$veg[rand(0, count($veg)-1)].'</span></li>
-                        <li><span data-filter="Tags" class="dl">'.$veg[rand(0, count($veg)-1)].'</span></li>
-                        <li><span data-filter="Tags" class="dl">'.$veg[rand(0, count($veg)-1)].'</span></li>
+                        <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][0].'</span></li>
+                        <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][1].'</span></li>
+                        <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][2].'</span></li>
                     </ul>
                 </div>
             </td>
@@ -239,10 +259,15 @@ function create_test()
                 </select>
         </tr>';
     }
-    return $html;
+    return [
+        'HTML' => $html,
+        'Data' => $jsonArray
+    ];
 }
 
-$html = create_test();
+$data = create_test();
+$html = $data['HTML'];
+$jsonArray = $data['Data'];
 
 
 
@@ -455,7 +480,12 @@ $html = create_test();
             if(! Array.isArray(TableFilterSortVars)) {
                 var TableFilterSortVars = [];
             }
-            TableFilterSortVars.push({mySelector: ".tfs-holder"});
+            TableFilterSortVars.push(
+                {
+                    mySelector: ".tfs-holder",
+                    rowData: <?php echo json_encode($jsonArray); ?>
+                }
+            );
         </script>
         <script>
             var html = jQuery('.tfs-holder').first().clone();
