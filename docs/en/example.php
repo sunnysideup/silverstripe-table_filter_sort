@@ -1,6 +1,44 @@
 <?php
 
 
+$useJSON = false;
+$templateRow = '
+<tr class="tfstr hide" id="tfs0">
+    <th scope="row">
+        <a href="#" class="more">+</a>
+        <a href="#" class="adf" title="Add to Favourites">♥</a>
+        <span data-filter="SKU">{{SKU}}</span><br>
+        <p style="display: none;" class="hidden">
+            Some more content goes here.
+        </p>
+    </th>
+    <td><span data-filter="Type">{{TYPE}}</span></td>
+    <td><span data-filter="Original Producer">{{Original Producer}}</span></td>
+    <td><span data-filter="Colour" class="dl">{{Color}}</span></td>
+    <td><span data-filter="Size">{{Large}}</span></td>
+    <td><span data-filter="Weight">{{Weight}}</span></td>
+    <td><span data-filter="Price">{{Price}}</span></td>
+    <td><span data-filter="Rating">{{Rating}}</span></td>
+    <td>
+        <p>Lorem ipsum dolor sit amet consectetur adipiscing elit cum nullam, risus posuere ligula eget ullamcorper orci ultricies neque lobortis suspendisse, sodales accumsan mus eleifend vulputate magna ornare at.</p>
+        <div style="display: none;" class="hidden">
+            <ul>
+                <li><span data-filter="Tags" class="dl">{{Tags}}</span></li>
+                <li><span data-filter="Tags" class="dl">{{Tags}}</span></li>
+                <li><span data-filter="Tags" class="dl">{{Tags}}</span></li>
+            </ul>
+        </div>
+    </td>
+    <td>
+        your description: <input name="rating" data-filter="your description" type="text" value="{{your description}}">
+        your selected: <select name="selection" data-filter="your selection">
+            <option value="yes" {{your selection}}>yes</option>
+            <option value="no" {{your selection}}>no</option>
+            <option value="maybe" {{your selection}}>maybe</option>
+        </select>
+</td></tr>
+
+';
 
 function create_test()
 {
@@ -383,7 +421,7 @@ $html = create_test();
                     </tr>
                 </thead>
                 <tbody>
-                    <?php echo $html ?>
+                    <?php if($useJSON) { echo $templateRow; } else {echo $html;} ?>
                 </tbody>
             </table>
 
@@ -417,8 +455,7 @@ $html = create_test();
             if(! Array.isArray(TableFilterSortVars)) {
                 var TableFilterSortVars = [];
             }
-            TableFilterSortVars.push({'mySelector: ".tfs-holder"'});
-        );
+            TableFilterSortVars.push({mySelector: ".tfs-holder"});
         </script>
         <script>
             var html = jQuery('.tfs-holder').first().clone();
