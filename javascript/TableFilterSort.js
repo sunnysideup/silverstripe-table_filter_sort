@@ -285,13 +285,13 @@
              *
              * @type {boolean}
              */
-            millisecondsBetweenActionsShort: 70,
+            millisecondsBetweenActionsShort: 20,
 
             /**
              *
              * @type {boolean}
              */
-            millisecondsBetweenActionsLong: 700,
+            millisecondsBetweenActionsLong: 200,
 
             /**
              * storing setTimeout so that we can cancel them
@@ -762,8 +762,8 @@
                 myob.setRowsWithDetails();
                 var length = myob.myRows.length;
                 if(length > 0){
-                    myob.millisecondsBetweenActionsShort = myob.millisecondsBetweenActionsShort * (Math.floor(length / 3000) + 1);
-                    myob.millisecondsBetweenActionsLong = myob.millisecondsBetweenActionsLong * (Math.floor(length / 3000) + 1);
+                    myob.millisecondsBetweenActionsShort = myob.millisecondsBetweenActionsShort * (Math.floor(length / 1000) + 1);
+                    myob.millisecondsBetweenActionsLong = myob.millisecondsBetweenActionsLong * (Math.floor(length / 1000) + 1);
                     if(typeof myob.initFX1 === 'function') {
                         myob.initFX1();
                     }
@@ -1999,7 +1999,7 @@
                             else {
                                 dataValue = 'zzzzzzzzzzzzzzzzzz';
                             }
-                            for (var i=0; i < rowIDs.length; i++) {
+                            for (var i = 0; i < rowIDs.length; i++) {
                                 rowID = rowIDs[i];
                                 var arrayRow = new Array(dataValue, rowID);
                                 arr.push(arrayRow);
