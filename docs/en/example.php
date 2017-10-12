@@ -3,7 +3,7 @@
 
 $useJSON = false;
 $templateRow = '
-<tr class="tfstr hide" id="tfs0">
+<tr class="tfstr hide" id="{{RowID}}">
     <th scope="row">
         <a href="#" class="more">+</a>
         <a href="#" class="adf" title="Add to Favourites">♥</a>
@@ -30,7 +30,7 @@ $templateRow = '
         </div>
     </td>
     <td>
-        your description: <input name="rating" data-filter="your description" type="text" value="{{your description}}" data-tfsvalue="{{your selection}}">
+        your description: <input name="rating" data-filter="your description" type="text" data-tfsvalue="{{your selection}}">
         your selected: <select name="selection" data-filter="your selection" data-tfsvalue="{{your selection}}">
             <option value="yes">yes</option>
             <option value="no">no</option>
@@ -483,7 +483,7 @@ $jsonArray = $data['Data'];
             TableFilterSortVars.push(
                 {
                     mySelector: ".tfs-holder",
-                    rowData: <?php echo json_encode($jsonArray); ?>
+                    rowRawData: <?php echo json_encode($jsonArray); ?>
                 }
             );
         </script>
