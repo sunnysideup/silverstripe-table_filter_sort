@@ -154,11 +154,23 @@
 
             /**
              * the rows as HTML
-             * if we use JSON then this is a raw list of rowIDs as array
-             * if we do not use JSON then this is a jQuery object
-             * @type {jQuery} | array
+             * if we use JSON then this is the template row
+             * if we do not use JSON then this is a jQuery object of all rows
+             * @type {jQuery}
              */
             myRows: null,
+
+            /**
+             * number of rows
+             * @type {Number}
+             */
+            myRowsTotalCount: 0,
+
+            /**
+            * a list of all rows in the sorted order
+            * @type Array
+            */
+            myRowsSorted: [],
 
             /**
              * a list of matching rows by RowID
@@ -167,16 +179,10 @@
             myRowsMatching: [],
 
             /**
-             * a list of matching rows by RowID
+             * a list of matching rows that are visible, by row ID
              * @type array
              */
             myRowsVisible: [],
-
-            /**
-             * a list of all rows in the sorted order
-             * @type Array
-             */
-            myRowsSorted: [],
 
             /**
              * to keep field options simple ...
@@ -267,12 +273,6 @@
              * @type {integer}
              */
             visibleRowCount: 100,
-
-            /**
-             * rows to show
-             * @type {integer}
-             */
-            totalRowCount: 0,
 
             /**
              * maximum number of checkboxes in the filter before it becomes a text filter
@@ -812,15 +812,13 @@
 
                 //get the rows
                 myob.setRowsWithDetails();
-                var length = myob.myRows.length;
-                if(length > 0){
-                    myob.millisecondsBetweenActionsShort = myob.millisecondsBetweenActionsShort * (Math.floor(length / 1000) + 1);
-                    myob.millisecondsBetweenActionsLong = myob.millisecondsBetweenActionsLong * (Math.floor(length / 1000) + 1);
+                if(myob.myRowsTotalCount > 0){
+                    myob.millisecondsBetweenActionsShort = myob.millisecondsBetweenActionsShort * (Math.floor(myob.myRowsTotalCount / 1000) + 1);
+                    myob.millisecondsBetweenActionsLong = myob.millisecondsBetweenActionsLong * (Math.floor(myob.myRowsTotalCount / 1000) + 1);
                     if(typeof myob.initFX1 === 'function') {
                         myob.initFX1();
                     }
                     myob.myTableHolder.find(myob.matchRowCountSelector).html('...');
-                    myob.myTableHolder.find(myob.totalRowCountSelector).html('...');
 
                     myob.myTableHolder.addClass(myob.loadingClass);
                     window.setTimeout(
@@ -893,10 +891,7 @@
             {
                 myob.profileStarter('setRows');
                 if(myob.useJSON) {
-                    if(myob.myRows === null) {
-                        myob.myRows = myob.rowRawData;
-                        myob.rowRawData = null;
-                    }
+                    myob.myRows = jQuery(myob.templateRow);
                 } else {
                     myob.myRows = myob.myTable.find(myob.rowSelector);
                 }
@@ -907,38 +902,53 @@
             /**
              * called after row manipulation to reset rows
              */
-            setRowsWithDetails: function(hideAll)
+            setRowsWithDetails: function(hideAll, findMyRowsSorted)
             {
                 myob.profileStarter('setRowsWithDetails');
                 myob.setRows();
+                if(typeof findMyRowsSorted === 'undefined') {
+                    findMyRowsSorted = true;
+                }
                 if(myob.useJSON) {
-                    myob.myRowsSorted = myob.myRows;
                     if(hideAll) {
-                        my.myTableBody.html('');
+                        myob.myTableBody.empty();
+                    }
+                    if(findMyRowsSorted) {
+                        for(rowID in myob.rowRawData) {
+                            if(myob.rowRawData.hasOwnProperty(rowID)) {
+                                myob.myRowsSorted.push(rowID);
+                            }
+                        }
+                        myob.myRowsTotalCount = myob.myRowsSorted.length;
                     }
                     //do nothing
                 } else {
-                    myob.myRowsSorted = [];
-                    var id = '';
-                    var reload = false;
-                    myob.myRows.each(
-                        function(i, el) {
-                            id = jQuery(el).attr('id');
-                            if(typeof id === 'string' && id.length > 0) {
-                                //do nothing
-                            } else {
-                                id = 'tfs-row-'+i;
-                                jQuery(el).attr('id', id);
-                                reload = true;
+                    if(findMyRowsSorted) {
+                        myob.myRowsSorted = [];
+                        var id = '';
+                        var reload = false;
+                        myob.myRows.each(
+                            function(i, el) {
+                                id = jQuery(el).attr('id');
+                                if(typeof id === 'string' && id.length > 0) {
+                                    //do nothing
+                                } else {
+                                    id = 'tfs-row-'+i;
+                                    jQuery(el).attr('id', id);
+                                    reload = true;
+                                }
+                                if(findMyRowsSorted) {
+                                    myob.myRowsSorted.push(id);
+                                }
+                                if(hideAll === true) {
+                                    jQuery(el).addClass(myob.hideClass).removeClass(myob.showClass);
+                                }
                             }
-                            myob.myRowsSorted.push(id);
-                            if(hideAll === true) {
-                                jQuery(el).addClass(myob.hideClass).removeClass(myob.showClass);
-                            }
+                        );
+                        if(reload === true) {
+                            myob.setRows();
                         }
-                    );
-                    if(reload === true) {
-                        myob.setRows();
+                        myob.myRowsTotalCount = myob.myRowsSorted.length;
                     }
                 }
                 myob.profileEnder('setRowsWithDetails');
@@ -977,9 +987,9 @@
                 var category = '';
                 var rowID = '';
                 if(myob.useJSON) {
-                    for(rowID in myob.myRows) {
-                        if(myob.myRows.hasOwnProperty(rowID)) {
-                            var rowData = myob.myRows[rowID];
+                    for(rowID in myob.rowRawData) {
+                        if(myob.rowRawData.hasOwnProperty(rowID)) {
+                            var rowData = myob.rowRawData[rowID];
                             for(category in rowData) {
                                 if(rowData.hasOwnProperty(category)) {
                                     myob.dataDictionaryBuildCategory(category);
@@ -1049,7 +1059,13 @@
                 }
             },
 
-            updateMatchingRows: function(category, newValue)
+            /**
+             * updates the dataDictionary for all rows
+             * that are currently marked as matching!
+             * @param  {string} category [description]
+             * @param  {mixed} newValue [description]
+             */
+            updateMatchingRowsInDataDictionary: function(category, newValue)
             {
                 for(var i = 0; i < myob.myRowsMatching.length; i++) {
                     var rowID = myob.myRowsMatching[i];
@@ -1161,26 +1177,25 @@
             hideIdenticalCols: function()
             {
                 myob.profileStarter('hideIdenticalCols');
-                if(myob.myRows.length > myob.maximumRowsForHideIdentical) {
+                if(myob.rowxxxxxxxx > myob.maximumRowsForHideIdentical) {
                     return;
                 }
-                var title = myob.myTableHolder.find('.'+ myob.commonContentHolderClass).attr("data-title");
-                if(typeof title !== "undefined") {
-                    title = "<h3>"+title+"</h3>";
-                }
-                else {
-                    title = "";
-                }
-                var commonContent = '<div class="'+myob.commonContentHolderClass+'-inner">' + title + "<ul>";
                 var commonContentExists = false;
+                var commonContent = '';
                 Object.keys(myob.dataDictionary).forEach(
                     function(category, categoryIndex) {
                         if(myob.dataDictionary[category]['Options'].length === 1) {
                             if (myob.dataDictionary[category]['IsEditable'] !== true) {
                                 commonContentExists = true;
                                 var commonContentAdded = false;
+                                if(myob.useJSON) {
+                                    var htmlObjects = jQuery(myob.templateRow);
+
+                                } else {
+                                    var htmlObjects = myob.myRows.find('['+myob.filterItemAttribute+'="' + category + '"]')
+                                }
                                 //remove text from span
-                                myob.myRows.find('['+myob.filterItemAttribute+'="' + category + '"]').each(
+                                htmlObjects.each(
                                     function(i, el) {
                                         el = jQuery(el);
                                         if(!commonContentAdded) {
@@ -1221,8 +1236,17 @@
                         }
                     }
                 );
-                commonContent += "</ul></div>";
                 if(commonContentExists){
+                    var title = myob.myTableHolder.find('.'+ myob.commonContentHolderClass).attr("data-title");
+                    if(typeof title !== "undefined") {
+                        title = "<h3>"+title+"</h3>";
+                    }
+                    else {
+                        title = "";
+                    }
+                    var commonContentStart = '<div class="'+myob.commonContentHolderClass+'-inner">' + title + "<ul>";
+                    commonContent = commonContentStart + commonContent;
+                    commonContent += "</ul></div>";
                     myob.myTableHolder.find('.' + myob.commonContentHolderClass).html(commonContent);
                 } else {
                     myob.myTableHolder.find('.' + myob.commonContentHolderClass).remove();
@@ -1625,6 +1649,11 @@
                             );
                         }
                         var onClass = myob.directLinkClass+'-on';
+                        if(myob.useJSON) {
+                            var htmlObjects = jQuery(myob.templateRow);
+                        } else {
+
+                        }
                         myob.myRows
                             .find('['+myob.filterItemAttribute+'="'+category+'"].'+myob.directLinkClass).each(
                                 function(i, el) {
@@ -2139,7 +2168,11 @@
                     arr.forEach(
                         function(entry) {
                             var indexOfRow = myob.myRowsSorted.push(entry);
-                            myob.myTableBody.append(myob.myRows[indexOfRow]);
+                            if(myob.useJSON) {
+
+                            } else {
+                                myob.myTableBody.append(myob.myRows[indexOfRow]);
+                            }
                         }
                     );
                     myob.windowTimeoutStoreSetter(
@@ -2169,125 +2202,142 @@
                 } else {
                     //start with blank slate ...
                     myob.myRowsMatching = [];
-                    myob.myRows.each(
-                        function(i, el) {
-                            var row = jQuery(el);
-                            //innocent until proven guilty
-                            var rowMatches = true;
+                    for(var i = 0; i < myob.myRowsSorted; i++) {
+                        var rowID = myob.myRowsSorted[i];
+                        if(myob.useJSON) {
+                            var rowObject = myob.rowRawData[rowID];
+                        } else {
+                            var row = myob.myTableBody.find('#'+rowID);
+                        }
+                        //innocent until proven guilty
+                        var rowMatches = true;
 
-                            var stillLookingForCategory = true;
+                        var stillLookingForCategory = true;
 
-                            var rowID = row.attr('id');
+                        //check for each category
+                        Object.keys(myob.cfi).forEach(
+                            function(categoryToMatch, categoryToMatchIndex) {
+                                if(stillLookingForCategory) {
+                                    //lets not assume there is anything
+                                    var rowMatchesForFilterGroup = false;
+                                    //values selected in category
+                                    var stillLookingForValue = true;
+                                    for(var j = 0; j < myob.cfi[categoryToMatch].length; j++) {
+                                        var searchObject = myob.cfi[categoryToMatch][j];
+                                        //what is the value .. if it matches, the row is OK and we can go to next category ...
+                                        if(stillLookingForValue) {
+                                            if(categoryToMatch === myob.favouritesCategoryTitle) {
 
-                            //check for each category
-                            Object.keys(myob.cfi).forEach(
-                                function(categoryToMatch, categoryToMatchIndex) {
-                                    if(stillLookingForCategory) {
-                                        //lets not assume there is anything
-                                        var rowMatchesForFilterGroup = false;
-                                        //values selected in category
-                                        var stillLookingForValue = true;
-                                        for(var j = 0; j < myob.cfi[categoryToMatch].length; j++) {
-                                            var searchObject = myob.cfi[categoryToMatch][j];
-                                            //what is the value .. if it matches, the row is OK and we can go to next category ...
-                                            if(stillLookingForValue) {
-                                                if(categoryToMatch === myob.favouritesCategoryTitle) {
-
-                                                    if(typeof rowID !== 'undefined' && rowID.length > 0) {
-                                                        if(myob.mfv.indexOf(rowID) > -1) {
-                                                            rowMatchesForFilterGroup = true;
-                                                        }
-                                                    }
-                                                } else if(categoryToMatch === myob.keywordsCategoryTitle) {
-                                                    var vtm = searchObject['vtm'];
-                                                    var rowText = row.text().toLowerCase();
-                                                    var keywords = vtm.split(' ');
-                                                    var matches = true;
-                                                    for(var i = 0; i < keywords.length; i++) {
-                                                        var keyword = keywords[i].trim().toLowerCase();
-                                                        if(rowText.indexOf(keyword) === -1) {
-                                                            matches = false;
-                                                            break;
-                                                        }
-                                                    }
-                                                    if(matches === true) {
+                                                if(typeof rowID !== 'undefined' && rowID.length > 0) {
+                                                    if(myob.mfv.indexOf(rowID) > -1) {
                                                         rowMatchesForFilterGroup = true;
                                                     }
+                                                }
+                                            } else if(categoryToMatch === myob.keywordsCategoryTitle) {
+                                                var vtm = searchObject['vtm'];
+                                                if(myob.useJSON) {
+                                                    var rowText = '';
+                                                    for(category in myob.dataDictionary) {
+                                                        if(myob.dataDictionary.hasOwnProperty(category)) {
+                                                            myTempValues = myob.dataDictionary[category]['Values'][rowID];
+                                                            rowText += myTempValues.join(' ');
+                                                        }
+                                                    }
                                                 } else {
-                                                    if(Array.isArray(myob.dataDictionary[categoryToMatch]['Values'][rowID])) {
-                                                        myTempValues = myob.dataDictionary[categoryToMatch]['Values'][rowID];
-                                                        for(var myTempValuesCount = 0; myTempValuesCount < myTempValues.length; myTempValuesCount++) {
-                                                            var rowValue = myTempValues[myTempValuesCount].toLowerCase();
-                                                            switch(myob.dataDictionary[categoryToMatch]['DataType']) {
-                                                                case 'date':
-                                                                    //to do ....
-                                                                    break;
-                                                                case 'number':
-                                                                    if(typeof searchObject['vtm'] !== 'undefined'){
-                                                                        var vtm = searchObject['vtm'];
-                                                                        if(rowValue == vtm){
-                                                                            rowMatchesForFilterGroup = true;
+                                                    var rowText = row.text().toLowerCase();
+                                                }
+                                                var keywords = vtm.split(' ');
+                                                var matches = true;
+                                                for(var i = 0; i < keywords.length; i++) {
+                                                    var keyword = keywords[i].trim().toLowerCase();
+                                                    if(rowText.indexOf(keyword) === -1) {
+                                                        matches = false;
+                                                        break;
+                                                    }
+                                                }
+                                                if(matches === true) {
+                                                    rowMatchesForFilterGroup = true;
+                                                }
+                                            } else {
+                                                if(Array.isArray(myob.dataDictionary[categoryToMatch]['Values'][rowID])) {
+                                                    myTempValues = myob.dataDictionary[categoryToMatch]['Values'][rowID];
+                                                    for(var myTempValuesCount = 0; myTempValuesCount < myTempValues.length; myTempValuesCount++) {
+                                                        var rowValue = myTempValues[myTempValuesCount].toLowerCase();
+                                                        switch(myob.dataDictionary[categoryToMatch]['DataType']) {
+                                                            case 'date':
+                                                                //to do ....
+                                                                break;
+                                                            case 'number':
+                                                                if(typeof searchObject['vtm'] !== 'undefined'){
+                                                                    var vtm = searchObject['vtm'];
+                                                                    if(rowValue == vtm){
+                                                                        rowMatchesForFilterGroup = true;
+                                                                    }
+                                                                } else {
+                                                                    rowValue = parseFloat(rowValue.replace(/[^0-9.]/g,''));
+                                                                    var lt = searchObject['lt'];
+                                                                    var match = true;
+                                                                    if(jQuery.isNumeric(lt) && lt !== 0) {
+                                                                        if(lt < rowValue) {
+                                                                            match = false;
                                                                         }
-                                                                    } else {
-                                                                        rowValue = parseFloat(rowValue.replace(/[^0-9.]/g,''));
-                                                                        var lt = searchObject['lt'];
-                                                                        var match = true;
-                                                                        if(jQuery.isNumeric(lt) && lt !== 0) {
-                                                                            if(lt < rowValue) {
+                                                                    }
+                                                                    if(match) {
+                                                                        var gt = searchObject['gt'];
+                                                                        if(jQuery.isNumeric(gt) && gt !== 0) {
+                                                                            if(gt > rowValue) {
                                                                                 match = false;
                                                                             }
                                                                         }
-                                                                        if(match) {
-                                                                            var gt = searchObject['gt'];
-                                                                            if(jQuery.isNumeric(gt) && gt !== 0) {
-                                                                                if(gt > rowValue) {
-                                                                                    match = false;
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        if(match) {
-                                                                            rowMatchesForFilterGroup = true;
-                                                                        }
-                                                                        break;
                                                                     }
-                                                                case 'string':
-                                                                default:
-                                                                    var vtm = searchObject['vtm'];
-                                                                    if(rowValue === vtm){
+                                                                    if(match) {
                                                                         rowMatchesForFilterGroup = true;
                                                                     }
-                                                            }
-                                                            if(rowMatchesForFilterGroup){
-                                                                //break out for each loop
-                                                                return false;
-                                                            }
+                                                                    break;
+                                                                }
+                                                            case 'string':
+                                                            default:
+                                                                var vtm = searchObject['vtm'];
+                                                                if(rowValue === vtm){
+                                                                    rowMatchesForFilterGroup = true;
+                                                                }
+                                                        }
+                                                        if(rowMatchesForFilterGroup){
+                                                            //break out for each loop
+                                                            return false;
                                                         }
                                                     }
                                                 }
-                                                if(rowMatchesForFilterGroup) {
-                                                    stillLookingForValue = false;
-                                                }
+                                            }
+                                            if(rowMatchesForFilterGroup) {
+                                                stillLookingForValue = false;
                                             }
                                         }
-                                        // you are out ...
-                                        if(!rowMatchesForFilterGroup) {
-                                            rowMatches = false;
-                                            //by breaking here, we have an "AND" filter search....
-                                            stillLookingForCategory = false;
-                                        }
+                                    }
+                                    // you are out ...
+                                    if(!rowMatchesForFilterGroup) {
+                                        rowMatches = false;
+                                        //by breaking here, we have an "AND" filter search....
+                                        stillLookingForCategory = false;
                                     }
                                 }
-                            );
-                            //hide or show
-                            if(rowMatches){
-                                myob.myRowsMatching.push(rowID);
+                            }
+                        );
+                        //hide or show
+                        if(rowMatches){
+                            myob.myRowsMatching.push(rowID);
+                            if(myob.useJSON) {
+                            } else {
                                 row.addClass(myob.matchClass).removeClass(myob.notMatchClass);
                             }
-                            else {
+                        }
+                        else {
+                            if(myob.useJSON) {
+                            } else {
                                 row.addClass(myob.notMatchClass).removeClass(myob.matchClass);
                             }
                         }
-                    );
+                    }
                 }
                 myob.windowTimeoutStoreSetter(
                     'endRowManipulation',
@@ -2380,14 +2430,17 @@
                      myob.resetFixedTableWidth();
                      //just in case ...
                      if(myob.myTableHolder.isOnScreen()) {
-                         var headerCells = myob.myTableHead.find('tr:visible:first th:visible');
-                         myob.myTableBody.find('tr:visible:first').find('th:visible, td:visible').each(
-                             function(colNumber, cell) {
-                                 var headerCell = headerCells.eq(colNumber);
-                                 var bodyCell = jQuery(cell);
-                                 headerCell.width(bodyCell.width());
-                             }
-                         );
+                         var bodyCells = myob.myTableBody.find('tr:visible:first').find('th:visible, td:visible');
+                         if(bodyCells.length > 0) {
+                             var headerCells = myob.myTableHead.find('tr:visible:first th:visible');
+                             bodyCells.each(
+                                 function(colNumber, cell) {
+                                     var headerCell = headerCells.eq(colNumber);
+                                     var bodyCell = jQuery(cell);
+                                     headerCell.width(bodyCell.width());
+                                 }
+                             );
+                         }
                      }
                      if(myob.myTableHolder.find('.tfspushdowndiv').length > 0) {
                          jQuery('<div class="tfspushdowndiv"></div>').insertBefore(myob.myTable);
@@ -2494,29 +2547,67 @@
                 myob.setRows();
                 //get basic numbers
                 var minRow = myob.sfr;
-                var totalRowCount = 0;
                 var matchCount = 0;
                 var actualVisibleRowCount = 0;
-                var noFilter = myob.myTableBody.find('tr.'+myob.notMatchClass).length === 0 ? true : false;
-                var rowMatches = false;
-                //hide and show ...
-                myob.myRows.each(
-                    function(i, el) {
-                        el = jQuery(el);
-                        totalRowCount++;
-                        rowMatches = false;
-                        if(noFilter || el.hasClass(myob.matchClass)) {
-                            rowMatches = true;
-                            matchCount++;
-                        }
-                        if(rowMatches) {
-                            if(matchCount > minRow && actualVisibleRowCount < myob.visibleRowCount) {
-                                actualVisibleRowCount++;
-                                el.removeClass(myob.hideClass).addClass(myob.showClass);
-                            }
+                if(myob.useJSON) {
+                    myob.myRowsVisible = [];
+                    for(var i = 0; i < myob.myRowsMatching.length; i++) {
+                        matchCount++;
+                        if(matchCount > minRow && actualVisibleRowCount < myob.visibleRowCount) {
+                            actualVisibleRowCount++;
+                            myob.myRowsVisible.push(myob.myRowsMatching[i]);
                         }
                     }
-                );
+                    myob.buildRows();
+                } else {
+                    var noFilter = myob.myRowsTotalCount === myob.myRowsMatching.length ? true : false;
+                    var rowMatches = false;
+                    //hide and show ...
+                    myob.myRows.each(
+                        function(i, el) {
+                            el = jQuery(el);
+                            rowMatches = false;
+                            if(noFilter || el.hasClass(myob.matchClass)) {
+                                rowMatches = true;
+                                matchCount++;
+                            }
+                            if(rowMatches) {
+                                if(matchCount > minRow && actualVisibleRowCount < myob.visibleRowCount) {
+                                    actualVisibleRowCount++;
+                                    el.removeClass(myob.hideClass).addClass(myob.showClass);
+                                }
+                            }
+                        }
+                    );
+                }
+                myob.myTable.removeClass(myob.hideClass);
+                //todo: double-up...
+                // myob.myTable.show();
+
+
+                if( ! myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
+                    myob.windowTimeoutStoreSetter(
+                        'scrollToTopOfHolder',
+                        function() {
+                            myob.scrollToTopOfHolder();
+                            myob.createPagination(minRow, matchCount, actualVisibleRowCount);
+                        },
+                        myob.millisecondsBetweenActionsShort
+                    );
+                }
+
+                //reset rows ...
+                myob.setRowsWithDetails();
+                myob.pushState();
+                if(typeof myob.endRowFX2 === 'function') {
+                    myob.endRowFX2(myob);
+                }
+                myob.profileEnder('endRowManipulation');
+            },
+
+
+            createPagination: function(minRow, matchCount, actualVisibleRowCount)
+            {
                 //calculate final stuff ...
                 if(matchCount > 0){
                     jQuery('.'+myob.noMatchMessageClass).hide();
@@ -2571,7 +2662,7 @@
                      myob.myTableHolder.find(myob.moreRowEntriesSelector).show();
                 }
                 minRow++;
-                if(totalRowCount === matchCount) {
+                if(myob.myRowsTotalCount === matchCount) {
                     myob.myTableHolder.find(myob.filteredCountHolder).hide();
                     myob.myTableHolder.find(myob.unfilteredCountHolder).show();
                 } else {
@@ -2581,31 +2672,10 @@
                 myob.myTableHolder.find(myob.minRowSelector).text(minRow);
                 myob.myTableHolder.find(myob.maxRowSelector).text(maxRow);
                 myob.myTableHolder.find(myob.matchRowCountSelector).text(matchCount);
-                myob.myTableHolder.find(myob.totalRowCountSelector).text(totalRowCount);
+                myob.myTableHolder.find(myob.totalRowCountSelector).text(myob.myRowsTotalCount);
                 myob.myTableHolder.find(myob.visibleRowCountSelector).val(myob.visibleRowCount);
                 myob.myTableHolder.find(myob.paginationSelector).html(pageHTML);
-                myob.myTable.show();
-
-                myob.myTable.removeClass(myob.hideClass);
-                if( ! myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
-                    myob.windowTimeoutStoreSetter(
-                        'scrollToTopOfHolder',
-                        function() {
-                            myob.scrollToTopOfHolder();
-                        },
-                        myob.millisecondsBetweenActionsShort
-                    );
-                }
-                myob.setRowsWithDetails();
-                myob.pushState();
-                if(typeof myob.endRowFX2 === 'function') {
-                    myob.endRowFX2(myob);
-                }
-                myob.profileEnder('endRowManipulation');
             },
-
-
-
 
 
             //===================================================================
@@ -2889,11 +2959,18 @@
                 } else {
                     if(typeof myob.serverDataToApply['mfv'] !== 'undefined' && myob.serverDataToApply['mfv'] === true) {
                         //remove all favourites
-                        myob.myTableBody.find('tr.'+myob.favouriteClass).removeClass(myob.favouriteClass);
+                        if(myob.useJSON) {
+                        } else {
+                            myob.myTableBody.find('tr.'+myob.favouriteClass).removeClass(myob.favouriteClass);
+                        }
                         //add all favourites
                         for (var i = 0;i < myob.mfv.length;  i++) {
                             var id = myob.mfv[i];
-                            var favRow = myob.myTableBody.find('#' + id);
+                            if(myob.useJSON) {
+                                var favRow = [];
+                            } else {
+                                var favRow = myob.myTableBody.find('#' + id);
+                            }
                             if(favRow.length > 0) {
                                 favRow.addClass(myob.favouriteClass);
                             } else {
@@ -3200,11 +3277,11 @@
                             var el = jQuery(el);
                             var value = el.attr('data-tfsvalue');
                             value = value.raw2safe();
-                            jQuery(el).val('value', value);
+                            jQuery(el).val( value);
                         }
                     );
                 }
-                myTableBody.html(html);
+                myob.myTableBody.html(html);
             }
         };
 
@@ -3240,8 +3317,8 @@
                 myob.replaceRowValue(category, rowID, newValue);
                 return this;
             },
-            updateMatchingRows: function(category, newValue){
-                myob.updateMatchingRows(category, newValue);
+            updateMatchingRowsInDataDictionary: function(category, newValue){
+                myob.updateMatchingRowsInDataDictionary(category, newValue);
                 return this;
             },
             resetAll: function()

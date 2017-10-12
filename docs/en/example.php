@@ -3,7 +3,7 @@
 
 $useJSON = false;
 $templateRow = '
-<tr class="tfstr hide" id="{{RowID}}">
+<tr class="tfstr" id="{{RowID}}">
     <th scope="row">
         <a href="#" class="more">+</a>
         <a href="#" class="adf" title="Add to Favourites">♥</a>
@@ -484,6 +484,7 @@ $jsonArray = $data['Data'];
                 {
                     mySelector: ".tfs-holder",
                     rowRawData: <?php echo json_encode($jsonArray); ?>
+                    templateRow: <?php echo json_encode($jsonArray); ?>
                 }
             );
         </script>
