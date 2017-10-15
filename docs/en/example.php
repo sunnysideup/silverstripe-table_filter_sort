@@ -1,214 +1,70 @@
 <?php
 
 
-$useJSON = false;
-$templateRow = '
-<tr class="tfstr" id="{{RowID}}">
-    <th scope="row">
-        <a href="#" class="more">+</a>
-        <a href="#" class="adf" title="Add to Favourites">♥</a>
-        <span data-filter="SKU">{{SKU}}</span><br>
-        <p style="display: none;" class="hidden">
-            Some more content goes here.
-        </p>
-    </th>
-    <td><span data-filter="Type">{{TYPE}}</span></td>
-    <td><span data-filter="Original Producer">{{Original Producer}}</span></td>
-    <td><span data-filter="Colour" class="dl">{{Color}}</span></td>
-    <td><span data-filter="Size">{{Large}}</span></td>
-    <td><span data-filter="Weight">{{Weight}}</span></td>
-    <td><span data-filter="Price">{{Price}}</span></td>
-    <td><span data-filter="Rating">{{Rating}}</span></td>
-    <td>
-        <p>Lorem ipsum dolor sit amet consectetur adipiscing elit cum nullam, risus posuere ligula eget ullamcorper orci ultricies neque lobortis suspendisse, sodales accumsan mus eleifend vulputate magna ornare at.</p>
-        <div style="display: none;" class="hidden">
-            <ul>
-                <li><span data-filter="Tags" class="dl">{{Tags}}</span></li>
-                <li><span data-filter="Tags" class="dl">{{Tags}}</span></li>
-                <li><span data-filter="Tags" class="dl">{{Tags}}</span></li>
-            </ul>
-        </div>
-    </td>
-    <td>
-        your description: <input name="rating" data-filter="your description" type="text" data-tfsvalue="{{your selection}}">
-        your selected: <select name="selection" data-filter="your selection" data-tfsvalue="{{your selection}}">
-            <option value="yes">yes</option>
-            <option value="no">no</option>
-            <option value="maybe">maybe</option>
-        </select>
-</td></tr>
-
-';
 
 function create_test()
 {
+
+    $useJSON = true;
+    if(isset($_GET['nojson'])) {
+        $useJSON = false;
+    }
+    $templateRow = '';
+    if($useJSON) {
+        $templateRow = '
+        <tr class="tfstr" id="{{RowID}}">
+            <th scope="row">
+                <a href="#" class="more">+</a>
+                <a href="#" class="adf" title="Add to Favourites">♥</a>
+                <span data-filter="SKU">{{SKU}}</span><br>
+                <p style="display: none;" class="hidden">
+                    Some more content goes here.
+                </p>
+            </th>
+            <td><span data-filter="Type">{{Type}}</span></td>
+            <td><span data-filter="Original Producer">{{Original Producer}}</span></td>
+            <td><span data-filter="Colour" class="dl">{{Colour}}</span></td>
+            <td><span data-filter="Size">{{Size}}</span></td>
+            <td><span data-filter="Weight">{{Weight}}</span></td>
+            <td><span data-filter="Price">{{Price}}</span></td>
+            <td><span data-filter="Rating">{{Rating}}</span></td>
+            <td>
+                <p>Lorem ipsum dolor sit amet consectetur adipiscing elit cum nullam, risus posuere ligula eget ullamcorper orci ultricies neque lobortis suspendisse, sodales accumsan mus eleifend vulputate magna ornare at.</p>
+                <div style="display: none;" class="hidden">
+                    <ul>
+                        <li><span data-filter="Tags" class="dl">{{Tags}}</span></li>
+                        <li><span data-filter="Tags" class="dl">{{Tags}}</span></li>
+                        <li><span data-filter="Tags" class="dl">{{Tags}}</span></li>
+                    </ul>
+                </div>
+            </td>
+            <td>
+                your description: <input name="rating" data-filter="your description" type="text" data-tfsvalue="{{InputValue}}">
+                your selected: <select name="selection" data-filter="your selection" data-tfsvalue="{{SelectValue}}">
+                    <option value="yes">yes</option>
+                    <option value="no">no</option>
+                    <option value="maybe">maybe</option>
+                </select>
+            </td>
+        </tr>
+
+        ';
+    }
     $lipsum = new LoremIpsum();
     $type = 'Test Product';
     $producer = 'Sunny Side Up';
-    $colours = array(
-        'orange',
-        'red',
-        'blue',
-        'indigo',
-        'violet',
-        'green',
-        'yellow',
-        'Crazy Dots'
-    );
-    $sizes = array(
-        'Small',
-        'Medium',
-        'Large',
-        'X-Large',
-        'XX-Large'
-    );
-    $veg = array(
-        'Artichoke',
-        'Artichoke Large',
-        'ArtichokeLarge',
-        'ArtichokeTest',
-        'Arugula',
-        'Asparagus',
-        'Aubergine (UK) = Eggplant (US)',
-        'Amaranth',
-        'Legumes',
-        'Alfalfa sprouts',
-        'Azuki beans (or adzuki)',
-        'Bean sprouts',
-        'Black beans',
-        'Black-eyed peas',
-        'Borlotti bean',
-        'Broad beans',
-        'Chickpeas, Garbanzos, or ceci beans',
-        'Green beans',
-        'Kidney beans',
-        'Lentils',
-        'Lima beans or Butter bean',
-        'Mung beans',
-        'Navy beans',
-        'Pinto beans',
-        'Runner beans',
-        'Split peas',
-        'Soy beans',
-        'Peas',
-        'Mangetout or Snap peas',
-        'Beet greens (see also chard)',
-        'Bok choy (known as Bok choy in UK and US)',
-        'Broccoflower (a hybrid)',
-        'Broccoli',
-        'Brussels sprouts',
-        'Cabbage',
-        'Calabrese',
-        'Carrots',
-        'Cauliflower',
-        'Celery',
-        'Chard',
-        'Collard greens',
-        'Corn salad',
-        'Endive',
-        'Fiddleheads (young coiled fern leaves)',
-        'Frisee',
-        'Fennel',
-        'Herbs and spices',
-        'Anise',
-        'Basil',
-        'Caraway',
-        'Cilantro seeds are Coriander',
-        'Chamomile',
-        'Dill',
-        'Fennel',
-        'Lavender',
-        'Lemon Grass',
-        'Marjoram',
-        'Oregano',
-        'Parsley',
-        'Rosemary',
-        'Sage',
-        'Thyme',
-        'Kale',
-        'Kohlrabi',
-        'Lettuce Lactuca sativa',
-        'Maize (UK) = Corn (US) = Sweetcorn (actually a grain)',
-        'Mushrooms (actually a fungus, not a plant)',
-        'Mustard greens',
-        'Nettles',
-        'New Zealand spinach',
-        'Okra',
-        'Onion family',
-        'Chives',
-        'Garlic',
-        'Leek Allium porrum',
-        'Onion',
-        'Shallot',
-        'Spring onion (UK) == Green onion (US) == Scallion',
-        'Parsley',
-        'Peppers (biologically fruits, but taxed as vegetables)',
-        'Green pepper and Red pepper == bell pepper == pimento',
-        'Chili pepper == Capsicum',
-        'Jalapeño',
-        'Habanero',
-        'Paprika',
-        'Tabasco pepper',
-        'Cayenne pepper',
-        'Radicchio',
-        'Rhubarb',
-        'Root vegetables',
-        'Beetroot (UK) == Beet (US)',
-        'mangel-wurzel: a variety of beet used mostly as cattlefeed',
-        'Carrot',
-        'Celeriac',
-        'Daikon',
-        'Ginger',
-        'Parsnip',
-        'Rutabaga',
-        'Turnip',
-        'Radish',
-        'Swede (UK) == Rutabaga (US)',
-        'Turnip',
-        'Wasabi',
-        'Horseradish',
-        'White radish',
-        'Salsify (usually Purple Salsify or Oyster Plant)',
-        'Skirret',
-        'Spinach',
-        'Topinambur',
-        'Squashes (biologically fruits, but taxed as vegetables)',
-        'Acorn squash',
-        'Butternut squash',
-        'Banana squash',
-        'Courgette (UK) == Zucchini (US)',
-        'Cucumber (biologically fruits, but taxed as vegetables)',
-        'Delicata',
-        'Gem squash',
-        'Hubbard squash',
-        'Marrow (UK) == Squash (US) Cucurbita maxima',
-        'Patty pans',
-        'Pumpkin',
-        'Spaghetti squash',
-        'Tat soi',
-        'Tomato (biologically a fruit, but taxed as a vegetable)',
-        'Tubers',
-        'Jicama',
-        'Jerusalem artichoke',
-        'Potato',
-        'Sunchokes',
-        'Sweet potato',
-        'Taro',
-        'Yam (Yam and Sweet Potato are NOT the same)',
-        'Turnip greens',
-        'Water chestnut',
-        'Watercress',
-        'Zucchini'
-    );
     $html = '';
     $limit = isset($_GET['i']) ? $_GET['i'] : 300;
     $jsonArray = [];
+    $colours = RandomTestValues::get_sample_array_by_type('colours');
+    $veg = RandomTestValues::get_sample_array_by_type('veg');
+    $sizes = RandomTestValues::get_sample_array_by_type('sizes');
     for($i = 0; $i < $limit; $i++) {
         $id = 'tfs'.$i;
         $jsonArray[$id] = [
             'SKU' => ($i+1),
             'Type' => $type,
-            'Producer' => $producer,
+            'Original Producer' => $producer,
             'Colour' => $colours[rand(0, count($colours)-1)],
             'Size' => $sizes[rand(0,count($sizes)-1)],
             'Weight' => rand(1,100),
@@ -219,56 +75,61 @@ function create_test()
                 $veg[rand(0, count($veg)-1)],
                 $veg[rand(0, count($veg)-1)]
             ],
-            'your description' => 'tba',
-            'your selected' => 'yes'
+            'InputValue' => 'tba',
+            'SelectValue' => 'yes'
         ];
         $rowData = $jsonArray[$id];
-        $html .= '
-        <tr class="tfstr hide" id="'.$id.'">
-            <th scope="row">
-                <a href="#" class="more">+</a>
-                <a href="#" class="adf" title="Add to Favourites">♥</a>
-                <span data-filter="SKU">'.$rowData['SKU'].'</span><br />
-                <p style="display: none;" class="hidden">
-                    Some more content goes here.
-                </p>
-            </th>
-            <td><span data-filter="Type">'.$type.'</span></td>
-            <td><span data-filter="Original Producer">'.$producer.'</span></td>
-            <td><span data-filter="Colour" class="dl">'.$rowData['Colour'].'</span></td>
-            <td><span data-filter="Size">'.$rowData['Size'].'</span></td>
-            <td><span data-filter="Weight">'.$rowData['Weight'].'kg.</span></td>
-            <td><span data-filter="Price">$'.$rowData['Price'].'</span></td>
-            <td><span data-filter="Rating">'.$rowData['Rating'].' Stars</span></td>
-            <td>
-                <p>'.$lipsum->sentence().'</p>
-                <div style="display: none;" class="hidden">
-                    <ul>
-                        <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][0].'</span></li>
-                        <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][1].'</span></li>
-                        <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][2].'</span></li>
-                    </ul>
-                </div>
-            </td>
-            <td>
-                your description: <input name="rating" data-filter="your description" type="text" value="" />
-                your selected: <select name="selection" data-filter="your selection">
-                    <option value="yes">yes</option>
-                    <option value="no">no</option>
-                    <option value="maybe">maybe</option>
-                </select>
-        </tr>';
+        if($useJSON) {
+            $html = $templateRow;
+        } else {
+            $html .= '
+            <tr class="tfstr hide" id="'.$id.'">
+                <th scope="row">
+                    <a href="#" class="more">+</a>
+                    <a href="#" class="adf" title="Add to Favourites">♥</a>
+                    <span data-filter="SKU">'.$rowData['SKU'].'</span><br />
+                    <p style="display: none;" class="hidden">
+                        Some more content goes here.
+                    </p>
+                </th>
+                <td><span data-filter="Type">'.$type.'</span></td>
+                <td><span data-filter="Original Producer">'.$producer.'</span></td>
+                <td><span data-filter="Colour" class="dl">'.$rowData['Colour'].'</span></td>
+                <td><span data-filter="Size">'.$rowData['Size'].'</span></td>
+                <td><span data-filter="Weight">'.$rowData['Weight'].'kg.</span></td>
+                <td><span data-filter="Price">$'.$rowData['Price'].'</span></td>
+                <td><span data-filter="Rating">'.$rowData['Rating'].' Stars</span></td>
+                <td>
+                    <p>'.$lipsum->sentence().'</p>
+                    <div style="display: none;" class="hidden">
+                        <ul>
+                            <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][0].'</span></li>
+                            <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][1].'</span></li>
+                            <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][2].'</span></li>
+                        </ul>
+                    </div>
+                </td>
+                <td>
+                    your description: <input name="rating" data-filter="your description" type="text" value="" />
+                    your selected: <select name="selection" data-filter="your selection">
+                        <option value="yes">yes</option>
+                        <option value="no">no</option>
+                        <option value="maybe">maybe</option>
+                    </select>
+            </tr>';
+        }
     }
     return [
         'HTML' => $html,
-        'Data' => $jsonArray
+        'Data' => $jsonArray,
+        'useJSON' => $useJSON
     ];
 }
 
 $data = create_test();
 $html = $data['HTML'];
 $jsonArray = $data['Data'];
-
+$useJSON = $data['useJSON'];
 
 
 
@@ -446,7 +307,7 @@ $jsonArray = $data['Data'];
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if($useJSON) { echo $templateRow; } else {echo $html;} ?>
+                    <?php echo $html; ?>
                 </tbody>
             </table>
 
@@ -482,9 +343,9 @@ $jsonArray = $data['Data'];
             }
             TableFilterSortVars.push(
                 {
+                    debug: true,
                     mySelector: ".tfs-holder",
                     rowRawData: <?php echo json_encode($jsonArray); ?>
-                    templateRow: <?php echo json_encode($jsonArray); ?>
                 }
             );
         </script>
@@ -503,6 +364,176 @@ $jsonArray = $data['Data'];
 
 <?php
 
+
+class RandomTestValues
+{
+    protected $data = [
+        'colours' => [
+            'orange',
+            'red',
+            'blue',
+            'indigo',
+            'violet',
+            'green',
+            'yellow',
+            'Crazy Dots'
+        ],
+        'sizes' => [
+            'Small',
+            'Medium',
+            'Large',
+            'X-Large',
+            'XX-Large'
+        ],
+        'veg' => [
+            'Artichoke',
+            'Artichoke Large',
+            'ArtichokeLarge',
+            'ArtichokeTest',
+            'Arugula',
+            'Asparagus',
+            'Aubergine (UK) = Eggplant (US)',
+            'Amaranth',
+            'Legumes',
+            'Alfalfa sprouts',
+            'Azuki beans (or adzuki)',
+            'Bean sprouts',
+            'Black beans',
+            'Black-eyed peas',
+            'Borlotti bean',
+            'Broad beans',
+            'Chickpeas, Garbanzos, or ceci beans',
+            'Green beans',
+            'Kidney beans',
+            'Lentils',
+            'Lima beans or Butter bean',
+            'Mung beans',
+            'Navy beans',
+            'Pinto beans',
+            'Runner beans',
+            'Split peas',
+            'Soy beans',
+            'Peas',
+            'Mangetout or Snap peas',
+            'Beet greens (see also chard)',
+            'Bok choy (known as Bok choy in UK and US)',
+            'Broccoflower (a hybrid)',
+            'Broccoli',
+            'Brussels sprouts',
+            'Cabbage',
+            'Calabrese',
+            'Carrots',
+            'Cauliflower',
+            'Celery',
+            'Chard',
+            'Collard greens',
+            'Corn salad',
+            'Endive',
+            'Fiddleheads (young coiled fern leaves)',
+            'Frisee',
+            'Fennel',
+            'Herbs and spices',
+            'Anise',
+            'Basil',
+            'Caraway',
+            'Cilantro seeds are Coriander',
+            'Chamomile',
+            'Dill',
+            'Fennel',
+            'Lavender',
+            'Lemon Grass',
+            'Marjoram',
+            'Oregano',
+            'Parsley',
+            'Rosemary',
+            'Sage',
+            'Thyme',
+            'Kale',
+            'Kohlrabi',
+            'Lettuce Lactuca sativa',
+            'Maize (UK) = Corn (US) = Sweetcorn (actually a grain)',
+            'Mushrooms (actually a fungus, not a plant)',
+            'Mustard greens',
+            'Nettles',
+            'New Zealand spinach',
+            'Okra',
+            'Onion family',
+            'Chives',
+            'Garlic',
+            'Leek Allium porrum',
+            'Onion',
+            'Shallot',
+            'Spring onion (UK) == Green onion (US) == Scallion',
+            'Parsley',
+            'Peppers (biologically fruits, but taxed as vegetables)',
+            'Green pepper and Red pepper == bell pepper == pimento',
+            'Chili pepper == Capsicum',
+            'Jalapeño',
+            'Habanero',
+            'Paprika',
+            'Tabasco pepper',
+            'Cayenne pepper',
+            'Radicchio',
+            'Rhubarb',
+            'Root vegetables',
+            'Beetroot (UK) == Beet (US)',
+            'mangel-wurzel: a variety of beet used mostly as cattlefeed',
+            'Carrot',
+            'Celeriac',
+            'Daikon',
+            'Ginger',
+            'Parsnip',
+            'Rutabaga',
+            'Turnip',
+            'Radish',
+            'Swede (UK) == Rutabaga (US)',
+            'Turnip',
+            'Wasabi',
+            'Horseradish',
+            'White radish',
+            'Salsify (usually Purple Salsify or Oyster Plant)',
+            'Skirret',
+            'Spinach',
+            'Topinambur',
+            'Squashes (biologically fruits, but taxed as vegetables)',
+            'Acorn squash',
+            'Butternut squash',
+            'Banana squash',
+            'Courgette (UK) == Zucchini (US)',
+            'Cucumber (biologically fruits, but taxed as vegetables)',
+            'Delicata',
+            'Gem squash',
+            'Hubbard squash',
+            'Marrow (UK) == Squash (US) Cucurbita maxima',
+            'Patty pans',
+            'Pumpkin',
+            'Spaghetti squash',
+            'Tat soi',
+            'Tomato (biologically a fruit, but taxed as a vegetable)',
+            'Tubers',
+            'Jicama',
+            'Jerusalem artichoke',
+            'Potato',
+            'Sunchokes',
+            'Sweet potato',
+            'Taro',
+            'Yam (Yam and Sweet Potato are NOT the same)',
+            'Turnip greens',
+            'Water chestnut',
+            'Watercress',
+            'Zucchini'
+        ]
+    ];
+
+    public static function get_sample_array_by_type($type) {
+        $obj = new RandomTestValues();
+        return $obj->getData($type);
+    }
+
+    public function  getData($type) {
+        return $this->data[$type];
+    }
+}
 
 /**
  * Lorem Ipsum Generator

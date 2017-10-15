@@ -529,6 +529,15 @@ li.tfs-save-and-load.save.filters,
     display: none!important;
 }
 
+.tfs-holder tbody tr input,
+.tfs-holder tbody tr select{
+    width: 100%;
+    display: block;
+    border: none;
+    background-color: #fff;
+    box-sizing: border-box;
+    padding: 5px;
+}
 
 /*
  * **********************************************
@@ -718,7 +727,8 @@ li.tfs-save-and-load.save.filters,
     display: none
 }
 
-#tfs-modal-pop-up .field input, #tfs-modal-pop-up .field textarea {
+#tfs-modal-pop-up .field input,
+#tfs-modal-pop-up .field textarea {
     width: 80%;
     border: 1px solid #3cb0fd;
     border-radius: 5px;

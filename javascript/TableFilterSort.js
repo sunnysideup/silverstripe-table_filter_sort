@@ -12,7 +12,7 @@
              * turn on to see what is going on in console
              * @type {boolean}
              */
-            debug: false,
+            debug: true,
 
             /**
              * set to true if we use a templateRow
@@ -32,7 +32,7 @@
              *
              * @type string
              */
-            templateRow: "",
+            templateRow: '',
 
             /**
              *
@@ -214,7 +214,13 @@
              *  - sfr: show from row
              * @type {array}
              */
-            filterAndSortVariables: ["cfi","cfc","cfx","csr", "pge"],
+            filterAndSortVariables: [
+                "cfi",
+                "cfc",
+                "cfx",
+                "csr",
+                "pge"
+            ],
 
             /**
              * variables that determine the favourites
@@ -225,8 +231,8 @@
 
             /**
              * list of current filters by category
-             * "Colour" => [Red]
-             * "Size" => [S,M,L]
+             * "Colour" => [{ivl: "Red", vtm: "red"}, {ivl: "Green", vtm: "green"}],
+             * "Size" => [{ivl: "XXL", vtm: "xxl"}, {ivl: "S", vtm: "small"}]
              * @var {object}
              */
             cfi: {},
@@ -333,13 +339,13 @@
              *
              * @type {boolean}
              */
-            millisecondsBetweenActionsShort: 20,
+            millisecondsBetweenActionsShort: 10,
 
             /**
              *
              * @type {boolean}
              */
-            millisecondsBetweenActionsLong: 200,
+            millisecondsBetweenActionsLong: 100,
 
             /**
              * storing setTimeout so that we can cancel them
@@ -613,7 +619,7 @@
             /**
              * @type {string}
              */
-            rowSelector: 'tr.tfstr',
+            rowSelector: 'tbody > tr.tfstr',
 
             /**
              * items that can be filtered / sorted for ...
@@ -795,26 +801,17 @@
              */
             init: function(holderNumber)
             {
-                if(myob.templateRow.length > 0 && myob.rowRawData !== null) {
-                    myob.useJSON = true;
-                }
                 //get the holders
                 myob.holderNumber = holderNumber;
                 myob.myTableHolder = myTableHolder;
-                myob.myFilterFormHolder = myob.myTableHolder.find(myob.filterFormHolderSelector).first();
-                myob.myFilterFormInner = myob.myFilterFormHolder.find(myob.filterFormInnerSelector).first();
-                myob.myTable = myob.myTableHolder.find(myob.tableSelector).first();
-                myob.myTableHead = myob.myTableHolder.find("table thead");
-                myob.myTableBody = myob.myTable.find(" > tbody");
-                myob.myTable.css('table-layout', 'fixed');
-                //base URL
-                myob.baseURL = location.protocol + '//' + location.host + location.pathname;
+
+                myob.setHTMLandJson();
 
                 //get the rows
-                myob.setRowsWithDetails();
+                myob.setRowsWithDetails(true);
                 if(myob.myRowsTotalCount > 0){
-                    myob.millisecondsBetweenActionsShort = myob.millisecondsBetweenActionsShort * (Math.floor(myob.myRowsTotalCount / 1000) + 1);
-                    myob.millisecondsBetweenActionsLong = myob.millisecondsBetweenActionsLong * (Math.floor(myob.myRowsTotalCount / 1000) + 1);
+                    myob.millisecondsBetweenActionsShort = myob.millisecondsBetweenActionsShort * (Math.floor(myob.myRowsTotalCount / 5000) + 1);
+                    myob.millisecondsBetweenActionsLong = myob.millisecondsBetweenActionsLong * (Math.floor(myob.myRowsTotalCount / 5000) + 1);
                     if(typeof myob.initFX1 === 'function') {
                         myob.initFX1();
                     }
@@ -887,11 +884,35 @@
                 }
             },
 
+            setHTMLandJson: function()
+            {
+                if(myob.rowRawData !== null) {
+                    myob.useJSON = true;
+                }
+                myob.myFilterFormHolder = myob.myTableHolder.find(myob.filterFormHolderSelector).first();
+                myob.myFilterFormInner = myob.myFilterFormHolder.find(myob.filterFormInnerSelector).first();
+                myob.myTable = myob.myTableHolder.find(myob.tableSelector).first();
+                myob.myTableHead = myob.myTable.find(" > thead");
+                myob.myTableBody = myob.myTable.find(" > tbody");
+                if(myob.templateRow.length === 0) {
+                    if(myob.myTable.find(myob.rowSelector).length === 1) {
+                        myob.templateRow = myob.myTableBody.clone().html();
+                        myob.myTableBody.empty();
+                    }
+                }
+                myob.myTable.css('table-layout', 'fixed');
+                //base URL
+                myob.baseURL = location.protocol + '//' + location.host + location.pathname;
+
+            },
+
             setRows: function()
             {
                 myob.profileStarter('setRows');
                 if(myob.useJSON) {
-                    myob.myRows = jQuery(myob.templateRow);
+                    if(myob.myRows === null) {
+                        myob.myRows = jQuery(myob.templateRow);
+                    }
                 } else {
                     myob.myRows = myob.myTable.find(myob.rowSelector);
                 }
@@ -907,7 +928,14 @@
                 myob.profileStarter('setRowsWithDetails');
                 myob.setRows();
                 if(typeof findMyRowsSorted === 'undefined') {
+                    findMyRowsSorted = false;
+                }
+                if(myob.myRowsSorted.length === 0) {
                     findMyRowsSorted = true;
+                }
+                if(findMyRowsSorted) {
+                    myob.myRowsSorted.length = 0;
+                    myob.myRowsSorted = [];
                 }
                 if(myob.useJSON) {
                     if(hideAll) {
@@ -924,21 +952,20 @@
                     //do nothing
                 } else {
                     if(findMyRowsSorted) {
-                        myob.myRowsSorted = [];
-                        var id = '';
+                        var rowID = '';
                         var reload = false;
                         myob.myRows.each(
                             function(i, el) {
-                                id = jQuery(el).attr('id');
-                                if(typeof id === 'string' && id.length > 0) {
+                                rowID = jQuery(el).attr('id');
+                                if(typeof rowID === 'string' && rowID.length > 0) {
                                     //do nothing
                                 } else {
-                                    id = 'tfs-row-'+i;
-                                    jQuery(el).attr('id', id);
+                                    rowID = 'tfs-row-'+i;
+                                    jQuery(el).attr('id', rowID);
                                     reload = true;
                                 }
                                 if(findMyRowsSorted) {
-                                    myob.myRowsSorted.push(id);
+                                    myob.myRowsSorted.push(rowID);
                                 }
                                 if(hideAll === true) {
                                     jQuery(el).addClass(myob.hideClass).removeClass(myob.showClass);
@@ -1003,7 +1030,7 @@
                                     if(values.length === 0) {
                                         values = [myob.placeholderValue];
                                     }
-                                    for(i = 0; i < values.length; i++) {
+                                    for(var i = 0; i < values.length; i++) {
                                         var value = values[i];
                                         myob.addOptionToCategory(category, value);
                                         myob.addValueToRow(category, rowID, value);
@@ -1130,6 +1157,9 @@
             replaceRowValue: function(category, rowID, value)
             {
                 myob.dataDictionaryBuildCategory(category);
+                if(Array.isArray(myob.dataDictionary[category]['Values'][rowID])) {
+                    myob.dataDictionary[category]['Values'][rowID].length = 0;
+                }
                 myob.dataDictionary[category]['Values'][rowID] = [];
                 if(typeof value !== 'undefined') {
                     myob.addRowToValue(category, rowID, value);
@@ -1177,7 +1207,7 @@
             hideIdenticalCols: function()
             {
                 myob.profileStarter('hideIdenticalCols');
-                if(myob.rowxxxxxxxx > myob.maximumRowsForHideIdentical) {
+                if(myob.myRowsTotalCount > myob.maximumRowsForHideIdentical) {
                     return;
                 }
                 var commonContentExists = false;
@@ -1189,20 +1219,27 @@
                                 commonContentExists = true;
                                 var commonContentAdded = false;
                                 if(myob.useJSON) {
-                                    var htmlObjects = jQuery(myob.templateRow);
-
+                                    myob.myTableBody.empty();
+                                    myob.myTableBody.append(myob.templateRow);
+                                    var htmlObjects = myob.myTableBody.find('['+myob.filterItemAttribute+'="' + category + '"]');
                                 } else {
-                                    var htmlObjects = myob.myRows.find('['+myob.filterItemAttribute+'="' + category + '"]')
+                                    var htmlObjects = myob.myRows.find('['+myob.filterItemAttribute+'="' + category + '"]');
                                 }
                                 //remove text from span
                                 htmlObjects.each(
                                     function(i, el) {
                                         el = jQuery(el);
-                                        if(!commonContentAdded) {
-                                            if(el.html() === "" || el.hasClass('ignore-content')){
+                                        if(commonContentAdded === false) {
+                                            var value = el.html();
+                                            if(myob.useJSON) {
+                                                var searchValue = value;
+                                                var replaceValue = myob.dataDictionary[category]['Options'][0];
+                                                value = value.split(searchValue).join(replaceValue)
+                                            }
+                                            if(value === "" || el.hasClass('ignore-content')){
                                                 // do nothing
                                             } else {
-                                                commonContent += "<li><strong>"+category + ":</strong> <span>" + el.html() + "</span></li>";
+                                                commonContent += "<li><strong>"+category + ":</strong> <span>" + value + "</span></li>";
                                                 commonContentAdded = true;
                                             }
                                         }
@@ -1227,6 +1264,9 @@
                                                         myob.myTable.find('thead tr th').eq(colNumber).remove();
                                                     }
                                                     spanParent.remove();
+                                                    if(myob.useJSON) {
+                                                        myob.templateRow = myob.myTableBody.html();
+                                                    }
                                                 }
                                             }
                                         }
@@ -1278,7 +1318,7 @@
 
                         //can it be sorted?
                         if(typeof myob.dataDictionary[category]['CanSort'] === "undefined" || myob.dataDictionary[category]['CanSort'] === null) {
-                            myob.dataDictionary[category]['CanSort'] = sortLink.length > 0;
+                            myob.dataDictionary[category]['CanSort'] = (sortLink.length > 0);
                         }
 
                         //what is the data type?
@@ -1306,7 +1346,7 @@
                         if(jQuery.inArray( myob.dataDictionary[category]['DataType'], myob.validDataTypes ) === false) {
                             console.debug('ERROR: invalid DataType for'+category+': '+myob.dataDictionary[category]['DataType'])
                         }
-                        myob.dataDictionarySorter(category, 'Options');
+                        myob.dataDictionarySorter(category);
                     }
                 );
                 myob.profileEnder('dataDictionaryCollector');
@@ -1317,26 +1357,27 @@
              * @param  string category
              * @param  string fieldName
              */
-            dataDictionarySorter: function(category, fieldName)
+            dataDictionarySorter: function(category)
             {
-                if(typeof fieldName === 'undefined') {
-                    fieldName = 'Options';
-                }
-                if(Array.isArray(myob.dataDictionary[category][fieldName])) {
+                if(Array.isArray(myob.dataDictionary[category]['Options'])) {
                     //sort options
                     switch(myob.dataDictionary[category]['DataType']) {
                         case 'number':
-                            myob.dataDictionary[category][fieldName].sort(
+                            myob.dataDictionary[category]['Options'].sort(
                                 function(a,b){
-                                    a = parseFloat(a.replace(/[^0-9.]/g,''));
-                                    b = parseFloat(b.replace(/[^0-9.]/g,''));
+                                    if(typeof a !== 'number') {
+                                        a = parseFloat(a.replace(/[^0-9.]/g,''));
+                                    }
+                                    if(typeof b !== 'number' ) {
+                                        b = parseFloat(b.replace(/[^0-9.]/g,''));
+                                    }
                                     return a - b
                                 }
                             );
                             break;
                         case 'string':
                         default:
-                            myob.dataDictionary[category][fieldName].sort();
+                            myob.dataDictionary[category]['Options'].sort();
                     }
                 }
             },
@@ -2007,7 +2048,7 @@
                             } else if(type === 'tag') {
                                 if(typeof myob.cfi[category] !== 'undefined') {
                                     for(var i = 0; i < myob.cfi[category].length; i++) {
-                                        valueIndex = myob.cfi[category][i].vtm;
+                                        valueIndex = myob.cfi[category][i].vtm + '';
                                         var html = myob.makeFieldForForm('checkbox', category, tabIndex, valueIndex);
                                         if(html.length > 5) {
                                             html = html.replace('<input ', '<input checked="checked" ');
@@ -2031,9 +2072,10 @@
                                     }
                                 }
                             }
+                            var labelValue = valueIndex.toString().raw2safe();
                             return startString +
-                                    '<input class="checkbox" type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + valueIndex.raw2attr() + '" ' + checked + ' tabindex="'+tabIndex+'" />' +
-                                    '<label for="' + valueID + '">' + valueIndex + '</label>' +
+                                    '<input class="checkbox" type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + cleanValue.raw2attr() + '" ' + checked + ' tabindex="'+tabIndex+'" />' +
+                                    '<label for="' + valueID + '">' + labelValue + '</label>' +
                                     endString;
 
                         case 'number':
@@ -2120,18 +2162,21 @@
                 if(myEl && myEl.length > 0) {
                     myob.startRowManipulation();
                     var type = myEl.attr("data-sort-type");
+                    var category = myob.csr.sct;
                     if(typeof type === 'undefined') {
-                        type = myob.dataDictionary[myob.csr.sct]['DataType'];
+                        type = myob.dataDictionary[category]['DataType'];
                     }
                     var arr = [];
-                    var rows = myob.dataDictionary[myob.csr.sct]['Values'];
+                    var rows = myob.dataDictionary[category]['Values'];
                     for (var rowID in rows) {
                         if (rows.hasOwnProperty(rowID)) {
                             var dataValue = rows[rowID][0];
                             if(typeof dataValue !== 'undefined') {
                                 if(type === "number") {
-                                    dataValue = dataValue.replace(/[^\d.-]/g, '');
-                                    dataValue = parseFloat(dataValue);
+                                    if(typeof dataValue !== 'number') {
+                                        dataValue = dataValue.replace(/[^\d.-]/g, '');
+                                        dataValue = parseFloat(dataValue);
+                                    }
                                 }
                                 else {
                                     //do nothing ...
@@ -2140,10 +2185,16 @@
                             else {
                                 dataValue = 'zzzzzzzzzzzzzzzzzz';
                             }
-                            arr.push(rowID);
+                            var innerArray = [dataValue, rowID];
+                            arr.push(innerArray);
                         }
                     }
 
+                    if(myob.useJSON) {
+                        //do nothing
+                    } else {
+                        var tempRows = myob.myTableBody.clone();
+                    }
                     //start doing stuff
                     //clear table ...
                     myob.myTableBody.empty();
@@ -2165,13 +2216,17 @@
                             .addClass(myob.sortAscClass)
                             .removeClass(myob.sortDescClass);
                     }
+                    myob.myRowsSorted.length = 0;
+                    myob.myRowsSorted = [];
                     arr.forEach(
-                        function(entry) {
-                            var indexOfRow = myob.myRowsSorted.push(entry);
+                        function(innerArray) {
+                            var rowID = innerArray[1];
+                            myob.myRowsSorted.push(rowID);
                             if(myob.useJSON) {
-
+                                //do nothing
                             } else {
-                                myob.myTableBody.append(myob.myRows[indexOfRow]);
+                                var row = tempRows.find('#'+rowID);
+                                myob.myTableBody.append(row);
                             }
                         }
                     );
@@ -2197,23 +2252,24 @@
                 myob.sfr = 0;
                 myob.workOutCurrentFilter();
                 myob.startRowManipulation();
-                if(myob.cfi.length === 0) {
-                    myob.myRowsMatching = myob.myRowsSorted;
+                if(myob.hasFilter()) {
+                    //clone!
+                    myob.myRowsMatching = myob.myRowsSorted.splice(0);
                 } else {
                     //start with blank slate ...
+                    myob.myRowsMatching.length = 0;
                     myob.myRowsMatching = [];
-                    for(var i = 0; i < myob.myRowsSorted; i++) {
+                    for(var i = 0; i < myob.myRowsSorted.length; i++) {
                         var rowID = myob.myRowsSorted[i];
                         if(myob.useJSON) {
                             var rowObject = myob.rowRawData[rowID];
                         } else {
-                            var row = myob.myTableBody.find('#'+rowID);
+                            var row = myob.myTableBody.find('#'+rowID).first();
                         }
                         //innocent until proven guilty
                         var rowMatches = true;
 
                         var stillLookingForCategory = true;
-
                         //check for each category
                         Object.keys(myob.cfi).forEach(
                             function(categoryToMatch, categoryToMatchIndex) {
@@ -2239,8 +2295,8 @@
                                                     var rowText = '';
                                                     for(category in myob.dataDictionary) {
                                                         if(myob.dataDictionary.hasOwnProperty(category)) {
-                                                            myTempValues = myob.dataDictionary[category]['Values'][rowID];
-                                                            rowText += myTempValues.join(' ');
+                                                            var myTempValues = myob.dataDictionary[category]['Values'][rowID];
+                                                            rowText += myTempValues.join(' ').toLowerCase();
                                                         }
                                                     }
                                                 } else {
@@ -2248,8 +2304,8 @@
                                                 }
                                                 var keywords = vtm.split(' ');
                                                 var matches = true;
-                                                for(var i = 0; i < keywords.length; i++) {
-                                                    var keyword = keywords[i].trim().toLowerCase();
+                                                for(var k = 0; k < keywords.length; k++) {
+                                                    var keyword = keywords[k].trim().toLowerCase();
                                                     if(rowText.indexOf(keyword) === -1) {
                                                         matches = false;
                                                         break;
@@ -2260,9 +2316,9 @@
                                                 }
                                             } else {
                                                 if(Array.isArray(myob.dataDictionary[categoryToMatch]['Values'][rowID])) {
-                                                    myTempValues = myob.dataDictionary[categoryToMatch]['Values'][rowID];
+                                                    var myTempValues = myob.dataDictionary[categoryToMatch]['Values'][rowID];
                                                     for(var myTempValuesCount = 0; myTempValuesCount < myTempValues.length; myTempValuesCount++) {
-                                                        var rowValue = myTempValues[myTempValuesCount].toLowerCase();
+                                                        var rowValue = myTempValues[myTempValuesCount];
                                                         switch(myob.dataDictionary[categoryToMatch]['DataType']) {
                                                             case 'date':
                                                                 //to do ....
@@ -2293,12 +2349,12 @@
                                                                     if(match) {
                                                                         rowMatchesForFilterGroup = true;
                                                                     }
-                                                                    break;
                                                                 }
+                                                                break;
                                                             case 'string':
+                                                                rowValue = rowValue.raw2safe().trim().toLowerCase();
                                                             default:
-                                                                var vtm = searchObject['vtm'];
-                                                                if(rowValue === vtm){
+                                                                if(rowValue === searchObject['vtm']){
                                                                     rowMatchesForFilterGroup = true;
                                                                 }
                                                         }
@@ -2327,12 +2383,14 @@
                         if(rowMatches){
                             myob.myRowsMatching.push(rowID);
                             if(myob.useJSON) {
+                                //do nothing
                             } else {
                                 row.addClass(myob.matchClass).removeClass(myob.notMatchClass);
                             }
                         }
                         else {
                             if(myob.useJSON) {
+                                //do nothing
                             } else {
                                 row.addClass(myob.notMatchClass).removeClass(myob.matchClass);
                             }
@@ -2402,7 +2460,7 @@
                          {
                              scrollTop: exactPosition
                          },
-                         200
+                         myob.millisecondsBetweenActionsLong
                      );
                  } else {
                      //fire scroll event in any case ...
@@ -2411,49 +2469,52 @@
              },
 
 
-             setTableWidthAndFixHeader: function()
-             {
-                 myob.windowTimeoutStoreSetter(
-                     'setTableWidthInFuture',
-                     function() {
-                         myob.setTableWidth();
-                         myob.fixTableHeader();
-                     },
-                     myob.millisecondsBetweenActionsLong
-                 );
-             },
+            setTableWidthAndFixHeader: function()
+            {
+                var filterFormIsOpen = myob.myTableHolder.hasClass(myob.filterIsOpenClass);
+                if(! filterFormIsOpen) {
+                    myob.windowTimeoutStoreSetter(
+                        'setTableWidthInFuture',
+                        function() {
+                            myob.setTableWidth();
+                            myob.fixTableHeader();
+                        },
+                        myob.millisecondsBetweenActionsLong
+                    );
+                }
+            },
 
-             setTableWidth: function()
-             {
-                 myob.profileStarter('setTableWidth');
-                 if(myob.fixedHeaderClass) {
-                     myob.resetFixedTableWidth();
-                     //just in case ...
-                     if(myob.myTableHolder.isOnScreen()) {
-                         var bodyCells = myob.myTableBody.find('tr:visible:first').find('th:visible, td:visible');
-                         if(bodyCells.length > 0) {
-                             var headerCells = myob.myTableHead.find('tr:visible:first th:visible');
-                             bodyCells.each(
-                                 function(colNumber, cell) {
-                                     var headerCell = headerCells.eq(colNumber);
-                                     var bodyCell = jQuery(cell);
-                                     headerCell.width(bodyCell.width());
-                                 }
-                             );
-                         }
-                     }
-                     if(myob.myTableHolder.find('.tfspushdowndiv').length > 0) {
-                         jQuery('<div class="tfspushdowndiv"></div>').insertBefore(myob.myTable);
-                     }
-                 }
-                 myob.profileEnder('setTableWidth');
-             },
+            setTableWidth: function()
+            {
+                myob.profileStarter('setTableWidth');
+                if(myob.fixedHeaderClass) {
+                    myob.resetFixedTableWidth();
+                    //just in case ...
+                    if(myob.myTableHolder.isOnScreen()) {
+                        var bodyCells = myob.myTableBody.find('tr:visible:first').find('th:visible, td:visible');
+                        if(bodyCells.length > 0) {
+                            var headerCells = myob.myTableHead.find('tr:visible:first th:visible');
+                            bodyCells.each(
+                                function(colNumber, cell) {
+                                    var headerCell = headerCells.eq(colNumber);
+                                    var bodyCell = jQuery(cell);
+                                    headerCell.width(bodyCell.width());
+                                }
+                            );
+                        }
+                    }
+                    if(myob.myTableHolder.find('.tfspushdowndiv').length > 0) {
+                        jQuery('<div class="tfspushdowndiv"></div>').insertBefore(myob.myTable);
+                    }
+                }
+                myob.profileEnder('setTableWidth');
+            },
 
-             resetFixedTableWidth: function()
-             {
-                  myob.myTableHolder.removeClass(myob.fixedHeaderClass);
-                  myob.hasFixedTableHeaderSet = false;
-             },
+            resetFixedTableWidth: function()
+            {
+                myob.myTableHolder.removeClass(myob.fixedHeaderClass);
+                myob.hasFixedTableHeaderSet = false;
+            },
 
             fixTableHeader: function()
             {
@@ -2463,11 +2524,8 @@
                     myob.myTableHolder.addClass(myob.filterInUseClass);
                     myob.myTableHolder.removeClass(myob.filterNotInUseClass);
                     if(myob.hasFixedTableHeader) {
-                        var addFilterForm = myob.myTableHolder.hasClass(myob.filterIsOpenClass) ? false : true;
                         var relativeMove = myob.myTableHead.outerHeight();
-                        if(addFilterForm) {
-                            relativeMove += myob.myFilterFormHolder.outerHeight();
-                        }
+                        relativeMove += myob.myFilterFormHolder.outerHeight();
                         var pushDownDiv = myob.myTableHolder.find('.tfspushdowndiv');
                         pushDownDiv.height(relativeMove);
                         //get basic data about scroll situation...
@@ -2479,14 +2537,10 @@
                         //end reset
                         if(showFixedHeader === true && myob.hasFixedTableHeaderSet === false) {
                             myob.hasFixedTableHeaderSet = true;
-                            if(addFilterForm) {
-                                myob.myFilterFormHolder.width(myob.myTableHead.width());
-                            }
+                            myob.myFilterFormHolder.width(myob.myTableHead.width());
                             myob.myTableHolder.addClass(myob.fixedHeaderClass);
                             var top = 0;
-                            if(addFilterForm) {
-                                top = myob.myFilterFormHolder.outerHeight();
-                            }
+                            top = myob.myFilterFormHolder.outerHeight();
                             myob.myTableHead.css('top', top);
                         } else {
                             if(myob.hasFixedTableHeaderSet === true) {
@@ -2544,37 +2598,56 @@
                     myob.endRowFX1(myob);
                 }
                 //crucial!
-                myob.setRows();
+                myob.setRowsWithDetails();
                 //get basic numbers
                 var minRow = myob.sfr;
                 var matchCount = 0;
                 var actualVisibleRowCount = 0;
+                var hasFilter = myob.hasFilter();
+                if(hasFilter) {
+                    var tempRowsMatching = myob.myRowsMatching.slice(0);
+                } else {
+                    if(myob.myRowsTotalCount !== myob.myRowsMatching.length) {
+                        myob.myRowsMatching = myob.myRowsSorted.splice(0);
+                    }
+                }
+                myob.myRowsVisible.length = 0;
+                myob.myRowsVisible = [];
                 if(myob.useJSON) {
-                    myob.myRowsVisible = [];
-                    for(var i = 0; i < myob.myRowsMatching.length; i++) {
-                        matchCount++;
-                        if(matchCount > minRow && actualVisibleRowCount < myob.visibleRowCount) {
-                            actualVisibleRowCount++;
-                            myob.myRowsVisible.push(myob.myRowsMatching[i]);
+                    for(var i = 0; i < myob.myRowsSorted.length; i++) {
+                        var rowID = myob.myRowsSorted[i];
+                        var match = false;
+                        if(hasFilter) {
+                            var index = tempRowsMatching.indexOf(rowID);
+                            if(index !== -1) {
+                                match = true;
+                                tempRowsMatching.splice(index, 1);
+                            }
+                        } else {
+                            match = true;
+                        }
+                        if(match) {
+                            matchCount++;
+                            if(matchCount > minRow && actualVisibleRowCount < myob.visibleRowCount) {
+                                actualVisibleRowCount++;
+                                myob.myRowsVisible.push(rowID);
+                            }
                         }
                     }
                     myob.buildRows();
                 } else {
-                    var noFilter = myob.myRowsTotalCount === myob.myRowsMatching.length ? true : false;
                     var rowMatches = false;
                     //hide and show ...
                     myob.myRows.each(
                         function(i, el) {
                             el = jQuery(el);
-                            rowMatches = false;
+                            rowID = el.attr('id');
                             if(noFilter || el.hasClass(myob.matchClass)) {
-                                rowMatches = true;
                                 matchCount++;
-                            }
-                            if(rowMatches) {
                                 if(matchCount > minRow && actualVisibleRowCount < myob.visibleRowCount) {
                                     actualVisibleRowCount++;
                                     el.removeClass(myob.hideClass).addClass(myob.showClass);
+                                    myob.myRowsVisible.push(rowID);
                                 }
                             }
                         }
@@ -2590,12 +2663,12 @@
                         'scrollToTopOfHolder',
                         function() {
                             myob.scrollToTopOfHolder();
-                            myob.createPagination(minRow, matchCount, actualVisibleRowCount);
                         },
                         myob.millisecondsBetweenActionsShort
                     );
                 }
 
+                myob.createPagination(minRow, matchCount, actualVisibleRowCount);
                 //reset rows ...
                 myob.setRowsWithDetails();
                 myob.pushState();
@@ -2603,8 +2676,57 @@
                     myob.endRowFX2(myob);
                 }
                 myob.profileEnder('endRowManipulation');
+                myob.debugger();
             },
 
+
+            buildRows: function()
+            {
+                myob.profileStarter('buildRows');
+                var dd = myob.dataDictionary;
+                var pre = myob.placeholderStartDelimiter;
+                var post = myob.placeholderEndDelimiter;
+                var html = '';
+                for(var i = 0; i < myob.myRowsVisible.length; i++) {
+                    rowID = myob.myRowsVisible[i];
+                    innerHtml = myob.templateRow;
+                    hasDoneID = false;
+                    for(category in dd) {
+                        if (dd.hasOwnProperty(category)) {
+                            //category info
+                            var ddc = dd[category]
+                            var values = ddc['Values'][rowID];
+                            for(var j = 0; j < values.length; j++) {
+                                var value = values[j];
+                                searchValue = pre+category+post;
+                                //easiest way to avoid regex, etc...
+                                innerHtml = innerHtml.split(searchValue).join(value);
+                            }
+
+                            //also replace the row ID
+                            if(hasDoneID === false) {
+                                hasDoneID = true;
+                                searchValue = pre+'RowID'+post;
+                                //easiest way to avoid regex, etc...
+                                innerHtml = innerHtml.split(searchValue).join(rowID);
+                            }
+                        }
+                    }
+                    html += innerHtml;
+                }
+                if(html.length > 0) {
+                    myob.myTableBody.html(html);
+                    myob.myTableBody.find('input[data-tfsvalue], select[data-tfsvalue], textarea[data-tfsvalue]').each(
+                        function(i, el) {
+                            var el = jQuery(el)
+                            var value = el.attr('data-tfsvalue');
+                            value = value.raw2safe();
+                            jQuery(el).val(value);
+                        }
+                    );
+                }
+                myob.profileEnder('buildRows');
+            },
 
             createPagination: function(minRow, matchCount, actualVisibleRowCount)
             {
@@ -2626,7 +2748,7 @@
                     var startOfPaginator = currentPage - 2;
                     var endOfPaginator = currentPage + 2;
                     var classes = [];
-                    for(i = 0; i < pageCount; i++ ) {
+                    for(i = 0; i < pageCount; i++) {
                         if(currentPage === i) {
                             dotCount = 0;
                             pageHTML += '<span>['+(i+1)+']</span>';
@@ -2635,6 +2757,7 @@
                             var test2 = (i >= (pageCount - 1));
                             var test3 = (i < (0 + 1));
                             if(test1 || test2 || test3) {
+                                classes.length = 0;
                                 classes = [];
                                 dotCount = 0;
                                 if(i === 0) {
@@ -2682,6 +2805,11 @@
             // SCRIPT SECTION: *** CALCULATIONS
             //===================================================================
 
+            hasFilter: function()
+            {
+                return myob.objectSize(myob.cfi) === 0  ? false : true;
+            },
+
             workOutCurrentFilter: function(){
                 myob.profileStarter('workOutCurrentFilter');
                 var html = "";
@@ -2707,12 +2835,12 @@
                             } else {
                                 var dataType = myob.dataDictionary[category]['DataType'];
                             }
-                            var ivls = [];
+                            var vtms = [];
                             categoryHolder.find('input').each(
                                 function(i, input) {
                                     input = jQuery(input);
-                                    var ivl = input.val().raw2safe();
-                                    var vtm = ivl.toLowerCase().trim().raw2safe();
+                                    var ivl = input.val().raw2safe().trim();
+                                    var vtm = ivl.toLowerCase();
                                     var innerInputVal = '';
                                     var innerValueToMatch = '';
                                     switch(fieldType) {
@@ -2722,8 +2850,13 @@
                                                     myob.cfi[category] = [];
                                                 }
                                                 if(type === 'keyword') {
-                                                    myob.cfi[category].push({vtm: vtm, ivl: ivl});
-                                                    ivls.push(vtm);
+                                                    myob.cfi[category].push(
+                                                        {
+                                                            vtm: vtm,
+                                                            ivl: ivl
+                                                        }
+                                                    );
+                                                    vtms.push(vtm);
                                                 } else {
                                                     var filterValueArray = vtm.split(",");
                                                     var i = 0;
@@ -2733,8 +2866,13 @@
                                                         innerInputVal = filterValueArray[i].trim();
                                                         innerValueToMatch = innerInputVal;
                                                         if(innerValueToMatch.length > 1) {
-                                                            myob.cfi[category].push({vtm: innerValueToMatch, ivl: innerInputVal});
-                                                            ivls.push(innerValueToMatch);
+                                                            myob.cfi[category].push(
+                                                                {
+                                                                    vtm: innerValueToMatch,
+                                                                    ivl: innerInputVal
+                                                                }
+                                                            );
+                                                            vtms.push(innerValueToMatch);
                                                         }
                                                     }
                                                 }
@@ -2746,8 +2884,13 @@
                                                 if(typeof myob.cfi[category] === "undefined") {
                                                     myob.cfi[category] = [];
                                                 }
-                                                ivls.push(vtm);
-                                                myob.cfi[category].push({vtm: vtm, ivl: ivl});
+                                                vtms.push(vtm);
+                                                myob.cfi[category].push(
+                                                    {
+                                                        vtm: vtm,
+                                                        ivl: ivl
+                                                    }
+                                                );
                                             }
                                             break;
                                         case 'favourites':
@@ -2755,8 +2898,12 @@
                                                 if(typeof myob.cfi[category] === "undefined") {
                                                     myob.cfi[category] = [];
                                                 }
-                                                myob.cfi[category].push({vtm: vtm, ivl: ivl});
-                                                ivls.push(vtm);
+                                                myob.cfi[category].push(
+                                                    {
+                                                        vtm: vtm, ivl: ivl
+                                                    }
+                                                );
+                                                vtms.push(vtm);
                                                 myob.myTableHolder.addClass(myob.hasFavouritesInFilterClass);
                                             } else {
                                                 myob.myTableHolder.removeClass(myob.hasFavouritesInFilterClass);
@@ -2768,7 +2915,7 @@
                                                 if(typeof myob.cfi[category] === "undefined") {
                                                     myob.cfi[category] = [];
                                                 }
-                                                ivls.push(input.attr('data-label') + val + ' ');
+                                                vtms.push(input.attr('data-label') + val + ' ');
                                                 if(typeof myob.cfi[category][0] === 'undefined') {
                                                     myob.cfi[category][0] = {};
                                                 }
@@ -2781,7 +2928,7 @@
                                                 if(typeof myob.cfi[category] === "undefined") {
                                                     myob.cfi[category] = {};
                                                 }
-                                                ivls.push(input.attr('data-label') + val);
+                                                vtms.push(input.attr('data-label') + val);
                                                 myob.cfi[category][0][input.attr('data-dir')] = val;
                                             }
                                             break;
@@ -2790,13 +2937,13 @@
                             );
                             if(typeof myob.cfi[category] !== "undefined") {
                                 var leftLabel = categoryHolder.find('label.'+myob.groupLabelClass).text();
-                                html += "<li class=\"category\"><strong>" + leftLabel + ":</strong> <span>" + ivls.join('</span><span>') + "</span></li>";
+                                html += "<li class=\"category\"><strong>" + leftLabel + ":</strong> <span>" + vtms.join('</span><span>') + "</span></li>";
                             }
                         }
                     //funny indenting to stay ....
                 );
                 var targetDomElement = myob.myTableHolder.find('.'+myob.currentSearchFilterClass);
-                var hasFilter = Object.keys(myob.cfi).length > 0 ? true : false;
+                var hasFilter = myob.hasFilter();
                 if(hasFilter === true) {
                     html = '<ul>' + html + '</ul>';
                     var title = targetDomElement.attr('data-title');
@@ -2843,7 +2990,7 @@
                         (tempType === 'number' && myob[varName] !== 0) ||
                         (tempType === 'string' && myob[varName].length > 0) ||
                         (tempType === 'boolean') ||
-                        (tempType === 'object' && Object.keys(myob[varName]).length > 0)
+                        (tempType === 'object' && myob.objectSize(myob[varName]) > 0)
                     ) {
                         urlObject[varName] = myob[varName];
                     }
@@ -3241,48 +3388,56 @@
                 }
             },
 
-            buildRows: function()
+            debugger: function(name)
             {
-                var dd = myob.dataDictionary;
-                var pre = myob.placeholderStartDelimiter;
-                var post = myob.placeholderEndDelimiter;
-                var html = '';
-                for(var i = 0; i < myob.myRowsVisible; i++) {
-                    rowID = myob.myRowsVisible[i];
-                    innerHtml = myob.templateRow;
-                    for(category in dd) {
-                        if (dd.hasOwnProperty(category)) {
-                            //category info
-                            var ddc = dd[category]
-                            var values = ddc['Values'];
-                            for(var j = 0; j < values.length; j++) {
-                                searchValue = pre+category+post;
-                                //easiest way to avoid regex, etc...
-                                innerHtml = innerHtml.split(searchValue).join(value);
-                            }
-
-                            //also replace the row ID
-                            if(i === 0) {
-                                searchValue = pre+'RowID'+post;
-                                //easiest way to avoid regex, etc...
-                                innerHtml = innerHtml.split(searchValue).join(rowID);
-                            }
+                if(myob.debug) {
+                    console.log('_______________________');
+                    console.log('_______________________ SORTED');
+                    console.debug(myob.myRowsSorted);
+                    console.log('_______________________ MATCHING');
+                    console.debug(myob.myRowsMatching);
+                    console.log('_______________________  VISIBLE ');
+                    console.debug(myob.myRowsVisible);
+                    var booleans = [];
+                    var strings = [];
+                    var numbers = [];
+                    var objects = [];
+                    var arrays = [];
+                    var others = [];
+                    for(prop in myob) {
+                        value = myob[prop];
+                        var type = typeof value;
+                        switch(type) {
+                            case "boolean":
+                                booleans[prop] = value;
+                                break;
+                            case "string":
+                                strings[prop] = value;
+                                break;
+                            case "number":
+                                numbers[prop] = value;
+                                break;
+                            case "array":
+                                arrays[prop] = value;
+                                break;
+                            default:
+                                others[prop] = value;
                         }
                     }
-                    html += innerHtml;
+                    console.log('_______________________ BOOLEANS');
+                    console.debug(booleans);
+                    console.log('_______________________ STRINGS');
+                    console.debug(strings);
+                    console.log('_______________________ NUMBERS');
+                    console.debug(numbers);
+                    console.log('_______________________ ARRAYS');
+                    console.debug(arrays);
+                    console.log('_______________________ OTHERS');
+                    console.debug(others);
+                    console.log('_______________________');
                 }
-                if(html.length > 0) {
-                    jQuery(html).find('input[data-tfsvalue], select[data-tfsvalue], textarea[data-tfsvalue]').each(
-                        function(i, el) {
-                            var el = jQuery(el);
-                            var value = el.attr('data-tfsvalue');
-                            value = value.raw2safe();
-                            jQuery(el).val( value);
-                        }
-                    );
-                }
-                myob.myTableBody.html(html);
             }
+
         };
 
         myob = jQuery.extend(
