@@ -902,7 +902,7 @@
                 }
                 myob.myTable.css('table-layout', 'fixed');
                 //base URL
-                myob.baseURL = location.protocol + '//' + location.host + location.pathname;
+                myob.baseURL = location.protocol + '//' + location.host + location.pathname + location.search;
 
             },
 
@@ -2252,7 +2252,7 @@
                 myob.sfr = 0;
                 myob.workOutCurrentFilter();
                 myob.startRowManipulation();
-                if(myob.hasFilter()) {
+                if(myob.hasFilter() === false) {
                     //clone!
                     myob.myRowsMatching = myob.myRowsSorted.splice(0);
                 } else {
@@ -2330,7 +2330,9 @@
                                                                         rowMatchesForFilterGroup = true;
                                                                     }
                                                                 } else {
-                                                                    rowValue = parseFloat(rowValue.replace(/[^0-9.]/g,''));
+                                                                    if(typeof rowValue !== 'number') {
+                                                                        rowValue = parseFloat(rowValue.replace(/[^0-9.]/g,''));
+                                                                    }
                                                                     var lt = searchObject['lt'];
                                                                     var match = true;
                                                                     if(jQuery.isNumeric(lt) && lt !== 0) {
@@ -2915,10 +2917,10 @@
                                                 if(typeof myob.cfi[category] === "undefined") {
                                                     myob.cfi[category] = [];
                                                 }
-                                                vtms.push(input.attr('data-label') + val + ' ');
                                                 if(typeof myob.cfi[category][0] === 'undefined') {
                                                     myob.cfi[category][0] = {};
                                                 }
+                                                vtms.push(input.attr('data-label') + val + ' ');
                                                 myob.cfi[category][0][input.attr('data-dir')] = val;
                                             }
                                             break;
@@ -2943,8 +2945,7 @@
                     //funny indenting to stay ....
                 );
                 var targetDomElement = myob.myTableHolder.find('.'+myob.currentSearchFilterClass);
-                var hasFilter = myob.hasFilter();
-                if(hasFilter === true) {
+                if( myob.hasFilter() === true) {
                     html = '<ul>' + html + '</ul>';
                     var title = targetDomElement.attr('data-title');
                     if(typeof title === 'string' && title.length > 0) {
@@ -3394,6 +3395,8 @@
                     console.log('_______________________');
                     console.log('_______________________ SORTED');
                     console.debug(myob.myRowsSorted);
+                    console.log('_______________________ HAS FILTER');
+                    console.debug(myob.hasFilter() ? "TRUE" : "FALSE");
                     console.log('_______________________ MATCHING');
                     console.debug(myob.myRowsMatching);
                     console.log('_______________________  VISIBLE ');
@@ -3401,8 +3404,9 @@
                     var booleans = [];
                     var strings = [];
                     var numbers = [];
-                    var objects = [];
                     var arrays = [];
+                    var jqueries = [];
+                    var objects = [];
                     var others = [];
                     for(prop in myob) {
                         value = myob[prop];
@@ -3417,8 +3421,14 @@
                             case "number":
                                 numbers[prop] = value;
                                 break;
-                            case "array":
-                                arrays[prop] = value;
+                            case "object":
+                                if(Array.isArray(value)) {
+                                    arrays[prop] = value;
+                                } else if(value instanceof jQuery) {
+                                    jqueries[prop] = value;
+                                } else {
+                                    objects[prop] = value;
+                                }
                                 break;
                             default:
                                 others[prop] = value;
@@ -3432,6 +3442,10 @@
                     console.debug(numbers);
                     console.log('_______________________ ARRAYS');
                     console.debug(arrays);
+                    console.log('_______________________ JQUERY OBJECTS');
+                    console.debug(jqueries);
+                    console.log('_______________________ OTHER OBJECTS');
+                    console.debug(objects);
                     console.log('_______________________ OTHERS');
                     console.debug(others);
                     console.log('_______________________');

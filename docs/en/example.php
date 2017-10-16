@@ -6,7 +6,7 @@ function create_test()
 {
 
     $useJSON = true;
-    if(isset($_GET['nojson'])) {
+    if(isset($_GET['nojson']) && $_GET['nojson'] === 1) {
         $useJSON = false;
     }
     $templateRow = '';
@@ -143,14 +143,25 @@ $useJSON = $data['useJSON'];
         <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.css?x=<?php echo rand(0,9999999999) ?>">
         <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.theme.css?x=<?php echo rand(0,9999999999) ?>">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+        <style>
+            form.update-page-form {width: 400px; margin-left: auto; margin-right: auto; box-sizing: border-box; background-color: #ccc; border: 1px solid #999; border-radius: 5px;}
+            form.update-page-form div {padding: 10px;}
+            form.update-page-form input {display: block; float: left;}
+            form.update-page-form input[type="number"] {width: 170px;}
+            form.update-page-form input[type="checkbox"] {margin-left: calc(170px - 0.5em);}
+            form.update-page-form input[type="submit"] {float: none; margin-left: 200px;}
+            form.update-page-form label {display: block; margin-left: 200px;}
+        </style>
     </head>
     <body>
 
         <header>
             <h1>Example of a Filter and Sort Table ... </h1>
-            <p style="text-align: center;">
-                You can set the number of rows by adding a GET veriable <strong>i</strong> to the current URL. (e.g. ...example.php?i=500).
-            </p>
+            <form action="?submitted" method="get" class="update-page-form">
+                <div><input type="number" name="i" value="<?php echo (isset($_GET['i']) ? intval($_GET['i']) : 300);  ?>"/><label for="i">number of rows</label></div>
+                <div><input type="checkbox" name="nojson" value="1" <?php echo (isset($_GET['nojson']) && $_GET['nojson'] == 1 ? 'checked="checked"' : '');  ?> /><label for="nojson">without json data</label></div>
+                <div><input type="submit" value="reload" /></div>
+            </form>
             <p>Below the table is an examle of the <a href="#html">HTML</a> you need to use.</p>
         </header>
 
@@ -326,7 +337,8 @@ $useJSON = $data['useJSON'];
                         <input type="number" min="1" max="10000" step="50" name="VisibleRowCount" class="visible-row-count" />
                     </span> -
                     <strong>Currently Showing:</strong>
-                    <span class="min-row-number">0</span> - <span class="max-row-number">0</span> of <span class="total-row-number">0</span>                </span>
+                    <span class="min-row-number">0</span> - <span class="max-row-number">0</span> of <span class="match-row-number"></span> / <span class="total-row-number">0</span>
+                </span>
             </div>
 
         </main>
