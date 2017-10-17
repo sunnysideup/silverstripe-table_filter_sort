@@ -951,9 +951,12 @@
                     }
                     //do nothing
                 } else {
-                    if(findMyRowsSorted) {
+                    if(findMyRowsSorted || hideAll) {
                         var rowID = '';
                         var reload = false;
+                        if(hideAll) {
+                            reload = true;
+                        }
                         myob.myRows.each(
                             function(i, el) {
                                 rowID = jQuery(el).attr('id');
@@ -2138,6 +2141,8 @@
 
             resetAll: function(){
                 myob.cfi = {};
+                myob.myRowsMatching.length = 0;
+                myob.myRowsMatching = [];
                 myob.createFilterForm();
                 myob.windowTimeoutStoreSetter(
                     'runCurrentFilter',
@@ -2255,6 +2260,13 @@
                 if(myob.hasFilter() === false) {
                     //clone!
                     myob.myRowsMatching = myob.myRowsSorted.splice(0);
+                    myob.myRows.each(
+                        function(i, row) {
+                            var row = jQuery(row);
+                            row.addClass(myob.matchClass).removeClass(myob.notMatchClass);
+                        }
+                    );
+
                 } else {
                     //start with blank slate ...
                     myob.myRowsMatching.length = 0;
@@ -2606,6 +2618,7 @@
                 var matchCount = 0;
                 var actualVisibleRowCount = 0;
                 var hasFilter = myob.hasFilter();
+                var noFilter = hasFilter ? false : true;
                 if(hasFilter) {
                     var tempRowsMatching = myob.myRowsMatching.slice(0);
                 } else {
