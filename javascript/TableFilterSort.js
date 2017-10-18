@@ -894,10 +894,12 @@
                 myob.myTable = myob.myTableHolder.find(myob.tableSelector).first();
                 myob.myTableHead = myob.myTable.find(" > thead");
                 myob.myTableBody = myob.myTable.find(" > tbody");
-                if(myob.templateRow.length === 0) {
-                    if(myob.myTable.find(myob.rowSelector).length === 1) {
-                        myob.templateRow = myob.myTableBody.clone().html();
-                        myob.myTableBody.empty();
+                if(myob.useJSON) {
+                    if(myob.templateRow.length === 0) {
+                        if(myob.myTable.find(myob.rowSelector).length === 1) {
+                            myob.templateRow = myob.myTableBody.clone().html();
+                            myob.myTableBody.empty();
+                        }
                     }
                 }
                 myob.myTable.css('table-layout', 'fixed');
@@ -1078,14 +1080,25 @@
             dataDictionaryBuildCategory: function(category)
             {
                 if(typeof myob.dataDictionary[category] === "undefined") {
-                    myob.dataDictionary[category] = {
-                        CanFilter: null,
-                        CanSort: null,
-                        DataType: '',
-                        Options: [],
-                        Values: {},
-                        IsEditable: null
-                    };
+                    myob.dataDictionary[category] = {}
+                }
+                if(typeof myob.dataDictionary[category]['CanFilter'] === "undefined") {
+                    myob.dataDictionary[category]['CanFilter'] = null;
+                }
+                if(typeof myob.dataDictionary[category]['CanSort'] === "undefined") {
+                    myob.dataDictionary[category]['CanSort'] = null;
+                }
+                if(typeof myob.dataDictionary[category]['DataType'] === "undefined") {
+                    myob.dataDictionary[category]['DataType'] = '';
+                }
+                if(typeof myob.dataDictionary[category]['Options'] === "undefined") {
+                    myob.dataDictionary[category]['Options'] = [];
+                }
+                if(typeof myob.dataDictionary[category]['Values'] === "undefined") {
+                    myob.dataDictionary[category]['Values'] = {};
+                }
+                if(typeof myob.dataDictionary[category]['IsEditable'] === "undefined") {
+                    myob.dataDictionary[category]['IsEditable'] = null;
                 }
             },
 
