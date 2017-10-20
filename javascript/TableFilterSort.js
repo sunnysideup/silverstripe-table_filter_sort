@@ -2211,7 +2211,15 @@
                     if(myob.useJSON) {
                         //do nothing
                     } else {
-                        var tempRows = myob.myTableBody.clone();
+                        var tempRows = myob.myTableBody.find('> tr');
+                        var tempRowsAsObject = {};
+                        jQuery(tempRows).each(
+                            function(i, el) {
+                                var myTempRowObject = jQuery(el);
+                                var tempRowID = myTempRowObject.attr('id');
+                                tempRowsAsObject[tempRowID] = myTempRowObject;
+                            }
+                        )
                     }
                     //start doing stuff
                     //clear table ...
@@ -2243,8 +2251,7 @@
                             if(myob.useJSON) {
                                 //do nothing
                             } else {
-                                var row = tempRows.find('#'+rowID);
-                                myob.myTableBody.append(row);
+                                myob.myTableBody.append(tempRowsAsObject[rowID]);
                             }
                         }
                     );
