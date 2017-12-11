@@ -1026,14 +1026,20 @@
                                 if(rowData.hasOwnProperty(category)) {
                                     myob.dataDictionaryBuildCategory(category);
                                     var values = rowData[category];
+                                    console.debug(category);
                                     if(typeof values === 'undefined') {
                                         values = [myob.placeholderValue];
-                                    }
-                                    if(typeof values === 'string' || typeof values === 'number') {
-                                        values = [values];
-                                    }
-                                    if(values.length === 0) {
-                                        values = [myob.placeholderValue];
+                                    } else {
+                                        if(values === null) {
+                                            values = [myob.placeholderValue];
+                                        } else {
+                                            if(typeof values === 'string' || typeof values === 'number') {
+                                                values = [values];
+                                            }
+                                            if(values.length === 0) {
+                                                values = [myob.placeholderValue];
+                                            }
+                                        }
                                     }
                                     for(var i = 0; i < values.length; i++) {
                                         var value = values[i];

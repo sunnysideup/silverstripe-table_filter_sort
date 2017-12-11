@@ -18,21 +18,51 @@ class TableFilterSortAPI extends Object
         'TableFilterSort.theme'
     );
 
+    private static $_jsSettingArray = [];
+
+
+    public static function add_setting($key, $value)
+    {
+        self::$_jsSettingArray[$key] = $value;
+    }
+
+    public static function add_settings($array)
+    {
+        foreach ($array as $key => $value) {
+            self::$_jsSettingArray[$key] = $value;
+        }
+    }
+
+    public static function remove_setting($key)
+    {
+        unset(self::$_jsSettingArray[$key]);
+    }
+
+    public static function reset_settings()
+    {
+        self::$_jsSettingArray = null;
+    }
+
     /**
      *
-     * @param  string $tableSelector      e.g. #MyTableHolder
-     * @param  array $blockArray          files not to include (both CSS and JS)
-     * @param  string $jqueryLocation     if you like to include jQuery then add link here...
-     * @param  boolean $includeInPage     would you like to include the css / js on the page itself?
-     * @param  string $jsSettings         add JS snippet for settings ...
+     * @param  string $tableSelector              e.g. #MyTableHolder
+     * @param  array $blockArray                  files not to include (both CSS and JS)
+     * @param  string $jqueryLocation             if you like to include jQuery then add link here...
+     * @param  boolean $includeInPage             would you like to include the css / js on the page itself?
+     * @param  string | array $jsSettings         add JS snippet for settings ...
      */
     public static function include_requirements(
         $tableSelector = '.tfs-holder',
         $blockArray = array(),
         $jqueryLocation = '',
         $includeInPage = false,
-        $jsSettings = '{}'
+        $jsSettings = null
     ) {
+        if(! $jsSettings) {
+            $jsSettings = json_encode(self::$_jsSettingArray);
+        } elseif(is_array($jsSettings)) {
+            $jsSettings = json_encode($jsSettings);
+        }
         //this must come first
         if($tableSelector) {
             $mySelector = str_replace('"', '\\"', $tableSelector);
