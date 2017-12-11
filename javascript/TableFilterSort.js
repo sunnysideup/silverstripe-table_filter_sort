@@ -999,12 +999,32 @@
                 myob.favouritesParentPageID = myob.myTableHolder.attr("data-favourites-parent-page-id");
                 if(typeof myob.favouritesParentPageID === 'string' && myob.favouritesParentPageID.length > 0) {
                     myob.hasFavouritesSaving = true;
+                } else {
+                    myob.hasFavouritesSaving = false;
+                    jQuery('.'+myob.saveAndLoadClass).each(
+                        function(i, el){
+                            var el = jQuery(el);
+                            if(el.hasClass('favourites')) {
+                                el.remove();
+                            }
+                        }
+                    );
                 }
 
                 //are we saving filter?
                 myob.filtersParentPageID = myob.myTableHolder.attr("data-filters-parent-page-id");
                 if(typeof myob.filtersParentPageID === 'string' && myob.filtersParentPageID.length > 0) {
                     myob.hasFilterSaving = true;
+                } else {
+                    myob.hasFilterSaving = false;
+                    jQuery('.'+myob.saveAndLoadClass).each(
+                        function(i, el){
+                            var el = jQuery(el);
+                            if(el.hasClass('filters')) {
+                                el.remove();
+                            }
+                        }
+                    );
                 }
             },
 
@@ -1828,76 +1848,80 @@
              */
             openServerModalWindowListener: function()
             {
-                myob.myTableHolder.on(
-                    'click',
-                    '.' + myob.saveAndLoadClass + ' a',
-                    function(event){
-                        event.preventDefault();
-                        var myEl = jQuery(this);
-                        var myParent = myEl.closest('.' + myob.saveAndLoadClass);
-                        //get connection type details
-                        var url = myob.serverConnectionURL;
-                        var isFilter = false;
-                        var isSave = false;
-                        var parentPageID = myob.filtersParentPageID;
-                        var variables = myob.filterAndSortVariables;
-                        if(myParent.hasClass('filters')) {
-                            isFilter = true;
-                        }
-                        else if(myParent.hasClass('favourites')) {
-                            parentPageID = myob.favouritesParentPageID;
-                            variables = myob.favouritesVariables;
-                        }
-                        if(myParent.hasClass('save')) {
-                            isSave = true;
-                            url += 'start/'
-                        } else {
-                            url += 'index/'
-                        }
-                        var data = {};
-                        if(isSave === true) {
-                            for(var i = 0; i  < variables.length; i++) {
-                                data[variables[i]] = myob[variables[i]];
+                if(myob.hasFilterSaving || myob.hasFavouritesSaving) {
+                    myob.myTableHolder.on(
+                        'click',
+                        '.' + myob.saveAndLoadClass + ' a',
+                        function(event){
+                            event.preventDefault();
+                            var myEl = jQuery(this);
+                            var myParent = myEl.closest('.' + myob.saveAndLoadClass);
+                            //get connection type details
+                            var url = myob.serverConnectionURL;
+                            var isFilter = false;
+                            var isSave = false;
+                            var parentPageID = myob.filtersParentPageID;
+                            var variables = myob.filterAndSortVariables;
+                            if(myParent.hasClass('filters')) {
+                                isFilter = true;
                             }
-                        }
-                        data.ParentPageID = parentPageID;
-                        jQuery.post(
-                            url,
-                            data,
-                            function(returnedURL) {
-                                var width = Math.round(jQuery(window).width() * 0.95) - 40;
-                                var height = Math.round(jQuery(window).height() * 0.95) - 40;
-                                jQuery.modal(
-                                    '<iframe src="'+returnedURL+'" width="'+width+'"height="'+height+'" style="border:0" id="tfs-pop-up-i-frame" name="tfs-pop-up-i-frame">',
-                                    {
-                                        closeHTML:"close",
-                                        containerCss:{
-                                            backgroundColor:"#fff",
-                                            borderColor:"#fff",
-                                            padding:0,
-                                            width:width,
-                                            height:height
+                            else if(myParent.hasClass('favourites')) {
+                                parentPageID = myob.favouritesParentPageID;
+                                variables = myob.favouritesVariables;
+                            }
+                            if(myParent.hasClass('save')) {
+                                isSave = true;
+                                url += 'start/'
+                            } else {
+                                url += 'index/'
+                            }
+                            var data = {};
+                            if(isSave === true) {
+                                for(var i = 0; i  < variables.length; i++) {
+                                    data[variables[i]] = myob[variables[i]];
+                                }
+                            }
+                            data.ParentPageID = parentPageID;
+                            console.debug(url);
+                            console.debug(data);
+                            jQuery.post(
+                                url,
+                                data,
+                                function(returnedURL) {
+                                    var width = Math.round(jQuery(window).width() * 0.95) - 40;
+                                    var height = Math.round(jQuery(window).height() * 0.95) - 40;
+                                    jQuery.modal(
+                                        '<iframe src="'+returnedURL+'" width="'+width+'"height="'+height+'" style="border:0" id="tfs-pop-up-i-frame" name="tfs-pop-up-i-frame">',
+                                        {
+                                            closeHTML:"close",
+                                            containerCss:{
+                                                backgroundColor:"#fff",
+                                                borderColor:"#fff",
+                                                padding:0,
+                                                width:width,
+                                                height:height
 
-                                        },
-                                        opacity: 75,
-                                        overlayClose:true,
-                                        onClose: function() {
-                                            jQuery.modal.close();
-                                            myob.retrieveDataFromGetVar();
-                                            myob.processRetrievedData();
+                                            },
+                                            opacity: 75,
+                                            overlayClose:true,
+                                            onClose: function() {
+                                                jQuery.modal.close();
+                                                myob.retrieveDataFromGetVar();
+                                                myob.processRetrievedData();
+                                            }
                                         }
-                                    }
-                                );
-                                return false;
-                            }
-                        ).fail(
-                            function() {
-                                alert('ERROR!');
-                            }
-                        );
-                        return false;
-                    }
-                );
+                                    );
+                                    return false;
+                                }
+                            ).fail(
+                                function() {
+                                    alert('ERROR!');
+                                }
+                            );
+                            return false;
+                        }
+                    );
+                }
             },
 
 
