@@ -8,6 +8,15 @@
 
         var myob = {
 
+
+            /**
+             *
+             *
+             * INPUTS
+             *
+             *
+             */
+
             /**
              * turn on to see what is going on in console
              * @type {boolean}
@@ -30,7 +39,7 @@
 
             /**
              *
-             * @type string
+             * @type {string}
              */
             templateRow: '',
 
@@ -116,6 +125,70 @@
             sizeOfFixedHeader: 0,
 
             /**
+             * maximum number of checkboxes in the filter before it becomes a text filter
+             * @type {integer}
+             */
+            maximumNumberOfFilterOptions: 12,
+
+            /**
+             * maximum number of checkboxes in the filter for a number before it becomes a text filter
+             * @type {integer}
+             */
+            maximumNumberOfNumericFilterOptions: 5,
+
+            /**
+             *
+             * @type {boolean}
+             */
+            scrollToTopAtPageOpening: true,
+
+
+            /**
+             *
+             * @type {boolean}
+             */
+            millisecondsBetweenActionsShort: 10,
+
+            /**
+             *
+             * @type {boolean}
+             */
+            millisecondsBetweenActionsLong: 100,
+
+            /**
+             * @type {array}
+             */
+            validDataTypes: ['number', 'string', 'date', 'boolean'],
+
+            /**
+             * when trying to establish the data-type
+             * max
+             * @type {int}
+             */
+            maxNumberOfValuesToCheck: 500,
+
+
+            /**
+             * if we have more than the rows specified then we do not search for identicals
+             * @type {integer}
+             */
+            maximumRowsForHideIdentical: 500,
+
+            /**
+             * categories to be excluded from filter ...
+             * @type {array}
+             */
+            excludeFromFilter:[],
+
+            /**
+             *
+             *
+             * jQuery Objects
+             *
+             *
+             */
+
+            /**
              * selector for outer holder
              *
              * @type {jQuery}
@@ -160,6 +233,91 @@
              */
             myRows: null,
 
+
+
+
+            /**
+             *
+             *
+             * DATA dataDictionary
+             *
+             *
+             */
+
+            /**
+             * to keep field options simple ...
+             * MyFieldA:
+             *    CanFilter: true
+             *    CanSort: false
+             *    DataType: number | string | date
+             *    Options: [A,B,C]
+             *    Values: {RowID1: [A], [RowID2]: [B], 3: RowID: [C]}
+             *    IsEditable: false
+             * MyFieldB:
+             *    CanFilter: true
+             *    CanSort: false
+             *    DataType: number | string | date
+             *    Options: [A,B,C]
+             *    Values: {RowID1: [A], [RowID2]: [B], 3: RowID: [C]}
+             *    IsEditable: true
+             * Options To Row save the RowIDs for each row with the index number of the value...
+             * @type {object}
+             */
+            dataDictionary: {},
+
+
+            /**
+             *
+             * @type {boolean}
+             */
+            hasFixedTableHeader: true,
+
+            /**
+             *
+             * @type {boolean}
+             */
+            hasFixedTableHeaderSet: false,
+
+            /**
+             *
+             * @type {boolean}
+             */
+            hasKeywords: true,
+
+            /**
+             * can favourites be selected by user?
+             * @type {boolean}
+             */
+            hasFavourites: false,
+
+            /**
+             * are their form elements the user can edit
+             * and filter with ...
+             * @type {boolean}
+             */
+            hasFormElements: false,
+
+            /**
+             *
+             * @type {boolean}
+             */
+            hasFavouritesSaving: false,
+
+            /**
+             * can filters be saved?
+             * @type {boolean}
+             */
+            hasFilterSaving: false,
+
+
+            /**
+             *
+             *
+             * Row Stats and holders
+             *
+             *
+             */
+
             /**
              * number of rows
              * @type {Number}
@@ -184,26 +342,14 @@
              */
             myRowsVisible: [],
 
+
             /**
-             * to keep field options simple ...
-             * MyFieldA:
-             *    CanFilter: true
-             *    CanSort: false
-             *    DataType: number | string | date
-             *    Options: [A,B,C]
-             *    Values: {RowID1: [A], [RowID2]: [B], 3: RowID: [C]}
-             *    IsEditable: false
-             * MyFieldB:
-             *    CanFilter: true
-             *    CanSort: false
-             *    DataType: number | string | date
-             *    Options: [A,B,C]
-             *    Values: {RowID1: [A], [RowID2]: [B], 3: RowID: [C]}
-             *    IsEditable: true
-             * Options To Row save the RowIDs for each row with the index number of the value...
-             * @type {object}
+             *
+             *
+             * Sorting and Filtering Variables
+             *
+             *
              */
-            dataDictionary: {},
 
             /**
              * variables that determine the filter and sort
@@ -280,109 +426,36 @@
              */
             visibleRowCount: 100,
 
-            /**
-             * maximum number of checkboxes in the filter before it becomes a text filter
-             * @type {integer}
-             */
-            maximumNumberOfFilterOptions: 12,
-
-            /**
-             * maximum number of checkboxes in the filter for a number before it becomes a text filter
-             * @type {integer}
-             */
-            maximumNumberOfNumericFilterOptions: 5,
 
             /**
              *
-             * @type {boolean}
-             */
-            hasFixedTableHeader: true,
-
-            /**
              *
-             * @type {boolean}
-             */
-            hasFixedTableHeaderSet: false,
-
-            /**
+             * FAVOURITES
              *
-             * @type {boolean}
-             */
-            hasKeywords: true,
-
-            /**
-             * can favourites be selected by user?
-             * @type {boolean}
-             */
-            hasFavourites: false,
-
-            /**
-             * are their form elements the user can edit
-             * and filter with ...
-             * @type {boolean}
-             */
-            hasFormElements: false,
-
-            /**
              *
-             * @type {boolean}
              */
-            hasFavouritesSaving: false,
 
-            /**
-             * can filters be saved?
-             * @type {boolean}
-             */
-            hasFilterSaving: false,
-
-            /**
-             *
-             * @type {boolean}
-             */
-            millisecondsBetweenActionsShort: 10,
-
-            /**
-             *
-             * @type {boolean}
-             */
-            millisecondsBetweenActionsLong: 100,
-
-            /**
-             * storing setTimeout so that we can cancel them
-             * @type {boolean}
-             */
-            windowTimeoutStore: {},
-
-            /**
-             *
-             * @type {boolean}
-             */
-            scrollToTopAtPageOpening: true,
-
-            /**
-             * @type {array}
-             */
-            validDataTypes: ['number', 'string', 'date', 'boolean'],
-
-            /**
-             * when trying to establish the data-type
-             * max
-             * @type {int}
-             */
-            maxNumberOfValuesToCheck: 500,
-
-
-            /**
-             * if we have more than the rows specified then we do not search for identicals
-             * @type {integer}
-             */
-            maximumRowsForHideIdentical: 500,
 
             /**
              * list of favourites
              * @type {Array}
              */
             mfv: [],
+
+            /**
+             *
+             *
+             * INTERNAL VARIABLES
+             *
+             *
+             */
+
+            /**
+             * storing setTimeout so that we can cancel them
+             * @type {Object}
+             */
+            windowTimeoutStore: {},
+
 
 
 
@@ -1346,15 +1419,20 @@
                 myob.profileStarter('dataDictionaryCollector');
                 Object.keys(myob.dataDictionary).forEach(
                     function(category, categoryIndex) {
+
                         //make sure there are options
                         myob.dataDictionaryBuildCategory(category);
                         var sortLink = myob.myTable.find(myob.sortLinkSelector+'[data-sort-field="'+category+'"]').first();
                         //can it be filtered?
                         if(typeof myob.dataDictionary[category]['CanFilter'] === "undefined" || myob.dataDictionary[category]['CanFilter'] === null) {
-                            if(sortLink && sortLink.attr('data-sort-only') == 'true') {
+                            if(myob.excludeFromFilter.length > 0 && myob.excludeFromFilter.indexOf(category) > -1) {
                                 myob.dataDictionary[category]['CanFilter'] = false;
                             } else {
-                                myob.dataDictionary[category]['CanFilter'] = myob.dataDictionary[category]['Options'].length > 1 || myob.dataDictionary[category]['IsEditable'];
+                                if(sortLink && sortLink.attr('data-sort-only') == 'true') {
+                                    myob.dataDictionary[category]['CanFilter'] = false;
+                                } else {
+                                    myob.dataDictionary[category]['CanFilter'] = myob.dataDictionary[category]['Options'].length > 1 || myob.dataDictionary[category]['IsEditable'];
+                                }
                             }
                         }
 
