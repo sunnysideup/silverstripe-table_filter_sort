@@ -2593,7 +2593,7 @@
              */
              scrollToTopOfHolder: function()
              {
-                 if(myob.canPushState || myob.scrollToTopAtPageOpening) {
+                 if(myob.canPushState && myob.scrollToTopAtPageOpening) {
                      var exactPosition = myob.myTableHolder.position().top;
                      if(myob.sizeOfFixedHeader) {
                          exactPosition = exactPosition - myob.sizeOfFixedHeader;
@@ -2608,6 +2608,9 @@
                      //fire scroll event in any case ...
                      window.scrollTo(window.scrollX, window.scrollY);
                  }
+
+                 //we now allow scrolls
+                 myob.scrollToTopAtPageOpening = true;
              },
 
 
