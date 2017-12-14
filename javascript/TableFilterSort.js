@@ -1276,7 +1276,7 @@
                 }
                 myob.dataDictionary[category]['Values'][rowID] = [];
                 if(typeof value !== 'undefined') {
-                    myob.addRowToValue(category, rowID, value);
+                    myob.addValueToRow(category, rowID, value);
                 }
             },
 
@@ -3622,6 +3622,10 @@
             },
             gotoPage: function(pageNumber) {
                 myob.gotoPage(pageNumber);
+                return this;
+            },
+            reloadCurrentSelection: function() {
+                myob.gotoPage(0, true);
                 return this;
             },
             updateDataDictionary: function(category, rowID, oldValue, newValue){
