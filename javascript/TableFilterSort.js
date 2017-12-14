@@ -1119,7 +1119,6 @@
                                 if(rowData.hasOwnProperty(category)) {
                                     myob.dataDictionaryBuildCategory(category);
                                     var values = rowData[category];
-                                    console.debug(category);
                                     if(typeof values === 'undefined') {
                                         values = [myob.placeholderValue];
                                     } else {
