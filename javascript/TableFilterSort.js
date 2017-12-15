@@ -1270,13 +1270,18 @@
              */
             replaceRowValue: function(category, rowID, value)
             {
+                //make sure its all there
                 myob.dataDictionaryBuildCategory(category);
+
+                //reset values
                 if(Array.isArray(myob.dataDictionary[category]['Values'][rowID])) {
                     myob.dataDictionary[category]['Values'][rowID].length = 0;
                 }
                 myob.dataDictionary[category]['Values'][rowID] = [];
+
+                //add value back in
                 if(typeof value !== 'undefined') {
-                    myob.addRowToValue(category, rowID, value);
+                    myob.addValueToRow(category, rowID, value);
                 }
             },
 
@@ -2573,6 +2578,26 @@
                 myob.profileEnder('gotoPage');
             },
 
+            /**
+             * switch to a different page
+             * @param  {int} page [description]
+             */
+            reloadCurrentPage: function()
+            {
+                myob.profileStarter('reloadCurrentPage');
+                // clear endRowManipulation just because we are going to run it in the end again - anyway ...
+                myob.windowTimeoutStoreSetter('endRowManipulation');
+                myob.startRowManipulation();
+                myob.windowTimeoutStoreSetter(
+                    'endRowManipulation',
+                    function() {
+                        myob.endRowManipulation();
+                    },
+                    myob.millisecondsBetweenActionsLong
+                );
+                myob.profileEnder('reloadCurrentPage');
+            },
+
 
 
 
@@ -3615,6 +3640,10 @@
             },
             setVar: function(variableName, value) {
                 myob[variableName] = value;
+                return this;
+            },
+            reloadCurrentPage: function(pageNumber) {
+                myob.reloadCurrentPage();
                 return this;
             },
             gotoPage: function(pageNumber) {
