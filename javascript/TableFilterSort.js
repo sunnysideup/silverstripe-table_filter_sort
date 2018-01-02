@@ -1,3 +1,23 @@
+if(typeof window.JSURL === 'undefined') {
+    var JSURL = require('./jsurl.js');
+}
+
+
+jQuery(document).ready(
+    function(){
+        if(typeof TableFilterSortVars !== 'undefined') {
+            if(Array.isArray(TableFilterSortVars)) {
+                for(var i = 0; i < TableFilterSortVars.length; i++) {
+                    var vars = TableFilterSortVars[i];
+                    TableFilterSortVars[i].myObject = jQuery(vars.mySelector).tableFilterSort(vars);
+                }
+            }
+        }
+    }
+);
+
+
+
 (function( $ ) {
 
     $.fn.tableFilterSort = function(options){
@@ -701,6 +721,12 @@
             filterItemAttribute: 'data-filter',
 
             /**
+             * where we (temporarily) save the value of an input attribute
+             * @type {string}
+             */
+            inputValueDataAttribute: 'data-tfsvalue',
+
+            /**
              * @type {string}
              */
             showMoreDetailsSelector: '.more',
@@ -752,6 +778,12 @@
              * @type {string}
              */
             directLinkClass: 'dl',
+
+            /**
+             *
+             * @type {string}
+             */
+            selectedFilterItem: 'dl-on',
 
             /**
              * class to show which TRs are favourites...
@@ -1789,19 +1821,17 @@
                         event.preventDefault();
                         var myEl = jQuery(this);
                         var category = myEl.attr(myob.filterItemAttribute);
-                        var filterValue = myob.findValueOfObject(myEl);
+                        var filterValue = myob.findValueOfObject(myEl).toLowerCase();
                         var filterHolder = myob.myFilterFormInner
                             .find('.'+myob.filterGroupClass+'[data-to-filter="'+category+'"]');
                         var fieldType = filterHolder.attr('field-type');
                         var filterToTriger = filterHolder
                             .find('input[value="'+ filterValue + '"].checkbox')
                             .first();
-                        var highlightIdenticals = true;
                         if(filterToTriger && filterToTriger.length > 0) {
                             if(filterToTriger.is(':checkbox')){
                                 if(filterToTriger.prop('checked') === true){
                                     filterToTriger.prop('checked', false).trigger('change');
-                                    highlightIdenticals = false;
                                 }
                                 else {
                                     filterToTriger.prop('checked', true).trigger('change');
@@ -1813,25 +1843,7 @@
                                 filterValue
                             );
                         }
-                        var onClass = myob.directLinkClass+'-on';
-                        if(myob.useJSON) {
-                            var htmlObjects = jQuery(myob.templateRow);
-                        } else {
 
-                        }
-                        myob.myRows
-                            .find('['+myob.filterItemAttribute+'="'+category+'"].'+myob.directLinkClass).each(
-                                function(i, el) {
-                                    var myEl = jQuery(el);
-                                    if(myEl.text().trim() === filterValue) {
-                                        if(highlightIdenticals) {
-                                            myEl.addClass(onClass);
-                                        } else {
-                                            myEl.removeClass(onClass);
-                                        }
-                                    }
-                                }
-                            );
                         myob.runCurrentFilter();
 
                         return false;
@@ -1854,7 +1866,7 @@
                             // update data dictionary
                             if(typeof category !== 'undefined') {
                                 if(typeof myob.dataDictionary[category] === 'object') {
-                                    var oldValue = el.attr('data-tfsvalue');
+                                    var oldValue = el.attr(myob.inputValueDataAttribute);
                                     var newValue = myob.findCurrentValueOfInputObject(el);
 
                                     // 1. add to Rows ...
@@ -1864,7 +1876,7 @@
                                     myob.replaceRowValue(category,rowID, newValue);
                                 }
                             }
-                            el.removeAttr('data-tfsvalue');
+                            el.removeAttr(myob.inputValueDataAttribute);
                             myob.findValueOfObject(el);
                         }
                     );
@@ -1970,8 +1982,6 @@
                                 }
                             }
                             data.ParentPageID = parentPageID;
-                            console.debug(url);
-                            console.debug(data);
                             jQuery.post(
                                 url,
                                 data,
@@ -2140,10 +2150,19 @@
                 return html;
             },
 
+            /**
+             * creates the filter form
+             * @param  {string} type       [description]
+             * @param  {string} category   [description]
+             * @param  {int} tabIndex   [description]
+             * @param  {string} valueIndex [description]
+             *
+             * @return {string}            HTML
+             */
             makeFieldForForm: function(type, category, tabIndex, valueIndex)
             {
                 var cleanCategory = category.replace(/\W/g, '');
-                var cleanValue = valueIndex.toString().toLowerCase();
+                var cleanValue = valueIndex.toString().raw2safe().toLowerCase();
                 var valueID = ('TFS_' + cleanCategory + '_' + cleanValue).replace(/[^a-zA-Z0-9]+/g, '_');
                 if(myob.myFilterFormInner.find('input#'+valueID).length === 0){
                     var startString = '<li class="' + type + 'Field">';
@@ -2194,7 +2213,7 @@
                             var checked = '';
                             if(typeof myob.cfi[category] !== 'undefined') {
                                 for(var i = 0; i < myob.cfi[category].length; i++) {
-                                    if(cleanValue.trim() === myob.cfi[category][i].vtm.trim()) {
+                                    if(cleanValue === myob.cfi[category][i].vtm.trim()) {
                                         checked = 'checked="checked"';
                                         break;
                                     }
@@ -2202,7 +2221,7 @@
                             }
                             var labelValue = valueIndex.toString().raw2safe();
                             return startString +
-                                    '<input class="checkbox" type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + cleanValue.raw2attr() + '" ' + checked + ' tabindex="'+tabIndex+'" />' +
+                                    '<input class="checkbox" type="checkbox" name="' + valueID + '" id="' + valueID + '" value="' + cleanValue + '" ' + checked + ' tabindex="'+tabIndex+'" />' +
                                     '<label for="' + valueID + '">' + labelValue + '</label>' +
                                     endString;
 
@@ -2498,7 +2517,7 @@
                                                                 }
                                                                 break;
                                                             case 'string':
-                                                                rowValue = rowValue.raw2safe().trim().toLowerCase();
+                                                                rowValue = rowValue.raw2safe().toLowerCase();
                                                             default:
                                                                 if(rowValue === searchObject['vtm']){
                                                                     rowMatchesForFilterGroup = true;
@@ -2823,6 +2842,9 @@
                         }
                     );
                 }
+
+                myob.highlightFilteredRows();
+
                 myob.myTable.removeClass(myob.hideClass);
                 //todo: double-up...
                 // myob.myTable.show();
@@ -2886,16 +2908,37 @@
                 }
                 if(html.length > 0) {
                     myob.myTableBody.html(html);
-                    myob.myTableBody.find('input[data-tfsvalue], select[data-tfsvalue], textarea[data-tfsvalue]').each(
+                    var selectorPhrase = 'input['+myob.inputValueDataAttribute+'], select['+myob.inputValueDataAttribute+'], textarea['+myob.inputValueDataAttribute+']'
+                    myob.myTableBody.find(selectorPhrase).each(
                         function(i, el) {
                             var el = jQuery(el)
-                            var value = el.attr('data-tfsvalue');
+                            var value = el.attr(myob.inputValueDataAttribute);
                             value = value.raw2safe();
                             jQuery(el).val(value);
                         }
                     );
                 }
                 myob.profileEnder('buildRows');
+            },
+
+            highlightFilteredRows: function()
+            {
+                myob.profileStarter('highlightFilteredRows');
+                myob.myTableBody.find('.' + myob.selectedFilterItem).each(
+                    function(i, el) {
+                        jQuery(el).removeClass(myob.selectedFilterItem);
+                    }
+                );
+                Object.keys(myob.cfi).forEach(
+                    function(categoryToMatch, categoryToMatchIndex) {
+                        myob.myTableBody.find('['+myob.filterItemAttribute+'="' + categoryToMatch + '"]').each(
+                            function(i, el) {
+                                jQuery(el).addClass(myob.selectedFilterItem);
+                            }
+                        );
+                    }
+                );
+                myob.profileEnder('highlightFilteredRows');
             },
 
             createPagination: function(minRow, matchCount, actualVisibleRowCount)
@@ -3009,7 +3052,7 @@
                             categoryHolder.find('input').each(
                                 function(i, input) {
                                     input = jQuery(input);
-                                    var ivl = input.val().raw2safe().trim();
+                                    var ivl = input.val().raw2safe();
                                     var vtm = ivl.toLowerCase();
                                     var innerInputVal = '';
                                     var innerValueToMatch = '';
@@ -3202,7 +3245,7 @@
                 if(typeof JSURL !== 'undefined') {
                     if(typeof location.hash !== 'undefined' && location.hash && location.hash.length > 0) {
                         var hash = window.location.hash.substr(1);
-                        data = JSURL.tryParse(hash, {});
+                        var data = JSURL.tryParse(hash, {});
                         for (var property in data) {
                             if (data.hasOwnProperty(property)) {
                                 if(property === 'pge') {
@@ -3373,7 +3416,7 @@
                     case 'INPUT':
                     case 'SELECT':
                     case 'TEXTAREA':
-                        val = myObject.attr('data-tfsvalue');
+                        val = myObject.attr(myob.inputValueDataAttribute);
                         if(typeof val !== 'undefined') {
                             quickInputFind = true;
                         }
@@ -3384,9 +3427,8 @@
                 }
                 if(quickInputFind === false) {
                     val = myob.findCurrentValueOfInputObject(myObject, mytype);
-                    myObject.attr('data-tfsvalue', val);
+                    myObject.attr(myob.inputValueDataAttribute, val);
                 }
-                val = val.trim();
                 val = val.raw2safe();
 
                 return val;
@@ -3680,9 +3722,11 @@
 String.prototype.raw2safe = function(){
     var tmp = document.createElement("DIV");
     tmp.innerHTML = this;
-    return tmp.textContent || tmp.innerText || "";
+    var v = tmp.textContent || tmp.innerText || "";
+    return v.trim();
     // return this.replace(/[^a-z0-9*._\-,\s]/gi, " ");
 }
+
 
 /**
  * source: http://stackoverflow.com/questions/7753448/how-do-i-escape-quotes-in-html-attribute-values
@@ -3834,17 +3878,3 @@ jQuery.fn.isOnScreen = function(){
         return on.apply(this, args);
     };
 }(jQuery));
-
-
-jQuery(document).ready(
-    function(){
-        if(typeof TableFilterSortVars !== 'undefined') {
-            if(Array.isArray(TableFilterSortVars)) {
-                for(var i = 0; i < TableFilterSortVars.length; i++) {
-                    var vars = TableFilterSortVars[i];
-                    TableFilterSortVars[i].myObject = jQuery(vars.mySelector).tableFilterSort(vars);
-                }
-            }
-        }
-    }
-);
