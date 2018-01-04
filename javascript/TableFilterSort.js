@@ -2316,6 +2316,12 @@ jQuery(document).ready(
                         type = myob.dataDictionary[category]['DataType'];
                     }
                     var arr = [];
+                    if(typeof myob.dataDictionary[category] === 'undefined') {
+                        myob.dataDictionary[category] = {};
+                    }
+                    if(typeof myob.dataDictionary[category]['Values'] === 'undefined') {
+                        myob.dataDictionary[category]['Values'] = {};
+                    }
                     var rows = myob.dataDictionary[category]['Values'];
                     for (var rowID in rows) {
                         if (rows.hasOwnProperty(rowID)) {
