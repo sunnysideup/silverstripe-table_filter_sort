@@ -1,19 +1,18 @@
 <?php
 
 
-class TableFilterSortServerSaver extends DataObject {
-
-
+class TableFilterSortServerSaver extends DataObject
+{
     private static $singular_name = 'Server Data';
 
-    function i18n_singular_name()
+    public function i18n_singular_name()
     {
         return Config::inst()->get('TableFilterSortServerSaver', 'singular_name');
     }
 
     private static $plural_name = 'Server Data';
 
-    function i18n_plural_name()
+    public function i18n_plural_name()
     {
         return Config::inst()->get('TableFilterSortServerSaver', 'plural_name');
     }
@@ -100,15 +99,14 @@ class TableFilterSortServerSaver extends DataObject {
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        if(!$this->Title) {
-            $this->Title = rand(0,99999999999999999);
+        if (!$this->Title) {
+            $this->Title = rand(0, 99999999999999999);
         }
         $iteration = 2;
         $originalName = $this->Title;
-        while($this->titleExists()){
+        while ($this->titleExists()) {
             $this->Title = $originalName . ' '.$iteration;
             $iteration++;
-
         }
         $this->URLSegment = urlencode(
             strtolower(
@@ -124,5 +122,4 @@ class TableFilterSortServerSaver extends DataObject {
             ->exclude(array('ID' => $this->ID))
             ->count() ? true : false;
     }
-
 }
