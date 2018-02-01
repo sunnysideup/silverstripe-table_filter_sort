@@ -57,7 +57,7 @@ class TableFilterSortServerSaver_Controller extends Controller
         );
     }
 
-    function init()
+    public function init()
     {
         parent::init();
         $this->parentPageID = Convert::raw2sql($this->request->param('ID'));
@@ -90,22 +90,22 @@ class TableFilterSortServerSaver_Controller extends Controller
         ');
     }
 
-    function Title()
+    public function Title()
     {
-        if($this->myTitle) {
+        if ($this->myTitle) {
             return $this->myTitle;
         } else {
             return $this->request->param('Action');
         }
     }
 
-    function index($request)
+    public function index($request)
     {
         $postData = $request->postVars();
-        if($postData) {
+        if ($postData) {
             //just in case ...
             Session::clear('TableFilterSortPostData');
-            if(isset($postData['ParentPageID'])) {
+            if (isset($postData['ParentPageID'])) {
                 $this->parentPageID = $postData['ParentPageID'];
                 return Director::absoluteURL($this->Link('find/'.$this->parentPageID));
             }
@@ -113,51 +113,52 @@ class TableFilterSortServerSaver_Controller extends Controller
         return '404';
     }
 
-    function find($request)
+    public function find($request)
     {
         $this->myTitle = 'Find ' . $this->parentPageID . ' ... ';
 
         return $this->renderWith($this->class);
     }
 
-    function start($request) {
+    public function start($request)
+    {
         $postData = $request->postVars();
-        if($postData) {
+        if ($postData) {
             Session::set('TableFilterSortPostData', $postData);
             return Director::absoluteURL($this->Link('save'));
         }
         return '404';
     }
 
-    function save($request)
+    public function save($request)
     {
-        if($this->dataToSave()) {
+        if ($this->dataToSave()) {
             $this->myTitle = 'Save ' . $this->parentPageID . ' ... ';
             return $this->renderWith($this->class);
         }
         return 'NO DATA TO BE SAVED ...';
     }
 
-    function dosave($data, $form)
+    public function dosave($data, $form)
     {
         $title = Convert::raw2sql($data['Title']);
-        if($title) {
+        if ($title) {
             $dataToSave = $this->dataToSave();
-            if($dataToSave) {
+            if ($dataToSave) {
                 $obj = TableFilterSortServerSaver::find_or_create($title, $this->parentPageID);
                 $obj->Data = json_encode($dataToSave);
                 $obj->Description = Convert::raw2sql($data["Description"]);
                 $obj->Author = Convert::raw2sql($data["Author"]);
                 $obj->write();
                 $tags = array();
-                foreach($data['TagsTempField'] as $tag) {
+                foreach ($data['TagsTempField'] as $tag) {
                     $tag = trim($tag);
-                    if($tag) {
+                    if ($tag) {
                         $tagObject = TableFilterSortTag::find_or_create($tag, $obj);
                     }
                 }
                 Session::clear('TableFilterSortPostData');
-                //$form->setMessage('Saved successfully', 'good');
+            //$form->setMessage('Saved successfully', 'good');
             } else {
                 $form->setMessage('An Error Occurred', 'bad');
             }
@@ -166,10 +167,9 @@ class TableFilterSortServerSaver_Controller extends Controller
         }
 
         return $this->renderWith($this->class);
-
     }
 
-    function load($request)
+    public function load($request)
     {
         $this->getResponse()->addHeader('Content-Type', 'application/json');
         $urlSegment = Convert::raw2sql($request->param('ID'));
@@ -177,7 +177,7 @@ class TableFilterSortServerSaver_Controller extends Controller
             'TableFilterSortServerSaver',
             array('URLSegment' => $urlSegment)
         );
-        if($obj) {
+        if ($obj) {
             return json_encode(
                 array(
                     'Data' => $obj->Data
@@ -192,15 +192,15 @@ class TableFilterSortServerSaver_Controller extends Controller
      * @param  [type] $request [description]
      * @return [type]          [description]
      */
-    function MyList()
+    public function MyList()
     {
         return TableFilterSortServerSaver::get()->filter(array('ParentPageID' => $this->parentPageID));
     }
 
 
-    function AddForm()
+    public function AddForm()
     {
-        if(
+        if (
             $this->dataToSave()
         ) {
             $singleton = Injector::inst()->get('TableFilterSortServerSaver');
@@ -208,21 +208,21 @@ class TableFilterSortServerSaver_Controller extends Controller
             $fieldList = FieldList::create(
                 TextField::create('Title', $fieldLabels['Title'])
                     ->setMaxLength(50)
-                    ->setAttribute('placeholder',  $fieldLabels['Title']),
+                    ->setAttribute('placeholder', $fieldLabels['Title']),
                 TextField::create('Author', $fieldLabels['Author'])
                     ->setMaxLength(50)
-                    ->setAttribute('placeholder',  $fieldLabels['Author']),
+                    ->setAttribute('placeholder', $fieldLabels['Author']),
                 TextareaField::create('Description', $fieldLabels['Description'])
-                    ->setAttribute('placeholder',  $fieldLabels['Description'])
+                    ->setAttribute('placeholder', $fieldLabels['Description'])
             );
-            for($i = 1; $i < 8; $i++) {
+            for ($i = 1; $i < 8; $i++) {
                 $title = $fieldLabels['Tags']. ' #'.$i;
                 $fieldList->push(
                     TextField::create('TagsTempField['.$i.']', $title)
-                        ->setAttribute('placeholder',  $title)
+                        ->setAttribute('placeholder', $title)
                 );
             }
-            $actionTitle = _t('TableFilterSortServerSaver_Controller.SAVE','Save');
+            $actionTitle = _t('TableFilterSortServerSaver_Controller.SAVE', 'Save');
             $actionList = FieldList::create(
                 FormAction::create('dosave', $actionTitle)
             );
@@ -241,13 +241,11 @@ class TableFilterSortServerSaver_Controller extends Controller
     protected function dataToSave()
     {
         $data = session::get('TableFilterSortPostData');
-        if($data) {
-            if(isset($data["ParentPageID"])) {
+        if ($data) {
+            if (isset($data["ParentPageID"])) {
                 $this->parentPageID = $data["ParentPageID"];
                 return $data;
             }
         }
     }
-
-
 }

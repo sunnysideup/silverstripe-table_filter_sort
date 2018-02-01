@@ -1,19 +1,18 @@
 <?php
 
 
-class TableFilterSortTag extends DataObject {
-
-
+class TableFilterSortTag extends DataObject
+{
     private static $singular_name = 'Tag';
 
-    function i18n_singular_name()
+    public function i18n_singular_name()
     {
         return Config::inst()->get('TableFilterSortTag', 'singular_name');
     }
 
     private static $plural_name = 'Tags';
 
-    function i18n_plural_name()
+    public function i18n_plural_name()
     {
         return Config::inst()->get('TableFilterSortTag', 'plural_name');
     }
@@ -75,6 +74,4 @@ class TableFilterSortTag extends DataObject {
 
         return $obj;
     }
-
-
 }

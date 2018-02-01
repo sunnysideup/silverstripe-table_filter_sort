@@ -58,13 +58,13 @@ class TableFilterSortAPI extends Object
         $includeInPage = false,
         $jsSettings = null
     ) {
-        if(! $jsSettings) {
+        if (! $jsSettings) {
             $jsSettings = json_encode(self::$_jsSettingArray);
-        } elseif(is_array($jsSettings)) {
+        } elseif (is_array($jsSettings)) {
             $jsSettings = json_encode($jsSettings);
         }
         //this must come first
-        if($tableSelector) {
+        if ($tableSelector) {
             $mySelector = str_replace('"', '\\"', $tableSelector);
             //this must come first
             Requirements::customScript(
@@ -80,52 +80,52 @@ class TableFilterSortAPI extends Object
         }
         $js = Config::inst()->get('TableFilterSortAPI', 'js');
         $css = Config::inst()->get('TableFilterSortAPI', 'css');
-        if($jqueryLocation) {
+        if ($jqueryLocation) {
             array_unshift($js, $jqueryLocation);
         }
-        if(is_array($blockArray) && count($blockArray)) {
+        if (is_array($blockArray) && count($blockArray)) {
             $js = array_diff($js, $blockArray);
             $css = array_diff($css, $blockArray);
         }
-        if(Director::isDev() && ! $includeInPage) {
-            foreach($css as $link) {
+        if (Director::isDev() && ! $includeInPage) {
+            foreach ($css as $link) {
                 Requirements::themedCSS($link, 'table_filter_sort');
             }
-            foreach($js as $link) {
+            foreach ($js as $link) {
                 Requirements::javascript($link);
             }
         } else {
             $base = Director::baseFolder().'/';
             //css
             $allCss = '';
-            foreach($css as $link) {
+            foreach ($css as $link) {
                 $link .= '.min';
                 $testFiles = array(
                     SSViewer::get_theme_folder().'_table_filter_sort/css/'.$link,
                     'table_filter_sort/css/'.$link
                 );
                 $hasBeenIncluded = false;
-                if($includeInPage) {
-                    foreach($testFiles as $testFile) {
+                if ($includeInPage) {
+                    foreach ($testFiles as $testFile) {
                         $testFile = $base . $testFile.'.css';
-                        if(file_exists($testFile)) {
+                        if (file_exists($testFile)) {
                             $hasBeenIncluded = true;
                             $allCss .= file_get_contents($testFile);
                             break;
                         }
                     }
                 }
-                if( ! $hasBeenIncluded) {
+                if (! $hasBeenIncluded) {
                     Requirements::themedCSS($link, 'table_filter_sort');
                 }
             }
             Requirements::customCSS($allCss, 'table_filter_sort_css');
             //js
             $allJS = '';
-            foreach($js as $link) {
+            foreach ($js as $link) {
                 $link = str_replace('.js', '.min.js', $link);
                 $testFile = $base . $link;
-                if($includeInPage && file_exists($testFile)) {
+                if ($includeInPage && file_exists($testFile)) {
                     $allJS .= file_get_contents($testFile);
                 } else {
                     Requirements::javascript($link);
