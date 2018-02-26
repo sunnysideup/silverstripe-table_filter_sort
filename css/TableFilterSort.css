@@ -109,7 +109,7 @@
 /***********************************************
  * fixed header
  */
-.fixed-header.tfs-filter-in-use .tfs-filter-form-holder,
+/* .fixed-header.tfs-filter-in-use .tfs-filter-form-holder,
 .fixed-header.tfs-filter-in-use table thead {
     position: fixed;
     top: 0;
@@ -137,4 +137,4 @@
 .fixed-header.tfs-filter-in-use table thead {
     z-index: 9;
     display: table-header-group;
-}
+} */
