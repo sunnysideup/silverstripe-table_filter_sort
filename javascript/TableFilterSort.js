@@ -287,13 +287,13 @@ jQuery(document).ready(
 
 
             /**
-             *
+             * Does the table need to have a fixed header at all???
              * @type {boolean}
              */
             hasFixedTableHeader: true,
 
             /**
-             *
+             * Has the fixed header been set at the moment???
              * @type {boolean}
              */
             hasFixedTableHeaderSet: false,
@@ -1571,19 +1571,8 @@ jQuery(document).ready(
                 myob.profileStarter('fixTableHeaderListener');
                 if(myob.fixedHeaderClass) {
                     jQuery(window).delayedOn(
-                        "load scroll",
+                        "load scroll resize",
                         function(e) {
-                            myob.setTableWidthAndFixHeader();
-                        },
-                        myob.millisecondsBetweenActionsShort
-                    );
-                    //note that we use a delay here !
-                    jQuery(window).delayedOn(
-                        "resize",
-                        function(e) {
-                            myob.myTableHolder
-                                .find('colgroup')
-                                .remove();
                             myob.setTableWidthAndFixHeader();
                         },
                         myob.millisecondsBetweenActionsShort
@@ -2665,46 +2654,41 @@ jQuery(document).ready(
 
             setTableWidthAndFixHeader: function()
             {
-                var filterFormIsOpen = myob.myTableHolder.hasClass(myob.filterIsOpenClass);
-                if(! filterFormIsOpen) {
-                    myob.windowTimeoutStoreSetter(
-                        'setTableWidthInFuture',
-                        function() {
-                            myob.setTableWidth();
-                            myob.fixTableHeader();
-                        },
-                        myob.millisecondsBetweenActionsLong
-                    );
-                }
+                myob.windowTimeoutStoreSetter(
+                    'setTableWidthInFuture',
+                    function() {
+                        myob.setTableWidth();
+                        myob.fixTableHeader();
+                    },
+                    myob.millisecondsBetweenActionsLong
+                );
             },
 
             setTableWidth: function()
             {
                 myob.profileStarter('setTableWidth');
                 if(myob.fixedHeaderClass) {
-                    myob.resetFixedTableWidth();
+                    myob.removeFixedTableHeader();
                     //just in case ...
                     if(myob.myTableHolder.isOnScreen()) {
-                        var bodyCells = myob.myTableBody.find('tr:visible:first').find('th:visible, td:visible');
-                        if(bodyCells.length > 0) {
-                            var headerCells = myob.myTableHead.find('tr:visible:first th:visible');
-                            bodyCells.each(
-                                function(colNumber, cell) {
-                                    var headerCell = headerCells.eq(colNumber);
-                                    var bodyCell = jQuery(cell);
-                                    headerCell.width(bodyCell.width());
-                                }
-                            );
-                        }
+
                     }
-                    if(myob.myTableHolder.find('.tfspushdowndiv').length > 0) {
-                        jQuery('<div class="tfspushdowndiv"></div>').insertBefore(myob.myTable);
+                    var filterFormIsOpen = myob.myTableHolder.hasClass(myob.filterIsOpenClass);
+                    if(filterFormIsOpen === false) {
+                        //weird? why add twice?????
+                        if(myob.myTableHolder.find('.tfspushdowndiv').length === 0) {
+                            jQuery('<div class="tfspushdowndiv"></div>').insertBefore(myob.myTable);
+                        }
+                    } else {
+                        if(myob.myTableHolder.find('.tfspushdowndiv').length > 0) {
+                            //remove tfspushdowndiv
+                        }
                     }
                 }
                 myob.profileEnder('setTableWidth');
             },
 
-            resetFixedTableWidth: function()
+            removeFixedTableHeader: function()
             {
                 myob.myTableHolder.removeClass(myob.fixedHeaderClass);
                 myob.hasFixedTableHeaderSet = false;
@@ -2715,9 +2699,11 @@ jQuery(document).ready(
                 myob.profileStarter('fixTableHeader');
                 if(myob.myTableHolder.isOnScreen()) {
                     //show if it is in use / not in use ...
+                    //why do we need this?
                     myob.myTableHolder.addClass(myob.filterInUseClass);
                     myob.myTableHolder.removeClass(myob.filterNotInUseClass);
                     if(myob.hasFixedTableHeader) {
+                        //about height ...
                         var relativeMove = myob.myTableHead.outerHeight();
                         relativeMove += myob.myFilterFormHolder.outerHeight();
                         var pushDownDiv = myob.myTableHolder.find('.tfspushdowndiv');
@@ -2725,7 +2711,9 @@ jQuery(document).ready(
                         //get basic data about scroll situation...
                         var tableOffset = myob.myTableBody.offset().top;
                         var offset = jQuery(window).scrollTop();
-
+                        //show fixed header if the Page offset is Grater than the table
+                        //ie. the table is above the current scroll point
+                        //ie. the table header is no longer visible
                         var showFixedHeader = offset > tableOffset ? true: false;
 
                         //end reset
@@ -2733,8 +2721,7 @@ jQuery(document).ready(
                             myob.hasFixedTableHeaderSet = true;
                             myob.myFilterFormHolder.width(myob.myTableHead.width());
                             myob.myTableHolder.addClass(myob.fixedHeaderClass);
-                            var top = 0;
-                            top = myob.myFilterFormHolder.outerHeight();
+                            var top = myob.myFilterFormHolder.outerHeight();
                             myob.myTableHead.css('top', top);
                         } else {
                             if(myob.hasFixedTableHeaderSet === true) {
@@ -2748,7 +2735,6 @@ jQuery(document).ready(
                     myob.myTableHolder.removeClass(myob.filterInUseClass);
                 }
                 myob.profileEnder('fixTableHeader');
-
             },
 
 
