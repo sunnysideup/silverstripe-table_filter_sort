@@ -497,7 +497,6 @@ li.tfs-save-and-load.save.filters,
 }
 
 
-
 /*
  * **********************************************
  * FIXED HEADER
@@ -507,10 +506,6 @@ li.tfs-save-and-load.save.filters,
     box-sizing: border-box;
     background-color: #b5b5b5;
     border: 1px solid #fff;
-}
-
-.fixed-header.tfs-filter-in-use table thead th {
-    border-top: none;
 }
 
 

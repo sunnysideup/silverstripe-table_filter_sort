@@ -246,6 +246,12 @@ jQuery(document).ready(
             myTableBody: null,
 
             /**
+             * [myRows description]
+             * @type {jQuery}
+             */
+            myFloatingTable: null,
+
+            /**
              * the rows as HTML
              * if we use JSON then this is the template row
              * if we do not use JSON then this is a jQuery object of all rows
@@ -915,6 +921,8 @@ jQuery(document).ready(
                 //get the rows
                 myob.setRowsWithDetails(true);
                 if(myob.myRowsTotalCount > 0){
+                    myob.buildFloatingHeaderTable();
+
                     myob.millisecondsBetweenActionsShort = myob.millisecondsBetweenActionsShort * (Math.floor(myob.myRowsTotalCount / 5000) + 1);
                     myob.millisecondsBetweenActionsLong = myob.millisecondsBetweenActionsLong * (Math.floor(myob.myRowsTotalCount / 5000) + 1);
                     if(typeof myob.initFX1 === 'function') {
@@ -1010,7 +1018,15 @@ jQuery(document).ready(
                 myob.myTable.css('table-layout', 'fixed');
                 //base URL
                 myob.baseURL = location.protocol + '//' + location.host + location.pathname + location.search;
+            },
 
+            buildFloatingHeaderTable: function()
+            {
+                myob.profileStarter('buildFloatingHeaderTable')
+                myob.myFloatingTable = myob.myTable.clone();
+                myob.myFloatingTable.appendTo(myob.myTableHolder)
+                myob.myFloatingTable.addClass("floating-table")
+                myob.profileEnder('buildFloatingHeaderTable');
             },
 
             setRows: function()
@@ -2700,7 +2716,7 @@ jQuery(document).ready(
                 if(myob.myTableHolder.isOnScreen()) {
                     //show if it is in use / not in use ...
                     //why do we need this?
-                    myob.myTableHolder.addClass(myob.filterInUseClass);
+                    myob.myTableHolder.addClass(myob.filterInUseClass); //class for filter
                     myob.myTableHolder.removeClass(myob.filterNotInUseClass);
                     if(myob.hasFixedTableHeader) {
                         //about height ...
@@ -2718,11 +2734,15 @@ jQuery(document).ready(
 
                         //end reset
                         if(showFixedHeader === true && myob.hasFixedTableHeaderSet === false) {
+                            myob.myTableHolder.addClass(myob.fixedHeaderClass); //class for pos fixed
                             myob.hasFixedTableHeaderSet = true;
-                            myob.myFilterFormHolder.width(myob.myTableHead.width());
-                            myob.myTableHolder.addClass(myob.fixedHeaderClass);
+
+                            var width = myob.myTableHead.width();
+                            myob.myFilterFormHolder.width(width);
+
                             var top = myob.myFilterFormHolder.outerHeight();
-                            myob.myTableHead.css('top', top);
+                            myob.myFloatingTable.css('top', top); //set offset
+                            myob.myFloatingTable.width(width)
                         } else {
                             if(myob.hasFixedTableHeaderSet === true) {
                                 myob.hasFixedTableHeaderSet = false;

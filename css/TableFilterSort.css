@@ -103,16 +103,20 @@
 }
 
 
-
-
-
 /***********************************************
  * fixed header
  */
-/* .fixed-header.tfs-filter-in-use .tfs-filter-form-holder,
-.fixed-header.tfs-filter-in-use table thead {
+
+.floating-table{
+    visibility: collapse;
+    z-index: 10;
+}
+
+.fixed-header.tfs-filter-in-use .tfs-filter-form-holder,
+.fixed-header .floating-table{
     position: fixed;
     top: 0;
+    visibility: visible;
 }
 
 .fixed-header.tfs-filter-in-use.filter-is-open .tfs-filter-form-holder {
@@ -137,4 +141,4 @@
 .fixed-header.tfs-filter-in-use table thead {
     z-index: 9;
     display: table-header-group;
-} */
+}
