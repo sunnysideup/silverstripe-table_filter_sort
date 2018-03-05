@@ -109,36 +109,26 @@
 
 .floating-table{
     visibility: collapse;
-    z-index: 10;
+    z-index: 7;
 }
 
-.fixed-header.tfs-filter-in-use .tfs-filter-form-holder,
+/* hide pesky extra data if it comes in */
+.floating-table tbody, .floating-table tfoot{
+    display: none;
+}
+
+.fixed-header .tfs-filter-form-holder{
+    z-index: 8;
+}
+
+.fixed-header .tfs-filter-form-holder,
 .fixed-header .floating-table{
     position: fixed;
     top: 0;
     visibility: visible;
+    margin-bottom: 0;
 }
 
-.fixed-header.tfs-filter-in-use.filter-is-open .tfs-filter-form-holder {
+.fixed-header.filter-is-open .tfs-filter-form-holder {
     position: relative;
-}
-
-.tfspushdowndiv {
-    display: none;
-}
-.fixed-header .tfspushdowndiv {
-    display: block;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    border: none;
-}
-
-.fixed-header.tfs-filter-in-use .tfs-filter-form-holder {
-    z-index: 10;
-}
-
-.fixed-header.tfs-filter-in-use table thead {
-    z-index: 9;
-    display: table-header-group;
 }

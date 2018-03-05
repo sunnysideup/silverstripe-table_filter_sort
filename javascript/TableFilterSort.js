@@ -921,7 +921,6 @@ jQuery(document).ready(
                 //get the rows
                 myob.setRowsWithDetails(true);
                 if(myob.myRowsTotalCount > 0){
-                    myob.buildFloatingHeaderTable();
 
                     myob.millisecondsBetweenActionsShort = myob.millisecondsBetweenActionsShort * (Math.floor(myob.myRowsTotalCount / 5000) + 1);
                     myob.millisecondsBetweenActionsLong = myob.millisecondsBetweenActionsLong * (Math.floor(myob.myRowsTotalCount / 5000) + 1);
@@ -941,6 +940,7 @@ jQuery(document).ready(
                             myob.filterItemCollector();
                             //look for cols that are the same
                             myob.hideIdenticalCols();
+
                             window.setTimeout(
                                 function() {
                                     //now we can hide table ...
@@ -950,6 +950,9 @@ jQuery(document).ready(
                                     myob.dataDictionaryCollector();
                                     //find defaultSort
                                     myob.findDefaultSort();
+
+                                    //build floating header after we have finished cols
+                                    myob.buildFloatingHeaderTable()
 
                                     //LISTENERS ...
                                     myob.fixTableHeaderListener();
@@ -1616,15 +1619,15 @@ jQuery(document).ready(
                             "fast",
                             function() {
                                 //set the height of the filter form
-                                if(myob.hasFixedTableHeader) {
-                                    myob.myTableHead.css('top', myob.myFilterFormHolder.outerHeight() + 'px');
-                                }
                                 myob.myTableHolder.toggleClass(myob.filterIsOpenClass);
                                 if(myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
                                     myob.scrollToTopOfHolder();
                                     //filter is now open
                                 } else {
                                     //filter is now closed
+                                }
+                                if(myob.hasFixedTableHeader) {
+                                    myob.fixTableHeader()
                                 }
                             }
                         );
@@ -2689,12 +2692,13 @@ jQuery(document).ready(
                     if(myob.myTableHolder.isOnScreen()) {
 
                     }
+                    //THIS HAS BEEN REMOVED AS ALL FLOATING HEADER LOGIC IS IN FIXTABLEHEADER
                     var filterFormIsOpen = myob.myTableHolder.hasClass(myob.filterIsOpenClass);
                     if(filterFormIsOpen === false) {
                         //weird? why add twice?????
-                        if(myob.myTableHolder.find('.tfspushdowndiv').length === 0) {
-                            jQuery('<div class="tfspushdowndiv"></div>').insertBefore(myob.myTable);
-                        }
+                        // if(myob.myTableHolder.find('.tfspushdowndiv').length === 0) {
+                        //     jQuery('<div class="tfspushdowndiv"></div>').insertBefore(myob.myTable);
+                        // }
                     } else {
                         if(myob.myTableHolder.find('.tfspushdowndiv').length > 0) {
                             //remove tfspushdowndiv
@@ -2716,14 +2720,14 @@ jQuery(document).ready(
                 if(myob.myTableHolder.isOnScreen()) {
                     //show if it is in use / not in use ...
                     //why do we need this?
-                    myob.myTableHolder.addClass(myob.filterInUseClass); //class for filter
-                    myob.myTableHolder.removeClass(myob.filterNotInUseClass);
+                    // myob.myTableHolder.addClass(myob.filterInUseClass); //class for filter
+                    // myob.myTableHolder.removeClass(myob.filterNotInUseClass);
                     if(myob.hasFixedTableHeader) {
                         //about height ...
                         var relativeMove = myob.myTableHead.outerHeight();
                         relativeMove += myob.myFilterFormHolder.outerHeight();
-                        var pushDownDiv = myob.myTableHolder.find('.tfspushdowndiv');
-                        pushDownDiv.height(relativeMove);
+                        // var pushDownDiv = myob.myTableHolder.find('.tfspushdowndiv');
+                        // pushDownDiv.height(relativeMove);
                         //get basic data about scroll situation...
                         var tableOffset = myob.myTableBody.offset().top;
                         var offset = jQuery(window).scrollTop();
@@ -2740,8 +2744,9 @@ jQuery(document).ready(
                             var width = myob.myTableHead.width();
                             myob.myFilterFormHolder.width(width);
 
-                            var top = myob.myFilterFormHolder.outerHeight();
-                            myob.myFloatingTable.css('top', top); //set offset
+                            var filterOpen = myob.myTableHolder.hasClass(myob.filterIsOpenClass);
+                            var top = myob.myFilterFormHolder.outerHeight(true)-2;
+                            myob.myFloatingTable.css('top', filterOpen ? 0 : top); //set offset
                             myob.myFloatingTable.width(width)
                         } else {
                             if(myob.hasFixedTableHeaderSet === true) {
@@ -2751,8 +2756,8 @@ jQuery(document).ready(
                         }
                     }
                 } else {
-                    myob.myTableHolder.addClass(myob.filterNotInUseClass);
-                    myob.myTableHolder.removeClass(myob.filterInUseClass);
+                    // myob.myTableHolder.addClass(myob.filterNotInUseClass);
+                    // myob.myTableHolder.removeClass(myob.filterInUseClass);
                 }
                 myob.profileEnder('fixTableHeader');
             },
