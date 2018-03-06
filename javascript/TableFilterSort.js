@@ -1599,7 +1599,6 @@ jQuery(document).ready(
                 myob.profileEnder('fixTableHeaderListener');
             },
 
-
             /**
              * set up filter listeners ...
              */
@@ -2714,19 +2713,8 @@ jQuery(document).ready(
                 myob.profileStarter('fixTableHeader');
                 console.log('fixtable')
                 if(myob.myTableHolder.isOnScreen()) {
-                    //show if it is in use / not in use ...
-                    //why do we need this?
-                    // myob.myTableHolder.addClass(myob.filterInUseClass); //class for filter
-                    // myob.myTableHolder.removeClass(myob.filterNotInUseClass);
-                    //
-                    //close filter
 
                     if(myob.hasFixedTableHeader) {
-                        //about height ...
-                        // var relativeMove = myob.myTableHead.outerHeight();
-                        // relativeMove += myob.myFilterFormHolder.outerHeight();
-                        // var pushDownDiv = myob.myTableHolder.find('.tfspushdowndiv');
-                        // pushDownDiv.height(relativeMove);
                         //get basic data about scroll situation...
 
                         var tableOffset = myob.myTableBody.offset().top;
@@ -2742,15 +2730,19 @@ jQuery(document).ready(
                             myob.myTableHolder.removeClass(myob.filterIsOpenClass);
                             myob.myFilterFormInner.slideUp(0)
 
+
                             myob.myTableHolder.addClass(myob.fixedHeaderClass); //class for pos fixed
+
+
                             myob.hasFixedTableHeaderSet = true;
 
                             var width = myob.myTableHead.width();
                             myob.myFilterFormHolder.width(width);
+                            myob.myFloatingTable.width(width+1)
+                            // myob.myFloatingTable("thead").width(width)
 
                             var top = myob.myFilterFormHolder.outerHeight(true)-2;
                             myob.myFloatingTable.css('top', top); //set offset
-                            myob.myFloatingTable.width(width)
                         } else {
                             if(myob.hasFixedTableHeaderSet === true) {
                                 myob.hasFixedTableHeaderSet = false;
@@ -2759,8 +2751,6 @@ jQuery(document).ready(
                         }
                     }
                 } else {
-                    // myob.myTableHolder.addClass(myob.filterNotInUseClass);
-                    // myob.myTableHolder.removeClass(myob.filterInUseClass);
                 }
                 myob.profileEnder('fixTableHeader');
             },
