@@ -1045,7 +1045,6 @@ jQuery(document).ready(
                 myob.profileStarter('setRows');
             },
 
-
             /**
              * called after row manipulation to reset rows
              */
@@ -1616,18 +1615,14 @@ jQuery(document).ready(
                     function(event) {
                         event.preventDefault();
                         myob.myFilterFormInner.slideToggle(
-                            "fast",
+                            // if currently has table header open, then immediate swap
+                            myob.hasFixedTableHeaderSet ? 0 : "fast",
                             function() {
                                 //set the height of the filter form
                                 myob.myTableHolder.toggleClass(myob.filterIsOpenClass);
                                 if(myob.myTableHolder.hasClass(myob.filterIsOpenClass)) {
-                                    myob.scrollToTopOfHolder();
                                     //filter is now open
-                                } else {
-                                    //filter is now closed
-                                }
-                                if(myob.hasFixedTableHeader) {
-                                    myob.fixTableHeader()
+                                    myob.scrollToTopOfHolder();
                                 }
                             }
                         );
@@ -2717,18 +2712,23 @@ jQuery(document).ready(
             fixTableHeader: function()
             {
                 myob.profileStarter('fixTableHeader');
+                console.log('fixtable')
                 if(myob.myTableHolder.isOnScreen()) {
                     //show if it is in use / not in use ...
                     //why do we need this?
                     // myob.myTableHolder.addClass(myob.filterInUseClass); //class for filter
                     // myob.myTableHolder.removeClass(myob.filterNotInUseClass);
+                    //
+                    //close filter
+
                     if(myob.hasFixedTableHeader) {
                         //about height ...
-                        var relativeMove = myob.myTableHead.outerHeight();
-                        relativeMove += myob.myFilterFormHolder.outerHeight();
+                        // var relativeMove = myob.myTableHead.outerHeight();
+                        // relativeMove += myob.myFilterFormHolder.outerHeight();
                         // var pushDownDiv = myob.myTableHolder.find('.tfspushdowndiv');
                         // pushDownDiv.height(relativeMove);
                         //get basic data about scroll situation...
+
                         var tableOffset = myob.myTableBody.offset().top;
                         var offset = jQuery(window).scrollTop();
                         //show fixed header if the Page offset is Grater than the table
@@ -2738,15 +2738,18 @@ jQuery(document).ready(
 
                         //end reset
                         if(showFixedHeader === true && myob.hasFixedTableHeaderSet === false) {
+                            //remove the filter
+                            myob.myTableHolder.removeClass(myob.filterIsOpenClass);
+                            myob.myFilterFormInner.slideUp(0)
+
                             myob.myTableHolder.addClass(myob.fixedHeaderClass); //class for pos fixed
                             myob.hasFixedTableHeaderSet = true;
 
                             var width = myob.myTableHead.width();
                             myob.myFilterFormHolder.width(width);
 
-                            var filterOpen = myob.myTableHolder.hasClass(myob.filterIsOpenClass);
                             var top = myob.myFilterFormHolder.outerHeight(true)-2;
-                            myob.myFloatingTable.css('top', filterOpen ? 0 : top); //set offset
+                            myob.myFloatingTable.css('top', top); //set offset
                             myob.myFloatingTable.width(width)
                         } else {
                             if(myob.hasFixedTableHeaderSet === true) {
