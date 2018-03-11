@@ -343,7 +343,7 @@ $useJSON = $data['useJSON'];
 
         </main>
 
-        <script src="https://code.jquery.com/jquery-git.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="../../javascript/jsurl.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/jquery.simplemodal-1.4.5?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/js.cookies.js?x=<?php echo rand(0,9999999999) ?>"></script>
