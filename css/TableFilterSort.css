@@ -137,8 +137,3 @@
 .fixed-header.tfs-filter-in-use .tfs-filter-form-holder {
     z-index: 10;
 }
-
-.fixed-header.tfs-filter-in-use table thead {
-    z-index: 9;
-    display: table-header-group;
-}

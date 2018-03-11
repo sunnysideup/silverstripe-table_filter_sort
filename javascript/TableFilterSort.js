@@ -1,6 +1,9 @@
 if(typeof window.JSURL === 'undefined') {
     var JSURL = require('./jsurl.js');
 }
+if(typeof window.doT === 'undefined') {
+    var doT = require('./doT.js');
+}
 
 
 jQuery(document).ready(
@@ -65,6 +68,12 @@ jQuery(document).ready(
 
             /**
              *
+             * @type {function}
+             */
+            templateRowCompiled: null,
+
+            /**
+             *
              * @type string
              */
             placeholderStartDelimiter: '{{',
@@ -74,6 +83,20 @@ jQuery(document).ready(
              * @type {string}
              */
             placeholderEndDelimiter: '}}',
+
+            /**
+             * in the template, you can write
+             * [[start VARIABLE_NAME]]
+             * [[end VARIABLE_NAME]]
+             * @type string
+             */
+            placeholderLoopStartDelimiter: '[[',
+
+            /**
+             *
+             * @type {string}
+             */
+            placeholderLoopEndDelimiter: ']]',
 
             /**
              *
@@ -1010,14 +1033,20 @@ jQuery(document).ready(
                 if(myob.useJSON) {
                     if(myob.templateRow.length === 0) {
                         if(myob.myTable.find(myob.rowSelector).length === 1) {
-                            myob.templateRow = myob.myTableBody.clone().html();
-                            myob.myTableBody.empty();
+                            myob.buildTemplateRow();
                         }
                     }
                 }
                 myob.myTable.css('table-layout', 'fixed');
                 //base URL
                 myob.baseURL = location.protocol + '//' + location.host + location.pathname + location.search;
+            },
+
+            buildTemplateRow: function()
+            {
+                myob.templateRow = myob.myTableBody.clone().html();
+                myob.templateRowCompiled = doT.template(myob.templateRow);
+                myob.myTableBody.empty();
             },
 
             buildFloatingHeaderTable: function()
@@ -1432,7 +1461,7 @@ jQuery(document).ready(
                                                     }
                                                     spanParent.remove();
                                                     if(myob.useJSON) {
-                                                        myob.templateRow = myob.myTableBody.html();
+                                                        myob.buildTemplateRow();
                                                     }
                                                 }
                                             }
@@ -2887,36 +2916,27 @@ jQuery(document).ready(
             buildRows: function()
             {
                 myob.profileStarter('buildRows');
+                console.debug(myob.templateRowCompiled);
                 var dd = myob.dataDictionary;
-                var pre = myob.placeholderStartDelimiter;
-                var post = myob.placeholderEndDelimiter;
                 var html = '';
                 for(var i = 0; i < myob.myRowsVisible.length; i++) {
-                    rowID = myob.myRowsVisible[i];
-                    innerHtml = myob.templateRow;
-                    hasDoneID = false;
+                    var rowData = {};
+                    rowData.RowID = myob.myRowsVisible[i];
                     for(category in dd) {
                         if (dd.hasOwnProperty(category)) {
                             //category info
                             var ddc = dd[category]
-                            var values = ddc['Values'][rowID];
-                            for(var j = 0; j < values.length; j++) {
-                                var value = values[j];
-                                searchValue = pre+category+post;
-                                //easiest way to avoid regex, etc...
-                                innerHtml = innerHtml.split(searchValue).join(value);
-                            }
-
-                            //also replace the row ID
-                            if(hasDoneID === false) {
-                                hasDoneID = true;
-                                searchValue = pre+'RowID'+post;
-                                //easiest way to avoid regex, etc...
-                                innerHtml = innerHtml.split(searchValue).join(rowID);
+                            var values = ddc['Values'][rowData.RowID];
+                            if(typeof values !== 'undefined') {
+                                for(var j = 0; j < values.length; j++) {
+                                    var value = values[j];
+                                    rowData[category] = value;
+                                }
                             }
                         }
                     }
-                    html += innerHtml;
+                    console.debug(rowData);
+                    html += myob.templateRowCompiled(rowData);
                 }
                 if(html.length > 0) {
                     myob.myTableBody.html(html);

@@ -8,6 +8,7 @@ class TableFilterSortAPI extends Object
         'table_filter_sort/javascript/js.cookies.js',
         'table_filter_sort/javascript/jquery.simplemodal-1.4.5.js',
         'table_filter_sort/javascript/awesomplete.js',
+        'table_filter_sort/javascript/doT.js',
         'table_filter_sort/javascript/TableFilterSort.js'
     );
 
@@ -28,9 +29,7 @@ class TableFilterSortAPI extends Object
 
     public static function add_settings($array)
     {
-        foreach ($array as $key => $value) {
-            self::$_jsSettingArray[$key] = $value;
-        }
+        self::$_jsSettingArray = self::$_jsSettingArray + $array;
     }
 
     public static function remove_setting($key)
