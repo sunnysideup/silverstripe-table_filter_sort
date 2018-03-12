@@ -1,8 +1,8 @@
 if(typeof window.JSURL === 'undefined') {
-    var JSURL = require('./jsurl.js');
+    var JSURL = require('jsurl');
 }
 if(typeof window.doT === 'undefined') {
-    var doT = require('./doT.js');
+    var doT = require('dot');
 }
 
 
