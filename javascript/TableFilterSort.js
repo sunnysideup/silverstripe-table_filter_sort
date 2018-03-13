@@ -1,8 +1,8 @@
 if(typeof window.JSURL === 'undefined') {
-    var JSURL = require('./jsurl.js');
+    var JSURL = require('jsurl');
 }
 if(typeof window.doT === 'undefined') {
-    var doT = require('./doT.js');
+    var doT = require('dot');
 }
 
 
@@ -71,32 +71,6 @@ jQuery(document).ready(
              * @type {function}
              */
             templateRowCompiled: null,
-
-            /**
-             *
-             * @type string
-             */
-            placeholderStartDelimiter: '{{',
-
-            /**
-             *
-             * @type {string}
-             */
-            placeholderEndDelimiter: '}}',
-
-            /**
-             * in the template, you can write
-             * [[start VARIABLE_NAME]]
-             * [[end VARIABLE_NAME]]
-             * @type string
-             */
-            placeholderLoopStartDelimiter: '[[',
-
-            /**
-             *
-             * @type {string}
-             */
-            placeholderLoopEndDelimiter: ']]',
 
             /**
              *
@@ -296,6 +270,7 @@ jQuery(document).ready(
             /**
              * to keep field options simple ...
              * MyFieldA:
+             *    Label: 'Field A'
              *    CanFilter: true
              *    CanSort: false
              *    DataType: number | string | date
@@ -303,6 +278,7 @@ jQuery(document).ready(
              *    Values: {RowID1: [A], [RowID2]: [B], 3: RowID: [C]}
              *    IsEditable: false
              * MyFieldB:
+             *    Label: 'Field Bee'
              *    CanFilter: true
              *    CanSort: false
              *    DataType: number | string | date
@@ -1259,23 +1235,32 @@ jQuery(document).ready(
                 if(typeof myob.dataDictionary[category] === "undefined") {
                     myob.dataDictionary[category] = {}
                 }
-                if(typeof myob.dataDictionary[category]['CanFilter'] === "undefined") {
-                    myob.dataDictionary[category]['CanFilter'] = null;
+                if(typeof myob.dataDictionary[category]['Built'] === 'undefined') {
+                    myob.dataDictionary[category]['Built'] = false;
                 }
-                if(typeof myob.dataDictionary[category]['CanSort'] === "undefined") {
-                    myob.dataDictionary[category]['CanSort'] = null;
-                }
-                if(typeof myob.dataDictionary[category]['DataType'] === "undefined") {
-                    myob.dataDictionary[category]['DataType'] = '';
-                }
-                if(typeof myob.dataDictionary[category]['Options'] === "undefined") {
-                    myob.dataDictionary[category]['Options'] = [];
-                }
-                if(typeof myob.dataDictionary[category]['Values'] === "undefined") {
-                    myob.dataDictionary[category]['Values'] = {};
-                }
-                if(typeof myob.dataDictionary[category]['IsEditable'] === "undefined") {
-                    myob.dataDictionary[category]['IsEditable'] = null;
+                if(myob.dataDictionary[category]['Built'] === false) {
+                    if(typeof myob.dataDictionary[category]['Label'] === "undefined") {
+                        myob.dataDictionary[category]['Label'] = category;
+                    }
+                    if(typeof myob.dataDictionary[category]['CanFilter'] === "undefined") {
+                        myob.dataDictionary[category]['CanFilter'] = null;
+                    }
+                    if(typeof myob.dataDictionary[category]['CanSort'] === "undefined") {
+                        myob.dataDictionary[category]['CanSort'] = null;
+                    }
+                    if(typeof myob.dataDictionary[category]['DataType'] === "undefined") {
+                        myob.dataDictionary[category]['DataType'] = '';
+                    }
+                    if(typeof myob.dataDictionary[category]['Options'] === "undefined") {
+                        myob.dataDictionary[category]['Options'] = [];
+                    }
+                    if(typeof myob.dataDictionary[category]['Values'] === "undefined") {
+                        myob.dataDictionary[category]['Values'] = {};
+                    }
+                    if(typeof myob.dataDictionary[category]['IsEditable'] === "undefined") {
+                        myob.dataDictionary[category]['IsEditable'] = null;
+                    }
+                    myob.dataDictionary[category]['Built'] = true;
                 }
             },
 
@@ -1339,6 +1324,22 @@ jQuery(document).ready(
                     return;
                 }
                 myob.dataDictionary[category]['Options'].splice(index, 1);
+            },
+
+
+            setCategoryLabel: function(category, label)
+            {
+                if(typeof label === 'undefined') {
+                    label = myob.replaceAll(category, '-', ' ');
+                }
+                myob.dataDictionary[category]['Label'] = label;
+
+                return myob;
+            },
+
+            getCategoryLabel: function(category)
+            {
+                return myob.dataDictionary[category]['Label'];
             },
 
             /**
@@ -1630,6 +1631,7 @@ jQuery(document).ready(
 
             /**
              * set up filter listeners ...
+             * open and close filter form, etc...
              */
             setupFilterFormListeners: function()
             {
@@ -2176,7 +2178,7 @@ jQuery(document).ready(
                 if (type === 'checkbox') {
                     html += '<span class="' + myob.inverseSelectionFilterClass + '"><i class="material-icons">flip</i></span>';
                 }
-                html += '<label class="'+myob.groupLabelClass+'">' + myob.replaceAll(category, '-', ' ') + '</label>';
+                html += '<label class="'+myob.groupLabelClass+'">' + myob.getCategoryLabel(category) + '</label>';
                 html += '<ul>';
                 return html;
             },
@@ -3179,7 +3181,7 @@ jQuery(document).ready(
                                 }
                             );
                             if(typeof myob.cfi[category] !== "undefined") {
-                                var leftLabel = categoryHolder.find('label.'+myob.groupLabelClass).text();
+                                var leftLabel = myob.getCategoryLabel(category);
                                 html += "<li class=\"category\"><strong>" + leftLabel + ":</strong> <span>" + vtms.join('</span><span>') + "</span></li>";
                             }
                         }
