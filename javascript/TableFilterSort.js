@@ -1450,7 +1450,7 @@ jQuery(document).ready(
                                             if(value === "" || el.hasClass('ignore-content')){
                                                 // do nothing
                                             } else {
-                                                commonContent += "<li><strong>"+category + ":</strong> <span>" + value + "</span></li>";
+                                                commonContent += "<li><strong>"+myob.getCategoryLabel(category) + ":</strong> <span>" + value + "</span></li>";
                                                 commonContentAdded = true;
                                             }
                                         }
