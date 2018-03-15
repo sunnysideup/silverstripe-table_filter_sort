@@ -2950,12 +2950,9 @@ jQuery(document).ready(
                         if (dd.hasOwnProperty(category)) {
                             //category info
                             var ddc = dd[category]
-                            var values = ddc['Values'][rowData.RowID];
-                            if(typeof values !== 'undefined') {
-                                for(var j = 0; j < values.length; j++) {
-                                    var value = values[j];
-                                    rowData[category] = value;
-                                }
+                            var valueOrValues = ddc['Values'][rowData.RowID];
+                            if(typeof valueOrValues !== 'undefined') {
+                                rowData[category] = valueOrValues;
                             }
                         }
                     }
