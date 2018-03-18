@@ -1,10 +1,8 @@
+
 /*
  * **********************************************
  * BASICS
  */
-
-
-
 .tfs-holder * {
     font-family: sans-serif;
     font-size: 13px;
@@ -23,7 +21,7 @@
 }
 
 .tfs-holder a {
-    color: #3498db;
+    color: #005994;
 }
 
 .tfs-holder ul {
@@ -37,6 +35,29 @@
     list-style: none;
 }
 
+/*
+ * **********************************************
+ * BACKGROUND-COLOUR
+ */
+
+.header-block {
+    background-color: #555;
+    border-bottom: 2px solid #fff;
+    clear: both;
+}
+.header-block * {
+    color: #fff;
+}
+
+.tfs-holder table thead td,
+.tfs-holder table thead th
+{
+    background-color: #777;
+}
+
+.filter-is-open.tfs-holder .tfs-filter-form-holder {
+    background-color: #333;
+}
 
 /*
  * **********************************************
@@ -66,7 +87,6 @@
 
 .total-showing-row-number input {
     width: 5em;
-    background-color: tranparent;
     border: 1px solid #bbb;
     border-radius: 5px;
     text-align: right;
@@ -100,21 +120,16 @@
 
 /*
  * **********************************************
- * MORE ..
+ * COMMON CONTENT
  */
 
-.tfs-common-content-holder {
-    clear: both;
-    border: 1px solid #fff;
-    background-color: crimson;
+
+.tfs-holder .tfs-common-content-holder  {
     padding: 10px;
-    color: #fff;
 }
 
-.tfs-common-content-holder * {
-    padding: 0;
-    margin: 0;
-    color: #fff;
+.tfs-holder .tfs-common-content-holder ul li {
+    padding: 0.5em 0;
 }
 
 .no-matches-message {
@@ -137,37 +152,39 @@
 /**
  * all # need to be replaced by %23
  */
-
+.tfs-action a{
+    opacity: 0.5;
+}
 .tfs-holder .save a {
-    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%233498db" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>');
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23FFFFFF" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>');
 }
 
 .tfs-holder .save a:hover {
-    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%233498db" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>');
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23FFFFFF" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>');
 }
 
 .tfs-holder .load a {
-    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%233498db" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 19.59V8l-6-6H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c.45 0 .85-.15 1.19-.4l-4.43-4.43c-.8.52-1.74.83-2.76.83-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5c0 1.02-.31 1.96-.83 2.75L20 19.59zM9 13c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3-3 1.34-3 3z"/></svg>');
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23FFFFFF" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 19.59V8l-6-6H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c.45 0 .85-.15 1.19-.4l-4.43-4.43c-.8.52-1.74.83-2.76.83-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5c0 1.02-.31 1.96-.83 2.75L20 19.59zM9 13c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3-3 1.34-3 3z"/></svg>');
 }
 
 .tfs-holder .tfs-clear a {
-    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23DC143C" height="24" viewBox="0 0 24 24" width="24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23FFFFFF" height="24" viewBox="0 0 24 24" width="24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
 }
 
 .tfs-holder .tfs-open-filter-form a {
-    background-image: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" fill="%233498db" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>');
+    background-image: url('data:image/svg+xml;charset=UTF-8, <svg xmlns="http://www.w3.org/2000/svg" fill="%23FFFFFF" height="24" viewBox="0 0 24 24" width="24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
 }
 
 .filter-is-open.tfs-holder .tfs-open-filter-form a {
-    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%233498db" height="24" viewBox="0 0 24 24" width="24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23FFFFFF" height="24" viewBox="0 0 24 24" width="24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
 }
 
 .tfs-holder .filter-for-favourites a {
-    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%233498db" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>');
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23FFFFFF" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>');
 }
 
 .tfs-has-favourites-in-filter .filter-for-favourites a {
-    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%233498db" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23FFFFFF" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');
 }
 
 .tfs-holder .tfs-action {
@@ -194,6 +211,7 @@
 
 .tfs-holder .tfs-action a:hover {
     background-position: 0 -1px;
+    opacity: 1;
 }
 
 
@@ -201,11 +219,15 @@
  * **********************************************
  * FILTER FORM
  */
+.tfs-filter-form-holder select,
+.tfs-filter-form-holder input,
+.tfs-filter-form-holder textarea {
+    color: green;
+}
+
 
 .tfs-filter-form-holder {
     position: relative;
-    background-color: #ddd;
-    border: 1px solid #fff;
 }
 
 
@@ -282,12 +304,8 @@ li.tfs-save-and-load.save.filters,
 .tfs-no-match-count-holder,
 .tfs-match-count-holder {
     padding: 7px;
-    color: #555;
 }
-.tfs-no-match-count-holder *,
-.tfs-match-count-holder * {
-    color: #555;
-}
+
 /* show load unless filter is open */
 
 .tfs-has-filter li.tfs-save-and-load.load.filters,
@@ -297,11 +315,12 @@ li.tfs-save-and-load.save.filters,
     display: none;
 }
 
-.tfs-save-and-load.save.filters.tfs-action,
-.tfs-save-and-load.load.filters.tfs-action {
+
+.tfs-open-filter-form.tfs-action.open-filter {
     clear: none;
     margin-right: 1em;
 }
+
 /*
  * **********************************************
  * FORM STUFF
@@ -321,10 +340,9 @@ li.tfs-save-and-load.save.filters,
     height: 24px;
     width: auto;
     vertical-align: top;
-    margin-left: 0px;
-    position: absolute;
     display: block!important;
     width: 210px!important;
+    float: right;
 }
 
 
@@ -356,15 +374,19 @@ li.tfs-save-and-load.save.filters,
 
 .tfs-filter-form-inner .tfs-filter-column {
     margin: 10px 10px 10px 0;
-    border-left: 1px solid #ccc;
-    border-top: 1px solid #ccc;
+    border-left: 1px solid rgba(255,255,255,0.3);
+    border-top: 1px solid  rgba(255,255,255,0.3);
     padding: 10px 0 0 10px;
+    height: 17em;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .tfs-filter-form-inner label.tfs-group-label {
     font-weight: bold;
-    padding-bottom: 10px;
-    display: block
+    margin: 0.5em 0;
+    display: block;
+    font-size: 17px!important;
 }
 .tfs-filter-form-inner .inverse-selection {
     cursor: pointer;
@@ -372,7 +394,7 @@ li.tfs-save-and-load.save.filters,
 }
 .tfs-filter-form-inner .inverse-selection i{
     font-size: 1.5em;
-    color: #777;
+    color: #fff;
 }
 .tfs-filter-form-inner .inverse-selection:hover {
     transform: rotateY(180deg);
@@ -398,7 +420,7 @@ li.tfs-save-and-load.save.filters,
     border: 1px solid #fff;
     margin: 0 0 5px 0;
     border-radius: 5px;
-    width: calc(100% - 10px);
+    width: calc(100% - 12px);
     outline: none;
 }
 
@@ -454,7 +476,7 @@ li.tfs-save-and-load.save.filters,
 .tfs-current-search-holder,
 .tfs-current-search-holder .category strong,
 .tfs-current-search-holder ul li span {
-    color: #555;
+    color: #fff;
 }
 .tfs-current-search-holder {
     margin-top: 0.5em;
@@ -482,17 +504,22 @@ li.tfs-save-and-load.save.filters,
     margin-right: auto;
 }
 
-.tfs-holder table th,
-.tfs-holder table td {
-    border: 1px solid #fff;
-    background-color: #ddd;
+.tfs-holder table tbody th,
+.tfs-holder table tbody td {
+    border-bottom: 1px solid rgba(255,255,255, 0.6);
+    border-left: 1px solid rgba(255,255,255, 0.1);
+    border-radius: 2px;
+    background-color: #999;
     text-align: left;
-    padding: 10px;
+    padding: 0.7vw;
     vertical-align: top;
+}
+.tfs-holder table tr th:first-child,
+.tfs-holder table tr td:first-child {
+    border-left: none;
 }
 
 .tfs-holder table thead th {
-    background-color: crimson;
     color: #fff;
 }
 
@@ -502,20 +529,12 @@ li.tfs-save-and-load.save.filters,
  * FIXED HEADER
  */
 
-.fixed-header.tfs-filter-in-use .tfs-filter-form-holder {
-    box-sizing: border-box;
-    background-color: #b5b5b5;
-    border: 1px solid #fff;
-}
 
 
 /*
  * **********************************************
  * TABLE ROWS
  */
-
-.tfs-holder tr.match {
-}
 
 
 
@@ -540,8 +559,10 @@ li.tfs-save-and-load.save.filters,
  */
 
 .tfs-holder table th a,
-.tfs-holder th span.dl {
-    border-bottom: 1px dotted #000;
+.tfs-holder th span.dl,
+.tfs-holder td span.dl {
+    border-bottom: 1px dotted #333;
+    display: inline-block;
 }
 
 
@@ -549,14 +570,11 @@ li.tfs-save-and-load.save.filters,
     color: #fff;
 }
 
-.tfs-holder td span.dl {
-    border-bottom: 1px dotted #000;
-}
-
 .tfs-holder span.dl-on {
-    color: #000!important;
-    border-bottom: none!important;
+    color: #fff!important;
     font-weight: bold;
+    background-color: green;
+    padding: 0 5px;
 }
 
 

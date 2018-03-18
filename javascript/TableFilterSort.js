@@ -2739,22 +2739,22 @@ jQuery(document).ready(
                 myob.profileStarter('setTableWidth');
                 if(myob.fixedHeaderClass) {
                     myob.removeFixedTableHeader();
-                    //just in case ...
-                    if(myob.myTableHolder.isOnScreen()) {
-
-                    }
-                    //THIS HAS BEEN REMOVED AS ALL FLOATING HEADER LOGIC IS IN FIXTABLEHEADER
-                    var filterFormIsOpen = myob.myTableHolder.hasClass(myob.filterIsOpenClass);
-                    if(filterFormIsOpen === false) {
-                        //weird? why add twice?????
-                        // if(myob.myTableHolder.find('.tfspushdowndiv').length === 0) {
-                        //     jQuery('<div class="tfspushdowndiv"></div>').insertBefore(myob.myTable);
-                        // }
-                    } else {
-                        if(myob.myTableHolder.find('.tfspushdowndiv').length > 0) {
-                            //remove tfspushdowndiv
-                        }
-                    }
+                    // //just in case ...
+                    // if(myob.myTableHolder.isOnScreen()) {
+                    //
+                    // }
+                    // //THIS HAS BEEN REMOVED AS ALL FLOATING HEADER LOGIC IS IN FIXTABLEHEADER
+                    // var filterFormIsOpen = myob.myTableHolder.hasClass(myob.filterIsOpenClass);
+                    // if(filterFormIsOpen === false) {
+                    //     //weird? why add twice?????
+                    //     // if(myob.myTableHolder.find('.tfspushdowndiv').length === 0) {
+                    //     //     jQuery('<div class="tfspushdowndiv"></div>').insertBefore(myob.myTable);
+                    //     // }
+                    // } else {
+                    //     if(myob.myTableHolder.find('.tfspushdowndiv').length > 0) {
+                    //         //remove tfspushdowndiv
+                    //     }
+                    // }
                 }
                 myob.profileEnder('setTableWidth');
             },
@@ -2794,7 +2794,7 @@ jQuery(document).ready(
 
                             var width = myob.myTableHead.width();
                             myob.myFilterFormHolder.width(width);
-                            myob.myFloatingTable.width(width+1)
+                            myob.myFloatingTable.width(width)
                             // myob.myFloatingTable("thead").width(width)
 
                             var top = myob.myFilterFormHolder.outerHeight(true)-2;

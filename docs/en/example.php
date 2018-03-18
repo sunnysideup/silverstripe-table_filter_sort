@@ -12,35 +12,35 @@ function create_test()
     $templateRow = '';
     if($useJSON) {
         $templateRow = '
-        <tr class="tfstr" id="{{RowID}}">
+        <tr class="tfstr" id="{{=it.RowID}}">
             <th scope="row">
                 <a href="#" class="more">+</a>
                 <a href="#" class="adf" title="Add to Favourites">♥</a>
-                <span data-filter="SKU">{{SKU}}</span><br>
+                <span data-filter="SKU">{{=it.SKU}}</span><br>
                 <p style="display: none;" class="hidden">
                     Some more content goes here.
                 </p>
             </th>
-            <td><span data-filter="Type">{{Type}}</span></td>
-            <td><span data-filter="Original Producer">{{Original Producer}}</span></td>
-            <td><span data-filter="Colour" class="dl">{{Colour}}</span></td>
-            <td><span data-filter="Size">{{Size}}</span></td>
-            <td><span data-filter="Weight">{{Weight}}</span></td>
-            <td><span data-filter="Price">{{Price}}</span></td>
-            <td><span data-filter="Rating">{{Rating}}</span></td>
+            <td><span data-filter="Type">{{=it.Type}}</span></td>
+            <td><span data-filter="OriginalProducer">{{=it.OriginalProducer}}</span></td>
+            <td><span data-filter="Colour" class="dl">{{=it.Colour}}</span></td>
+            <td><span data-filter="Size">{{=it.Size}}</span></td>
+            <td><span data-filter="Weight">{{=it.Weight}}</span></td>
+            <td><span data-filter="Price">{{=it.Price}}</span></td>
+            <td><span data-filter="Rating">{{=it.Rating}}</span></td>
             <td>
-                <p>Lorem ipsum dolor sit amet consectetur adipiscing elit cum nullam, risus posuere ligula eget ullamcorper orci ultricies neque lobortis suspendisse, sodales accumsan mus eleifend vulputate magna ornare at.</p>
-                <div style="display: none;" class="hidden">
-                    <ul>
-                        <li><span data-filter="Tags" class="dl">{{Tags}}</span></li>
-                        <li><span data-filter="Tags" class="dl">{{Tags}}</span></li>
-                        <li><span data-filter="Tags" class="dl">{{Tags}}</span></li>
+                <ul>
+                    {{~it.Tags : Tag}}
+                    <li><span data-filter="Tags" class="dl">{{=Tag}}</span></li>
+                    {{~}}
                     </ul>
+                <div style="display: none;" class="hidden">
+                    <p>Lorem ipsum dolor sit amet consectetur adipiscing elit cum nullam, risus posuere ligula eget ullamcorper orci ultricies neque lobortis suspendisse, sodales accumsan mus eleifend vulputate magna ornare at.</p>
                 </div>
             </td>
             <td>
-                your description: <input name="rating" data-filter="your description" type="text" data-tfsvalue="{{InputValue}}">
-                your selected: <select name="selection" data-filter="your selection" data-tfsvalue="{{SelectValue}}">
+                your description: <input name="rating" data-filter="your description" type="text" data-tfsvalue="{{=it.InputValue}}">
+                your selected: <select name="selection" data-filter="your selection" data-tfsvalue="{{=it.SelectValue}}">
                     <option value="yes">yes</option>
                     <option value="no">no</option>
                     <option value="maybe">maybe</option>
@@ -64,7 +64,7 @@ function create_test()
         $jsonArray[$id] = [
             'SKU' => ($i+1),
             'Type' => $type,
-            'Original Producer' => $producer,
+            'OriginalProducer' => $producer,
             'Colour' => $colours[rand(0, count($colours)-1)],
             'Size' => $sizes[rand(0,count($sizes)-1)],
             'Weight' => rand(1,100),
@@ -93,20 +93,20 @@ function create_test()
                     </p>
                 </th>
                 <td><span data-filter="Type">'.$type.'</span></td>
-                <td><span data-filter="Original Producer">'.$producer.'</span></td>
+                <td><span data-filter="OriginalProducer">'.$producer.'</span></td>
                 <td><span data-filter="Colour" class="dl">'.$rowData['Colour'].'</span></td>
                 <td><span data-filter="Size">'.$rowData['Size'].'</span></td>
                 <td><span data-filter="Weight">'.$rowData['Weight'].'kg.</span></td>
                 <td><span data-filter="Price">$'.$rowData['Price'].'</span></td>
                 <td><span data-filter="Rating">'.$rowData['Rating'].' Stars</span></td>
                 <td>
-                    <p>'.$lipsum->sentence().'</p>
+                    <ul>
+                        <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][0].'</span></li>
+                        <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][1].'</span></li>
+                        <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][2].'</span></li>
+                    </ul>
                     <div style="display: none;" class="hidden">
-                        <ul>
-                            <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][0].'</span></li>
-                            <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][1].'</span></li>
-                            <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][2].'</span></li>
-                        </ul>
+                    <p>'.$lipsum->sentence().'</p>
                     </div>
                 </td>
                 <td>
@@ -170,6 +170,7 @@ $useJSON = $data['useJSON'];
             data-filters-parent-page-id="Test Filters"
             data-favourites-parent-page-id="Test Favourites"
         >
+
             <div class="loading-screen">
                 <p class="loader">loading ...</p>
                 <div class="load-bar">
@@ -178,14 +179,34 @@ $useJSON = $data['useJSON'];
                     <div class="bar"></div>
                 </div>
             </div>
-            <div class="tfs-filter-form-holder">
+
+            <div class="tfs-more-entries pagination-top">
+                <span class="line">
+                    <span class="pagination"></span>
+                </span>
+            </div>
+
+            <div class="tfs-current-favourites header-block">
+                <ul>
+                    <li class="filter-for-favourites tfs-action">
+                        <a href="#">Show Favourites</a>
+                    </li>
+                    <li class="tfs-save-and-load load favourites tfs-action">
+                        <a href="#">Load Favourites</a>
+                    </li>
+                    <li class="tfs-save-and-load save favourites tfs-action">
+                        <a href="#">Save Favourites</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tfs-common-content-holder header-block" data-title="Common Info"></div>
+
+            <div class="tfs-filter-form-holder header-block">
                 <div class="tfs-filter-form-holder-section top left">
                     <ul>
                         <li class="tfs-open-filter-form tfs-action open-filter">
                             <a href="#">Create Filter</a>
-                        </li>
-                        <li class="tfs-save-and-load load filters tfs-action">
-                            <a href="#">Load Filter</a>
                         </li>
                         <li class="quick-keyword tfs-action">
                             <input name="QuickKeyword" placeholder="Quick Search ..." />
@@ -198,7 +219,9 @@ $useJSON = $data['useJSON'];
                         <li class="tfs-save-and-load save filters tfs-action">
                             <a href="#">Save Filter</a>
                         </li>
-
+                        <li class="tfs-save-and-load load filters tfs-action">
+                            <a href="#">Load Filter</a>
+                        </li>
                         <li class="tfs-current-search-holder" data-no-filter-text="No filter selected"></li>
                         <li class="tfs-match-count-holder">
                             <strong>Results:</strong>
@@ -232,29 +255,9 @@ $useJSON = $data['useJSON'];
 
             </div>
 
-            <div class="tfs-more-entries pagination-top">
-                <span class="line">
-                    <span class="pagination"></span>
-                </span>
-            </div>
 
-            <div class="tfs-common-content-holder" data-title="Common Info"></div>
-
-            <div class="tfs-current-favourites">
-                <ul>
-                    <li class="filter-for-favourites tfs-action">
-                        <a href="#">Show Favourites</a>
-                    </li>
-                    <li class="tfs-save-and-load load favourites tfs-action">
-                        <a href="#">Load Favourites</a>
-                    </li>
-                    <li class="tfs-save-and-load save favourites tfs-action">
-                        <a href="#">Save Favourites</a>
-                    </li>
-                </ul>
-            </div>
             <table class="tfs-table">
-                <thead>
+                <thead class="header-block">
                     <tr>
                         <th scope="col">
                             <a href="#"
@@ -348,6 +351,7 @@ $useJSON = $data['useJSON'];
         <script src="../../javascript/jquery.simplemodal-1.4.5?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/js.cookies.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/awesomplete.js?x=<?php echo rand(0,9999999999) ?>"></script>
+        <script src="../../javascript/doT.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script src="../../javascript/TableFilterSort.js?x=<?php echo rand(0,9999999999) ?>"></script>
         <script type="text/javascript">
             if(! Array.isArray(TableFilterSortVars)) {
@@ -357,7 +361,12 @@ $useJSON = $data['useJSON'];
                 {
                     debug: true,
                     mySelector: ".tfs-holder",
-                    rowRawData: <?php echo json_encode($jsonArray); ?>
+                    rowRawData: <?php echo json_encode($jsonArray); ?>,
+                    dataDictionary: {
+                        OriginalProducer: {
+                            Label: 'Original Producer'
+                        }
+                    }
                 }
             );
         </script>

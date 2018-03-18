@@ -123,8 +123,6 @@
 
 .fixed-header .tfs-filter-form-holder{
     z-index: 8;
-    background-color: #575757;
-    border-color: #999;
 }
 
 .fixed-header .tfs-current-search-holder{
