@@ -1740,7 +1740,8 @@ jQuery(document).ready(
                 myob.myFilterFormInner.on(
                     'click',
                     '.' +  myob.inverseSelectionFilterClass,
-                    function (e) {
+                    function (e, target) {
+                        jQuery(this).toggleClass('flipped');
                         jQuery(this).parent().find('input[type="checkbox"]').each(
                             function(i, el) {
                                 el = jQuery(el);
@@ -2220,6 +2221,9 @@ jQuery(document).ready(
              */
             makeFieldForForm: function(type, category, tabIndex, valueIndex)
             {
+                if(valueIndex === null) {
+                    return;
+                }
                 var cleanCategory = category.replace(/\W/g, '');
                 var cleanValue = valueIndex.toString().raw2safe().toLowerCase();
                 var valueID = ('TFS_' + cleanCategory + '_' + cleanValue).replace(/[^a-zA-Z0-9]+/g, '_');
@@ -2940,7 +2944,6 @@ jQuery(document).ready(
             buildRows: function()
             {
                 myob.profileStarter('buildRows');
-                console.debug(myob.templateRowCompiled);
                 var dd = myob.dataDictionary;
                 var html = '';
                 for(var i = 0; i < myob.myRowsVisible.length; i++) {
@@ -2956,7 +2959,6 @@ jQuery(document).ready(
                             }
                         }
                     }
-                    console.debug(rowData);
                     html += myob.templateRowCompiled(rowData);
                 }
                 if(html.length > 0) {
