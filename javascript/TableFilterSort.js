@@ -44,7 +44,7 @@ jQuery(document).ready(
              * turn on to see what is going on in console
              * @type {boolean}
              */
-            debug: false,
+            debug: true,
 
             /**
              * set to true if we use a templateRow
@@ -161,13 +161,13 @@ jQuery(document).ready(
 
 
             /**
-             *
+             * used for releasing
              * @type {boolean}
              */
-            millisecondsBetweenActionsShort: 10,
+            millisecondsBetweenActionsShort: 0,
 
             /**
-             *
+             * used for setting input updates, scroll updates, etc...
              * @type {boolean}
              */
             millisecondsBetweenActionsLong: 100,
@@ -1450,7 +1450,7 @@ jQuery(document).ready(
                                             if(value === "" || el.hasClass('ignore-content')){
                                                 // do nothing
                                             } else {
-                                                commonContent += "<li><strong>"+myob.getCategoryLabel(category) + ":</strong> <span>" + value + "</span></li>";
+                                                commonContent += "<li class=\"tfs-filter-column\"><strong>"+myob.getCategoryLabel(category) + ":</strong> <span>" + value + "</span></li>";
                                                 commonContentAdded = true;
                                             }
                                         }
@@ -1650,7 +1650,7 @@ jQuery(document).ready(
                         function(e) {
                             myob.setTableWidthAndFixHeader();
                         },
-                        myob.millisecondsBetweenActionsShort
+                        myob.millisecondsBetweenActionsLong
                     );
                 }
                 myob.profileEnder('fixTableHeaderListener');
@@ -2352,7 +2352,7 @@ jQuery(document).ready(
                     function() {
                         myob.runCurrentFilter();
                     },
-                    myob.millisecondsBetweenActionsLong
+                    myob.millisecondsBetweenActionsShort
                 );
             },
 
@@ -2456,7 +2456,7 @@ jQuery(document).ready(
                         function() {
                             myob.endRowManipulation();
                         },
-                        myob.millisecondsBetweenActionsLong
+                        myob.millisecondsBetweenActionsShort
                     );
                 }
                 myob.profileEnder('runCurrentSort');
@@ -2632,7 +2632,7 @@ jQuery(document).ready(
                     function() {
                         myob.endRowManipulation();
                     },
-                    myob.millisecondsBetweenActionsLong
+                    myob.millisecondsBetweenActionsShort
                 );
                 myob.profileEnder('runCurrentFilter');
             },
@@ -2656,7 +2656,7 @@ jQuery(document).ready(
                         function() {
                             myob.endRowManipulation();
                         },
-                        myob.millisecondsBetweenActionsLong
+                        myob.millisecondsBetweenActionsShort
                     );
                 }
                 myob.profileEnder('gotoPage');
@@ -2677,7 +2677,7 @@ jQuery(document).ready(
                     function() {
                         myob.endRowManipulation();
                     },
-                    myob.millisecondsBetweenActionsLong
+                    myob.millisecondsBetweenActionsShort
                 );
                 myob.profileEnder('reloadCurrentPage');
             },
@@ -2730,7 +2730,7 @@ jQuery(document).ready(
                         myob.setTableWidth();
                         myob.fixTableHeader();
                     },
-                    myob.millisecondsBetweenActionsLong
+                    myob.millisecondsBetweenActionsShort
                 );
             },
 
@@ -2832,7 +2832,7 @@ jQuery(document).ready(
                 //show the table as loading
                 myob.myTable.addClass(myob.hideClass);
 
-                myob.myTableHolder.find(myob.moreRowEntriesSelector).hide();
+                //myob.myTableHolder.find(myob.moreRowEntriesSelector).hide();
 
                 myob.setRowsWithDetails(true);
 
@@ -2984,9 +2984,21 @@ jQuery(document).ready(
                 );
                 Object.keys(myob.cfi).forEach(
                     function(categoryToMatch, categoryToMatchIndex) {
+                        var filterDetails = myob.cfi[categoryToMatch];
+                        var options = [];
+                        for(var i = 0; i < filterDetails.length; i++) {
+                            options.push(filterDetails[i]['vtm']);
+                        }
                         myob.myTableBody.find('['+myob.filterItemAttribute+'="' + categoryToMatch + '"]').each(
                             function(i, el) {
-                                jQuery(el).addClass(myob.selectedFilterItem);
+                                var elValue = jQuery(el).text().toString().raw2safe().toLowerCase();
+                                for(var i = 0; i < options.length; i++) {
+                                    var option = options[i]
+                                    if(elValue === option) {
+                                        jQuery(el).addClass(myob.selectedFilterItem);
+                                        break;
+                                    }
+                                }
                             }
                         );
                     }
@@ -3601,7 +3613,7 @@ jQuery(document).ready(
             {
                 var strA = a[0].toLowerCase();
                 var strB = b[0].toLowerCase();
-                if (strA == strB) {
+                if (strA === strB) {
                     return 0;
                 }
                 return strA > strB ? 1 : -1;
