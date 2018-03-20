@@ -53,6 +53,7 @@
 .tfs-holder table thead th
 {
     background-color: #777;
+    padding: 0.4vw;
 }
 
 .filter-is-open.tfs-holder .tfs-filter-form-holder {
@@ -429,10 +430,10 @@ li.tfs-save-and-load.save.filters,
  {
     display: block;
     padding: 5px;
-    background: #ccc;
-    border: 1px solid #fff;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.9);
     margin: 0 0 5px 0;
-    border-radius: 2px;
+    border-radius: 3px;
     width: calc(100% - 12px);
     outline: none;
 }
@@ -520,9 +521,8 @@ li.tfs-save-and-load.save.filters,
 .tfs-holder table tbody th,
 .tfs-holder table tbody td {
     border-bottom: 1px solid rgba(255,255,255, 0.6);
-    border-left: 1px solid rgba(255,255,255, 0.1);
-    border-radius: 2px;
-    background-color: #999;
+    border-left: 1px solid rgba(255,255,255, 0.4);
+    background-color: #e1e2e1;
     text-align: left;
     padding: 0.7vw;
     vertical-align: top;

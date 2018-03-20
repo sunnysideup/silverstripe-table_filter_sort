@@ -13,9 +13,9 @@ function create_test()
     if($useJSON) {
         $templateRow = '
         <tr class="tfstr" id="{{=it.RowID}}">
+            <td><a href="#" class="more">+</a></td>
+            <td><a href="#" class="adf" title="Add to Favourites">♥</a></td>
             <th scope="row">
-                <a href="#" class="more">+</a>
-                <a href="#" class="adf" title="Add to Favourites">♥</a>
                 <span data-filter="SKU">{{=it.SKU}}</span><br>
                 <p style="display: none;" class="hidden">
                     Some more content goes here.
@@ -84,9 +84,9 @@ function create_test()
         } else {
             $html .= '
             <tr class="tfstr hide" id="'.$id.'">
+                <td><a href="#" class="more">+</a></td>
+                <td><a href="#" class="adf" title="Add to Favourites">♥</a></td>
                 <th scope="row">
-                    <a href="#" class="more">+</a>
-                    <a href="#" class="adf" title="Add to Favourites">♥</a>
                     <span data-filter="SKU">'.$rowData['SKU'].'</span><br />
                     <p style="display: none;" class="hidden">
                         Some more content goes here.
@@ -259,6 +259,8 @@ $useJSON = $data['useJSON'];
             <table class="tfs-table">
                 <thead class="header-block">
                     <tr>
+                        <th>MORE</th>
+                        <th>MARK</th>
                         <th scope="col">
                             <a href="#"
                                 class="sortable"
