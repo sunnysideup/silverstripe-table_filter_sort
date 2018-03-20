@@ -89,9 +89,9 @@
 .total-showing-row-number input {
     width: 5em;
     border: 1px solid #bbb;
+    background-color: #eee;
     border-radius: 3px;
     text-align: right;
-    background-color: #eee;
 }
 
 
@@ -424,24 +424,35 @@ li.tfs-save-and-load.save.filters,
     display: block;
 }
 
+.header-block .tfs-filter-column input.text,
+.header-block .tfs-filter-column input.number,
+.header-block .tfs-filter-column input.awesomplete,
+.header-block .quick-keyword input
+{
+    width: 3em;
+    border: 1px solid rgba(255,255,255,0.9);
+    background-color: rgba(255,255,255,0.7);
+    border-radius: 3px;
+}
+.header-block .tfs-filter-column input.text:focus,
+.header-block .tfs-filter-column input.number:focus,
+.header-block .tfs-filter-column input.awesomplete:focus,
+.header-block .quick-keyword input:focus
+{
+    background-color: #fff;
+}
+
 .header-block .tfs-filter-column input.awesomplete,
 .header-block .tfs-filter-column input.keyword,
 .tfs-filter-form-holder .quick-keyword input
  {
     display: block;
     padding: 5px;
-    background: rgba(255,255,255,0.7);
-    border: 1px solid rgba(255,255,255,0.9);
     margin: 0 0 5px 0;
-    border-radius: 3px;
     width: calc(100% - 12px);
     outline: none;
 }
 
-.header-block .tfs-filter-column input.keyword {
-    background-color: #fff;
-    border: 1px solid #ccc;
-}
 
 .header-block .tfs-filter-column.tagFilter .awesomplete>ul {
     min-width: auto!important;
