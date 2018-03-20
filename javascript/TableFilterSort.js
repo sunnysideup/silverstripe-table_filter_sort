@@ -1133,7 +1133,6 @@ jQuery(document).ready(
             whatIsIncluded: function()
             {
                 //are we saving favourites?
-                myob.favouritesParentPageID = myob.myTableHolder.attr("data-favourites-parent-page-id");
                 if(typeof myob.favouritesParentPageID === 'string' && myob.favouritesParentPageID.length > 0) {
                     myob.hasFavouritesSaving = true;
                 } else {
@@ -1149,7 +1148,6 @@ jQuery(document).ready(
                 }
 
                 //are we saving filter?
-                myob.filtersParentPageID = myob.myTableHolder.attr("data-filters-parent-page-id");
                 if(typeof myob.filtersParentPageID === 'string' && myob.filtersParentPageID.length > 0) {
                     myob.hasFilterSaving = true;
                 } else {
@@ -1205,6 +1203,10 @@ jQuery(document).ready(
                                 }
                             }
                         }
+                    }
+                    var firstRow = myob.myRows.first()
+                    if(i === 0) {
+                        myob.hasFavourites = firstRow.find(myob.favouriteLinkSelector).length > 0 ? true : false;
                     }
                 } else {
                     myob.myRows.each(

@@ -165,11 +165,7 @@ $useJSON = $data['useJSON'];
             <p>Below the table is an examle of the <a href="#html">HTML</a> you need to use.</p>
         </header>
 
-        <main
-            class="tfs-holder loading"
-            data-filters-parent-page-id="Test Filters"
-            data-favourites-parent-page-id="Test Favourites"
-        >
+        <main class="tfs-holder loading">
 
             <div class="loading-screen">
                 <p class="loader">loading ...</p>
@@ -364,6 +360,8 @@ $useJSON = $data['useJSON'];
                     debug: true,
                     mySelector: ".tfs-holder",
                     rowRawData: <?php echo json_encode($jsonArray); ?>,
+                    filtersParentPageID: 'Test Filter',
+                    favouritesParentPageID: 'Test Favourites',                    
                     dataDictionary: {
                         OriginalProducer: {
                             Label: 'Original Producer'
