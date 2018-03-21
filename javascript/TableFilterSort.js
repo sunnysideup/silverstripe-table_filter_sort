@@ -44,7 +44,7 @@ jQuery(document).ready(
              * turn on to see what is going on in console
              * @type {boolean}
              */
-            debug: false,
+            debug: true,
 
             /**
              * set to true if we use a templateRow
@@ -117,6 +117,7 @@ jQuery(document).ready(
 
             /**
              * the code for all pages that share the same favourites
+             * you need this for saving the favourites.
              * @type {string}
              */
             favouritesParentPageID: '',
@@ -320,6 +321,7 @@ jQuery(document).ready(
 
             /**
              * can favourites be selected by user?
+             * this is simply checked in HTML - we check if there is a selector.
              * @type {boolean}
              */
             hasFavourites: false,
@@ -332,7 +334,7 @@ jQuery(document).ready(
             hasFormElements: false,
 
             /**
-             *
+             * is there a place to save it to?
              * @type {boolean}
              */
             hasFavouritesSaving: false,
@@ -1204,18 +1206,11 @@ jQuery(document).ready(
                             }
                         }
                     }
-                    var firstRow = myob.myRows.first()
-                    if(i === 0) {
-                        myob.hasFavourites = firstRow.find(myob.favouriteLinkSelector).length > 0 ? true : false;
-                    }
                 } else {
                     myob.myRows.each(
                         function(i, row) {
                             var row = jQuery(row);
                             rowID = jQuery(row).attr('id');
-                            if(i === 0) {
-                                myob.hasFavourites = row.find(myob.favouriteLinkSelector).length > 0 ? true : false;
-                            }
                             row.find('[' + myob.filterItemAttribute + ']').each(
                                 function(j, el) {
                                     el = jQuery(el);
@@ -1238,6 +1233,9 @@ jQuery(document).ready(
                         }
                     );
                 }
+                //also check favourites:
+                myob.hasFavourites = myob.myRows.find(myob.favouriteLinkSelector).length > 0 ? true : false;
+
                 myob.profileEnder('filterItemCollector');
             },
 
@@ -1969,7 +1967,10 @@ jQuery(document).ready(
                                     }
                                 }
                                 if(typeof Cookies !== 'undefined') {
+                                    alert('set cookie');
                                     Cookies.set('mfv', myob.mfv, {path: myob.baseURL, expires: 180});
+                                } else {
+                                    alert('do not set cookie');
                                 }
                             }
                             if(myob.mfv.length > 0) {
@@ -1988,10 +1989,13 @@ jQuery(document).ready(
                         function(event){
                             event.preventDefault();
                             var filterToTriger = myob.myFilterFormInner.find('input[name="Favourites"]').first();
+
+                            //remove if already set
                             if(filterToTriger.prop('checked') === true){
                                 filterToTriger.prop('checked', false).trigger('change');
                             }
                             else {
+                                //add it not set.
                                 myob.myFilterFormHolder.find('.' + myob.clearFilterClass + ' a').click();
                                 var filterToTriger = myob.myFilterFormInner.find('input[name="Favourites"]').first();
                                 filterToTriger.prop('checked', true).trigger('change');
@@ -2021,16 +2025,19 @@ jQuery(document).ready(
                             var myParent = myEl.closest('.' + myob.saveAndLoadClass);
                             //get connection type details
                             var url = myob.serverConnectionURL;
-                            var isFilter = false;
+                            var isFilter = true;
                             var isSave = false;
                             var parentPageID = myob.filtersParentPageID;
                             var variables = myob.filterAndSortVariables;
                             if(myParent.hasClass('filters')) {
-                                isFilter = true;
+                                //do nothing
                             }
                             else if(myParent.hasClass('favourites')) {
                                 parentPageID = myob.favouritesParentPageID;
                                 variables = myob.favouritesVariables;
+                                isFilter = false;
+                            } else {
+                                isFilter = false;
                             }
                             if(myParent.hasClass('save')) {
                                 isSave = true;
@@ -2517,7 +2524,8 @@ jQuery(document).ready(
                                         //what is the value .. if it matches, the row is OK and we can go to next category ...
                                         if(stillLookingForValue) {
                                             if(categoryToMatch === myob.favouritesCategoryTitle) {
-
+                                                console.debug('looking for '+categoryToMatch);
+                                                console.debug('row ID' + rowID);
                                                 if(typeof rowID !== 'undefined' && rowID.length > 0) {
                                                     if(myob.mfv.indexOf(rowID) > -1) {
                                                         rowMatchesForFilterGroup = true;
@@ -2964,9 +2972,11 @@ jQuery(document).ready(
                     html += myob.templateRowCompiled(rowData);
                 }
                 if(html.length > 0) {
-                    myob.myTableBody.html(html);
+                    var htmlObj = jQuery(html);
+
+                    //set inputs
                     var selectorPhrase = 'input['+myob.inputValueDataAttribute+'], select['+myob.inputValueDataAttribute+'], textarea['+myob.inputValueDataAttribute+']'
-                    myob.myTableBody.find(selectorPhrase).each(
+                    htmlObj.find(selectorPhrase).each(
                         function(i, el) {
                             var el = jQuery(el)
                             var value = el.attr(myob.inputValueDataAttribute);
@@ -2974,6 +2984,10 @@ jQuery(document).ready(
                             jQuery(el).val(value);
                         }
                     );
+
+                    //highlight favourites
+
+                    myob.myTableBody.html(html);
                 }
                 myob.profileEnder('buildRows');
             },
@@ -3716,7 +3730,7 @@ jQuery(document).ready(
                     console.log('_______________________ BOOLEANS');
                     console.debug(booleans);
                     console.log('_______________________ STRINGS');
-                    console.debug(strings);
+                    console.lo(strings);
                     console.log('_______________________ NUMBERS');
                     console.debug(numbers);
                     console.log('_______________________ ARRAYS');
