@@ -2768,6 +2768,7 @@ jQuery(document).ready(
             removeFixedTableHeader: function()
             {
                 myob.myTableHolder.removeClass(myob.fixedHeaderClass);
+                myob.myTableHolder.find('#tableHolder').css('margin-top', 0);
                 myob.hasFixedTableHeaderSet = false;
             },
 
@@ -2792,9 +2793,7 @@ jQuery(document).ready(
                             myob.myTableHolder.removeClass(myob.filterIsOpenClass);
                             myob.myFilterFormInner.slideUp(0)
 
-
                             myob.myTableHolder.addClass(myob.fixedHeaderClass); //class for pos fixed
-
 
                             myob.hasFixedTableHeaderSet = true;
 
@@ -2805,6 +2804,7 @@ jQuery(document).ready(
 
                             var top = myob.myFilterFormHolder.outerHeight(true)-2;
                             myob.myFloatingTable.css('top', top); //set offset
+                            myob.myTableHolder.find('#tableHolder').css('margin-top', myob.myFilterFormHolder.outerHeight(true)+9);
                         } else {
                             if(myob.hasFixedTableHeaderSet === true) {
                                 myob.hasFixedTableHeaderSet = false;
