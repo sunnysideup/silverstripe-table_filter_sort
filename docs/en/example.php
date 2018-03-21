@@ -27,11 +27,13 @@ function create_test()
             <td><span data-filter="Price">{{=it.Price}}</span></td>
             <td><span data-filter="Rating">{{=it.Rating}}</span></td>
             <td>
+                {{?it.Tags}}
                 <ul>
                     {{~it.Tags : Tag}}
                     <li><span data-filter="Tags" class="dl">{{=Tag}}</span></li>
                     {{~}}
-                    </ul>
+                </ul>
+                {{?}}
                 <div style="display: none;" class="hidden">
                     <p>Lorem ipsum dolor sit amet consectetur adipiscing elit cum nullam, risus posuere ligula eget ullamcorper orci ultricies neque lobortis suspendisse, sodales accumsan mus eleifend vulputate magna ornare at.</p>
                 </div>
