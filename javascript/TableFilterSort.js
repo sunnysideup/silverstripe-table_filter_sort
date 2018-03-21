@@ -138,6 +138,7 @@ jQuery(document).ready(
             /**
              * fixed header to keep into consideration
              * when scrolling to top.
+             * This is a fixed header outside of the table filter sort itself.
              * @type {Number}
              */
             sizeOfFixedHeader: 0,
@@ -1550,7 +1551,7 @@ jQuery(document).ready(
                         }
                         //check data type
                         if(jQuery.inArray( myob.dataDictionary[category]['DataType'], myob.validDataTypes ) === false) {
-                            console.debug('ERROR: invalid DataType for'+category+': '+myob.dataDictionary[category]['DataType'])
+                            console.log('ERROR: invalid DataType for'+category+': '+myob.dataDictionary[category]['DataType'])
                         }
                         myob.dataDictionarySorter(category);
 
@@ -2524,8 +2525,8 @@ jQuery(document).ready(
                                         //what is the value .. if it matches, the row is OK and we can go to next category ...
                                         if(stillLookingForValue) {
                                             if(categoryToMatch === myob.favouritesCategoryTitle) {
-                                                console.debug('looking for '+categoryToMatch);
-                                                console.debug('row ID' + rowID);
+                                                console.log('looking for '+categoryToMatch);
+                                                console.log('row ID' + rowID);
                                                 if(typeof rowID !== 'undefined' && rowID.length > 0) {
                                                     if(myob.mfv.indexOf(rowID) > -1) {
                                                         rowMatchesForFilterGroup = true;
@@ -3687,13 +3688,13 @@ jQuery(document).ready(
                 if(myob.debug) {
                     console.log('_______________________');
                     console.log('_______________________ SORTED');
-                    console.debug(myob.myRowsSorted);
+                    console.log(myob.myRowsSorted);
                     console.log('_______________________ HAS FILTER');
-                    console.debug(myob.hasFilter() ? "TRUE" : "FALSE");
+                    console.log(myob.hasFilter() ? "TRUE" : "FALSE");
                     console.log('_______________________ MATCHING');
-                    console.debug(myob.myRowsMatching);
+                    console.log(myob.myRowsMatching);
                     console.log('_______________________  VISIBLE ');
-                    console.debug(myob.myRowsVisible);
+                    console.log(myob.myRowsVisible);
                     var booleans = [];
                     var strings = [];
                     var numbers = [];
@@ -3728,19 +3729,19 @@ jQuery(document).ready(
                         }
                     }
                     console.log('_______________________ BOOLEANS');
-                    console.debug(booleans);
+                    console.log(booleans);
                     console.log('_______________________ STRINGS');
-                    console.lo(strings);
+                    console.log(strings);
                     console.log('_______________________ NUMBERS');
-                    console.debug(numbers);
+                    console.log(numbers);
                     console.log('_______________________ ARRAYS');
-                    console.debug(arrays);
+                    console.log(arrays);
                     console.log('_______________________ JQUERY OBJECTS');
-                    console.debug(jqueries);
+                    console.log(jqueries);
                     console.log('_______________________ OTHER OBJECTS');
-                    console.debug(objects);
+                    console.log(objects);
                     console.log('_______________________ OTHERS');
-                    console.debug(others);
+                    console.log(others);
                     console.log('_______________________');
                 }
             }
