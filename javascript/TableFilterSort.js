@@ -1183,6 +1183,9 @@ jQuery(document).ready(
                             for(category in rowData) {
                                 if(rowData.hasOwnProperty(category)) {
                                     myob.dataDictionaryBuildCategory(category);
+                                    if(typeof myob.dataDictionary[category]['IsEditable'] === 'undefined' ){
+                                        myob.dataDictionary[category]['IsEditable'] = false;
+                                    }
                                     var values = rowData[category];
                                     if(typeof values === 'undefined') {
                                         values = [myob.placeholderValue];
@@ -1314,6 +1317,11 @@ jQuery(document).ready(
             {
                 myob.dataDictionaryBuildCategory(category);
                 if(typeof value !== 'undefined') {
+                    if(Array.isArray(value)) {
+                        for(var i = 0; i < value.length; i++) {
+                            return myob.addOptionToCategory(category, value[i]);
+                        }
+                    }
                     if(myob.dataDictionary[category]['Options'].indexOf(value) === -1) {
                         //push value
                         myob.dataDictionary[category]['Options'].push(value);
