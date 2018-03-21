@@ -1,7 +1,5 @@
 <?php
 
-
-
 function create_test()
 {
 
@@ -361,7 +359,7 @@ $useJSON = $data['useJSON'];
                     mySelector: ".tfs-holder",
                     rowRawData: <?php echo json_encode($jsonArray); ?>,
                     filtersParentPageID: 'Test Filter',
-                    favouritesParentPageID: 'Test Favourites',                    
+                    favouritesParentPageID: 'Test Favourites',
                     dataDictionary: {
                         OriginalProducer: {
                             Label: 'Original Producer'
