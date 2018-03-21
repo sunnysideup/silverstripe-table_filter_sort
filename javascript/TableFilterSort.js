@@ -3730,7 +3730,7 @@ jQuery(document).ready(
                     console.log('_______________________ BOOLEANS');
                     console.debug(booleans);
                     console.log('_______________________ STRINGS');
-                    console.lo(strings);
+                    console.log(strings);
                     console.log('_______________________ NUMBERS');
                     console.debug(numbers);
                     console.log('_______________________ ARRAYS');
