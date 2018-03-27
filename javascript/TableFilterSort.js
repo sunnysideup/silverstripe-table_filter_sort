@@ -1498,7 +1498,7 @@ jQuery(document).ready(
                         }
                     }
                 );
-                if(commonContentExists){
+                if(commonContentExists && commonContent.length){
                     var title = myob.myTableHolder.find('.'+ myob.commonContentHolderClass).attr("data-title");
                     if(typeof title !== "undefined") {
                         title = "<h3>"+title+"</h3>";
