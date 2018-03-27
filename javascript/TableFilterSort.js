@@ -1560,7 +1560,7 @@ jQuery(document).ready(
                             myob.dataDictionary[category]['DataType'] = type;
                         }
                         //check data type
-                        if(jQuery.inArray( myob.dataDictionary[category]['DataType'], myob.validDataTypes ) === false) {
+                        if(jQuery.inArray( myob.dataDictionary[category]['DataType'], myob.validDataTypes ) === -1) {
                             console.log('ERROR: invalid DataType for'+category+': '+myob.dataDictionary[category]['DataType'])
                         }
                         myob.dataDictionarySorter(category);
@@ -2008,7 +2008,7 @@ jQuery(document).ready(
             {
                 //remove ones that are not relevant
                 for(var i = 0; i < myob.mfv.length; i++) {
-                    if(jQuery.inArray(myob.mfv[i], myob.myRowsSorted) === false) {
+                    if(jQuery.inArray(myob.mfv[i], myob.myRowsSorted) === -1) {
                         myob.mfv.splice(i, 1);
                     }
                 }
@@ -3417,7 +3417,7 @@ jQuery(document).ready(
                         }
                     ).fail(
                         function(){
-                            alert('Error - trying it again.');
+                            alert('Error - trying it again ...');
                         }
                     );
                 }
