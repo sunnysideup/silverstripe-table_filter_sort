@@ -2999,7 +2999,7 @@ jQuery(document).ready(
                     var selectorPhrase = 'input['+myob.inputValueDataAttribute+'], select['+myob.inputValueDataAttribute+'], textarea['+myob.inputValueDataAttribute+']'
                     myob.myTableBody.find(selectorPhrase).each(
                         function(i, el) {
-                            var el = jQuery(el)
+                            var el = jQuery(el);
                             var value = el.attr(myob.inputValueDataAttribute);
                             value = value.raw2safe();
                             jQuery(el).val(value);
