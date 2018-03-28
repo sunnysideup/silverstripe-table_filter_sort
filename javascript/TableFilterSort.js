@@ -1340,11 +1340,10 @@ jQuery(document).ready(
             {
                 myob.dataDictionaryBuildCategory(category);
                 var index = myob.dataDictionary[category]['Options'].indexOf(value);
-                if(index === -1) {
-                    //push value
-                    return;
+                if(index > -1) {
+                    myob.dataDictionary[category]['Options'].splice(index, 1);
                 }
-                myob.dataDictionary[category]['Options'].splice(index, 1);
+                return;
             },
 
 
@@ -1430,6 +1429,7 @@ jQuery(document).ready(
             {
                 myob.profileStarter('hideIdenticalCols');
                 if(myob.myRowsTotalCount > myob.maximumRowsForHideIdentical) {
+                    myob.myTableHolder.find('.' + myob.commonContentHolderClass).remove();
                     return;
                 }
                 var commonContentExists = false;
