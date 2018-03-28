@@ -2552,17 +2552,18 @@ jQuery(document).ready(
                                                 }
                                             } else if(categoryToMatch === myob.keywordsCategoryTitle) {
                                                 var vtm = searchObject['vtm'];
-                                                if(myob.useJSON) {
-                                                    var rowText = '';
-                                                    for(category in myob.dataDictionary) {
-                                                        if(myob.dataDictionary.hasOwnProperty(category)) {
-                                                            var myTempValues = myob.dataDictionary[category]['Values'][rowID];
-                                                            rowText += myTempValues.join(' ').toLowerCase();
+                                                var rowText = '';
+                                                for(category in myob.dataDictionary) {
+                                                    if(myob.dataDictionary.hasOwnProperty(category)) {
+                                                        if(typeof myob.dataDictionary[category]['Values'][rowID] !== 'undefined') {
+                                                            rowText += myob.joinRecursively(
+                                                                myob.dataDictionary[category]['Values'][rowID],
+                                                                ' '
+                                                            );
                                                         }
                                                     }
-                                                } else {
-                                                    var rowText = row.text().toLowerCase();
                                                 }
+                                                rowText = rowText.toLowerCase();
                                                 var keywords = vtm.split(' ');
                                                 var matches = true;
                                                 for(var k = 0; k < keywords.length; k++) {
@@ -3668,6 +3669,25 @@ jQuery(document).ready(
                     return -1;
                 }
                 return (a[0]- b[0])
+            },
+
+            joinRecursively: function(varOfAnyType, glue)
+            {
+                var finalResult = [];
+                if(typeof varOfAnyType === 'string') {
+                    finalResult.push(varOfAnyType);
+                } else if (Array.isArray(varOfAnyType)) {
+                    for(var i = 0; i < varOfAnyType.length; i++) {
+                        finalResult.push(myob.joinRecursively(varOfAnyType[i], glue));
+                    }
+                } else if (typeof varOfAnyType === 'object') {
+                    for(i in varOfAnyType) {
+                        if(varOfAnyType.hasOwnProperty(i)) {
+                            finalResult.push(myob.joinRecursively(varOfAnyType[i], glue));
+                        }
+                    }
+                }
+                return glue + finalResult.join(glue);
             },
 
             windowTimeoutStoreSetter(name, fx, delay) {
