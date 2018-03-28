@@ -1340,11 +1340,10 @@ jQuery(document).ready(
             {
                 myob.dataDictionaryBuildCategory(category);
                 var index = myob.dataDictionary[category]['Options'].indexOf(value);
-                if(index === -1) {
-                    //push value
-                    return;
+                if(index > -1) {
+                    myob.dataDictionary[category]['Options'].splice(index, 1);
                 }
-                myob.dataDictionary[category]['Options'].splice(index, 1);
+                return;
             },
 
 
@@ -1430,6 +1429,7 @@ jQuery(document).ready(
             {
                 myob.profileStarter('hideIdenticalCols');
                 if(myob.myRowsTotalCount > myob.maximumRowsForHideIdentical) {
+                    myob.myTableHolder.find('.' + myob.commonContentHolderClass).remove();
                     return;
                 }
                 var commonContentExists = false;
@@ -2999,7 +2999,7 @@ jQuery(document).ready(
                     var selectorPhrase = 'input['+myob.inputValueDataAttribute+'], select['+myob.inputValueDataAttribute+'], textarea['+myob.inputValueDataAttribute+']'
                     myob.myTableBody.find(selectorPhrase).each(
                         function(i, el) {
-                            var el = jQuery(el)
+                            var el = jQuery(el);
                             var value = el.attr(myob.inputValueDataAttribute);
                             value = value.raw2safe();
                             jQuery(el).val(value);
