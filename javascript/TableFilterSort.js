@@ -44,7 +44,7 @@ jQuery(document).ready(
              * turn on to see what is going on in console
              * @type {boolean}
              */
-            debug: false,
+            debug: true,
 
             /**
              * set to true if we use a templateRow
@@ -1273,12 +1273,8 @@ jQuery(document).ready(
                     myob.dataDictionary[category] = {}
                 }
                 if(typeof myob.dataDictionary[category]['Built'] === 'undefined') {
-                    myob.dataDictionary[category]['Built'] = false;
-                }
-                if(myob.dataDictionary[category]['Built'] === false) {
                     if(typeof myob.dataDictionary[category]['Label'] === "undefined") {
-                        label = myob.replaceAll(category, '-', ' ');
-                        myob.dataDictionary[category]['Label'] = label;
+                        myob.dataDictionary[category]['Label'] = myob.replaceAll(category, '-', ' ');;
                     }
                     if(typeof myob.dataDictionary[category]['CanFilter'] === "undefined") {
                         myob.dataDictionary[category]['CanFilter'] = null;
@@ -1340,16 +1336,16 @@ jQuery(document).ready(
             addOptionToCategory: function(category, value)
             {
                 myob.dataDictionaryBuildCategory(category);
-                if(typeof value !== 'undefined') {
-                    if(Array.isArray(value)) {
-                        for(var i = 0; i < value.length; i++) {
-                            return myob.addOptionToCategory(category, value[i]);
-                        }
+                value = myob.validateValue(category, value);
+                //is this right or should we set the option as an Array?
+                if(Array.isArray(value)) {
+                    for(var i = 0; i < value.length; i++) {
+                        return myob.addOptionToCategory(category, value[i]);
                     }
-                    if(myob.dataDictionary[category]['Options'].indexOf(value) === -1) {
-                        //push value
-                        myob.dataDictionary[category]['Options'].push(value);
-                    }
+                }
+                if(myob.dataDictionary[category]['Options'].indexOf(value) === -1) {
+                    //push value
+                    myob.dataDictionary[category]['Options'].push(value);
                 }
             },
 
@@ -1361,6 +1357,7 @@ jQuery(document).ready(
             removeOptionFromCategory: function(category, value)
             {
                 myob.dataDictionaryBuildCategory(category);
+                value = myob.validateValue(category, value);
                 var index = myob.dataDictionary[category]['Options'].indexOf(value);
                 if(index > -1) {
                     myob.dataDictionary[category]['Options'].splice(index, 1);
@@ -1441,6 +1438,56 @@ jQuery(document).ready(
                     return;
                 }
                 myob.dataDictionary[category]['Values'][rowID].splice(index, 1);
+            },
+
+            validateValue: function(category, value)
+            {
+                myob.dataDictionaryBuildCategory(category);
+                //reset all empty values
+                if(typeof value === 'undefined' && !value) {
+                    value = '';
+                }
+                //arrays
+                if (Array.isArray(value)) {
+                    for(var i = 0; i < value.length; i++) {
+                        value[i] = myob.validateValue(category, value[i]);
+                    }
+                //objects
+                } else if (typeof value === 'object') {
+                    for(i in value) {
+                        if(value.hasOwnProperty(i)) {
+                            value[i] = myob.validateValue(category, value[i]);
+                        }
+                    }
+                //values
+                } else {
+                    switch(myob.dataDictionary[category]['DataType']) {
+                        case 'number':
+                            if(isNaN(value)) {
+                                value = parseFloat(value.replace(/[^0-9.]/g,'')) - 0;
+                                if(isNaN(value)) {
+                                    value = 0;
+                                }
+                            }
+                            break;
+                        case 'date':
+                            // Expect input as d/m/y
+                            var bits = s.split('/');
+                            var d = new Date(bits[2], bits[1] - 1, bits[0]);
+                            var isDate = d && (d.getMonth() + 1) == bits[1];
+                            if(! isDate) {
+                                value = '';
+                            }
+                            break;
+                        case 'string':
+                        case '':
+                            value = (String(value)+'').trim();
+                            break;
+                        default:
+                            console.log('ERROR: unknown data type.'+string);
+                    }
+                }
+                return value;
             },
 
             /**
@@ -2328,7 +2375,7 @@ jQuery(document).ready(
                             var checked = '';
                             if(typeof myob.cfi[category] !== 'undefined') {
                                 for(var i = 0; i < myob.cfi[category].length; i++) {
-                                    if(cleanValue === myob.cfi[category][i].vtm.trim()) {
+                                    if(cleanValue === myob.cfi[category][i].vtm) {
                                         checked = 'checked="checked"';
                                         break;
                                     }
@@ -2425,36 +2472,15 @@ jQuery(document).ready(
                 var myEl = myob.myTableHead.find(myob.sortLinkSelector+'[data-sort-field="'+myob.csr.sct+'"]').first();
                 if(myEl && myEl.length > 0) {
                     myob.startRowManipulation();
-                    var type = myEl.attr("data-sort-type");
                     var category = myob.csr.sct;
-                    if(typeof type === 'undefined') {
-                        type = myob.dataDictionary[category]['DataType'];
-                    }
+                    myob.dataDictionaryBuildCategory(category);
+                    type = myob.dataDictionary[category]['DataType'];
                     var arr = [];
-                    if(typeof myob.dataDictionary[category] === 'undefined') {
-                        myob.dataDictionary[category] = {};
-                    }
-                    if(typeof myob.dataDictionary[category]['Values'] === 'undefined') {
-                        myob.dataDictionary[category]['Values'] = {};
-                    }
                     var rows = myob.dataDictionary[category]['Values'];
                     for (var rowID in rows) {
                         if (rows.hasOwnProperty(rowID)) {
                             var dataValue = rows[rowID][0];
-                            if(typeof dataValue !== 'undefined') {
-                                if(type === "number") {
-                                    if(typeof dataValue !== 'number') {
-                                        dataValue = dataValue.replace(/[^\d.-]/g, '');
-                                        dataValue = parseFloat(dataValue);
-                                    }
-                                }
-                                else {
-                                    //do nothing ...
-                                }
-                            }
-                            else {
-                                dataValue = 'zzzzzzzzzzzzzzzzzz';
-                            }
+                            dataValue = myob.validateValue(category, dataValue);
                             var innerArray = [dataValue, rowID];
                             arr.push(innerArray);
                         }
@@ -2603,52 +2629,45 @@ jQuery(document).ready(
                                                     var myTempValues = myob.dataDictionary[categoryToMatch]['Values'][rowID];
                                                     for(var myTempValuesCount = 0; myTempValuesCount < myTempValues.length; myTempValuesCount++) {
                                                         var rowValue = myTempValues[myTempValuesCount];
-                                                        if(rowValue !== null && typeof rowValue !== 'undefined') {
-                                                            switch(myob.dataDictionary[categoryToMatch]['DataType']) {
-                                                                case 'date':
-                                                                    //to do ....
-                                                                    break;
-                                                                case 'number':
-                                                                    if(typeof searchObject['vtm'] !== 'undefined'){
-                                                                        var vtm = searchObject['vtm'];
-                                                                        if(rowValue == vtm){
-                                                                            rowMatchesForFilterGroup = true;
+                                                        rowValue = myob.validateValue(categoryToMatch, rowValue);
+                                                        switch(myob.dataDictionary[categoryToMatch]['DataType']) {
+                                                            case 'date':
+                                                                //to do ....
+                                                                break;
+                                                            case 'number':
+                                                                if(typeof searchObject['vtm'] !== 'undefined'){
+                                                                    var vtm = searchObject['vtm'];
+                                                                    if(rowValue == vtm){
+                                                                        rowMatchesForFilterGroup = true;
+                                                                    }
+                                                                } else {
+                                                                    var lt = searchObject['lt'];
+                                                                    var match = true;
+                                                                    if(jQuery.isNumeric(lt) && lt !== 0) {
+                                                                        if(lt < rowValue) {
+                                                                            match = false;
                                                                         }
-                                                                    } else {
-                                                                        if(typeof rowValue !== 'number') {
-                                                                            rowValue = parseFloat(rowValue.replace(/[^0-9.]/g,''));
-                                                                        }
-                                                                        var lt = searchObject['lt'];
-                                                                        var match = true;
-                                                                        if(jQuery.isNumeric(lt) && lt !== 0) {
-                                                                            if(lt < rowValue) {
+                                                                    }
+                                                                    if(match) {
+                                                                        var gt = searchObject['gt'];
+                                                                        if(jQuery.isNumeric(gt) && gt !== 0) {
+                                                                            if(gt > rowValue) {
                                                                                 match = false;
                                                                             }
                                                                         }
-                                                                        if(match) {
-                                                                            var gt = searchObject['gt'];
-                                                                            if(jQuery.isNumeric(gt) && gt !== 0) {
-                                                                                if(gt > rowValue) {
-                                                                                    match = false;
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        if(match) {
-                                                                            rowMatchesForFilterGroup = true;
-                                                                        }
                                                                     }
-                                                                    break;
-                                                                case 'string':
-                                                                    rowValue = rowValue.raw2safe().toLowerCase();
-                                                                default:
-                                                                    if(rowValue === searchObject['vtm']){
+                                                                    if(match) {
                                                                         rowMatchesForFilterGroup = true;
                                                                     }
-                                                            }
-                                                        } else {
-                                                            console.log('START ERROR - null value in ...' + rowID + ' category: ' + categoryToMatch);
-                                                            console.log(rowValue);
-                                                            console.log('END ERROR - null value in ...' + rowID + ' category: ' + categoryToMatch);
+                                                                }
+                                                                break;
+                                                            case 'string':
+                                                            default:
+
+                                                                rowValue = rowValue.raw2safe().toLowerCase();
+                                                                if(rowValue === searchObject['vtm']){
+                                                                    rowMatchesForFilterGroup = true;
+                                                                }
                                                         }
                                                         if(rowMatchesForFilterGroup){
                                                             //break out for each loop
@@ -3186,7 +3205,9 @@ jQuery(document).ready(
                             categoryHolder.find('input').each(
                                 function(i, input) {
                                     input = jQuery(input);
-                                    var ivl = input.val().raw2safe();
+                                    var val = input.val();
+                                    var validatedVal = myob.validateValue(category, val);
+                                    var ivl = val.raw2safe();
                                     var vtm = ivl.toLowerCase();
                                     var innerInputVal = '';
                                     var innerValueToMatch = '';
@@ -3210,7 +3231,7 @@ jQuery(document).ready(
                                                     var len = filterValueArray.length;
                                                     var tempVal = '';
                                                     for(i = 0; i < len; i++) {
-                                                        innerInputVal = filterValueArray[i].trim();
+                                                        innerInputVal = filterValueArray[i];
                                                         innerValueToMatch = innerInputVal;
                                                         if(innerValueToMatch.length > 1) {
                                                             myob.cfi[category].push(
@@ -3247,7 +3268,8 @@ jQuery(document).ready(
                                                 }
                                                 myob.cfi[category].push(
                                                     {
-                                                        vtm: vtm, ivl: ivl
+                                                        vtm: vtm,
+                                                        ivl: ivl
                                                     }
                                                 );
                                                 vtms.push(vtm);
@@ -3257,26 +3279,24 @@ jQuery(document).ready(
                                             }
                                             break;
                                         case 'number':
-                                            var val = parseFloat(input.val());
-                                            if(jQuery.isNumeric(val) && val !== 0) {
+                                            if(validatedVal !== 0) {
                                                 if(typeof myob.cfi[category] === "undefined") {
                                                     myob.cfi[category] = [];
                                                 }
                                                 if(typeof myob.cfi[category][0] === 'undefined') {
                                                     myob.cfi[category][0] = {};
                                                 }
-                                                vtms.push(input.attr('data-label') + val + ' ');
-                                                myob.cfi[category][0][input.attr('data-dir')] = val;
+                                                vtms.push(input.attr('data-label') + validatedVal + ' ');
+                                                myob.cfi[category][0][input.attr('data-dir')] = validatedVal;
                                             }
                                             break;
                                         case 'date':
-                                            var val = input.val().trim();
-                                            if(val !== '0' && val !== '') {
+                                            if(validatedVal !== '') {
                                                 if(typeof myob.cfi[category] === "undefined") {
                                                     myob.cfi[category] = {};
                                                 }
-                                                vtms.push(input.attr('data-label') + val);
-                                                myob.cfi[category][0][input.attr('data-dir')] = val;
+                                                vtms.push(input.attr('data-label') + validatedVal);
+                                                myob.cfi[category][0][input.attr('data-dir')] = validatedVal;
                                             }
                                             break;
                                     }
