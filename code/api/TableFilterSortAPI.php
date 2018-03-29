@@ -19,27 +19,27 @@ class TableFilterSortAPI extends Object
         'TableFilterSort.theme'
     );
 
-    private static $_jsSettingArray = [];
+    private static $js_settings = [];
 
 
     public static function add_setting($key, $value)
     {
-        self::$_jsSettingArray[$key] = $value;
+        self::$js_settings[$key] = $value;
     }
 
     public static function add_settings($array)
     {
-        self::$_jsSettingArray = self::$_jsSettingArray + $array;
+        self::$js_settings = self::$js_settings + $array;
     }
 
     public static function remove_setting($key)
     {
-        unset(self::$_jsSettingArray[$key]);
+        unset(self::$js_settings[$key]);
     }
 
     public static function reset_settings()
     {
-        self::$_jsSettingArray = null;
+        self::$js_settings = null;
     }
 
     /**
@@ -57,18 +57,45 @@ class TableFilterSortAPI extends Object
         $includeInPage = false,
         $jsSettings = null
     ) {
-        if (! $jsSettings) {
-            $jsSettings = json_encode(self::$_jsSettingArray);
-        } elseif (is_array($jsSettings)) {
-            $jsSettings = json_encode($jsSettings);
+        if($jsSettings === null) {
+            $jsSettings = self::$js_settings;
         }
+        if (is_array($jsSettings)) {
+            if(isset($jsSettings['rowRawData'])) {
+                $rawDataFieldKey = [];
+                $firstRow = true;
+                $categoryIndex = 0;
+                foreach($jsSettings['rowRawData'] as $rowID => $categories) {
+                    foreach($categories as $category => $values) {
+                        if($firstRow) {
+                            $shortKey = self::num_2_alpha($categoryIndex);
+                            $categoryIndex++;
+                            if(isset($jsSettings['rowRawData'][$rowID][$shortKey])) {
+                                user_error('You are using an illegal key in the raw data, namely: '.$shortKey);
+                            }
+                            $rawDataFieldKey[$category] = $shortKey;
+                        } else {
+                            if(!isset($jsSettings['rowRawData'][$rowID][$category])) {
+                                user_error('Your rows are not identical: '.$rowID.' has an unknown category: '.$category);
+                            }
+                            $shortKey = $rawDataFieldKey[$category];
+                        }
+                        $jsSettings['rowRawData'][$rowID][$shortKey] = $values;
+                        unset($jsSettings['rowRawData'][$rowID][$category]);
+                    }
+                    $firstRow = false;
+                }
+                $jsSettings['rawDataFieldKey'] = array_flip($rawDataFieldKey);
+            }
+        }
+        $jsSettings = json_encode($jsSettings);
         //this must come first
         if ($tableSelector) {
             $mySelector = str_replace('"', '\\"', $tableSelector);
             //this must come first
             Requirements::customScript(
                 '
-                    if(!Array.isArray(TableFilterSortVars)) {
+                    if(Array.isArray(TableFilterSortVars) === false) {
                         var TableFilterSortVars = [];
                     }
                     TableFilterSortVars.push('.$jsSettings.');
@@ -133,4 +160,13 @@ class TableFilterSortAPI extends Object
             Requirements::customScript($allJS, 'table_filter_sort_js');
         }
     }
+
+    protected static function num_2_alpha($n)
+    {
+        for($r = ""; $n >= 0; $n = intval($n / 26) - 1) {
+            $r = chr($n%26 + 0x41) . $r;
+        }
+        return $r;
+    }
+
 }

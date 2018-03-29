@@ -54,11 +54,21 @@ jQuery(document).ready(
             useJSON: false,
 
             /**
-             * do we use straight HTML (value is NO)
-             * or do we use a JSON object of data
-             * @type {boolean}
+             * the raw json object per row ... you need to provide this of the useJSON
+             * way of running this...
+             * 
+             * @type {null|object}
              */
             rowRawData: null,
+
+            /**
+             * A list of keys for categories
+             * categories can be provided with SHORT keys
+             * so that the rowRawData can be shorter!
+             * This object is for translations to proper keys
+             * @type {null|object}
+             */
+            rawDataFieldKey: null,
 
             /**
              *
@@ -1182,29 +1192,41 @@ jQuery(document).ready(
                             var rowData = myob.rowRawData[rowID];
                             for(category in rowData) {
                                 if(rowData.hasOwnProperty(category)) {
-                                    myob.dataDictionaryBuildCategory(category);
-                                    if(typeof myob.dataDictionary[category]['IsEditable'] === 'undefined' ){
-                                        myob.dataDictionary[category]['IsEditable'] = false;
-                                    }
-                                    var values = rowData[category];
-                                    if(typeof values === 'undefined') {
-                                        values = [myob.placeholderValue];
-                                    } else {
-                                        if(values === null) {
-                                            values = [myob.placeholderValue];
-                                        } else {
-                                            if(typeof values === 'string' || typeof values === 'number') {
-                                                values = [values];
-                                            }
-                                            if(values.length === 0) {
-                                                values = [myob.placeholderValue];
-                                            }
+                                    if(typeof myob.rawDataFieldKey === 'object') {
+                                        if(myob.rawDataFieldKey.hasOwnProperty(category)) {
+                                            var realCategory = myob.rawDataFieldKey[category];
+                                            myob.rowRawData[rowID][realCategory] = myob.rowRawData[rowID][category];
+                                            rowData[realCategory] = rowData[category];
+                                            delete myob.rowRawData[rowID][category];
+                                            delete rowData[category];
+                                            category = realCategory;
                                         }
                                     }
-                                    for(var i = 0; i < values.length; i++) {
-                                        var value = values[i];
-                                        myob.addOptionToCategory(category, value);
-                                        myob.addValueToRow(category, rowID, value);
+                                    if(rowData.hasOwnProperty(category)) {
+                                        myob.dataDictionaryBuildCategory(category);
+                                        if(typeof myob.dataDictionary[category]['IsEditable'] === 'undefined' ){
+                                            myob.dataDictionary[category]['IsEditable'] = false;
+                                        }
+                                        var values = rowData[category];
+                                        if(typeof values === 'undefined') {
+                                            values = [myob.placeholderValue];
+                                        } else {
+                                            if(values === null) {
+                                                values = [myob.placeholderValue];
+                                            } else {
+                                                if(typeof values === 'string' || typeof values === 'number') {
+                                                    values = [values];
+                                                }
+                                                if(values.length === 0) {
+                                                    values = [myob.placeholderValue];
+                                                }
+                                            }
+                                        }
+                                        for(var i = 0; i < values.length; i++) {
+                                            var value = values[i];
+                                            myob.addOptionToCategory(category, value);
+                                            myob.addValueToRow(category, rowID, value);
+                                        }
                                     }
                                 }
                             }
@@ -2524,7 +2546,7 @@ jQuery(document).ready(
                     for(var i = 0; i < myob.myRowsSorted.length; i++) {
                         var rowID = myob.myRowsSorted[i];
                         if(myob.useJSON) {
-                            var rowObject = myob.rowRawData[rowID];
+                            //do nothing
                         } else {
                             var row = myob.myTableBody.find('#'+rowID).first();
                         }
