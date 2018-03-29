@@ -56,7 +56,7 @@ jQuery(document).ready(
             /**
              * the raw json object per row ... you need to provide this of the useJSON
              * way of running this...
-             * 
+             *
              * @type {null|object}
              */
             rowRawData: null,
@@ -2603,46 +2603,52 @@ jQuery(document).ready(
                                                     var myTempValues = myob.dataDictionary[categoryToMatch]['Values'][rowID];
                                                     for(var myTempValuesCount = 0; myTempValuesCount < myTempValues.length; myTempValuesCount++) {
                                                         var rowValue = myTempValues[myTempValuesCount];
-                                                        switch(myob.dataDictionary[categoryToMatch]['DataType']) {
-                                                            case 'date':
-                                                                //to do ....
-                                                                break;
-                                                            case 'number':
-                                                                if(typeof searchObject['vtm'] !== 'undefined'){
-                                                                    var vtm = searchObject['vtm'];
-                                                                    if(rowValue == vtm){
-                                                                        rowMatchesForFilterGroup = true;
-                                                                    }
-                                                                } else {
-                                                                    if(typeof rowValue !== 'number') {
-                                                                        rowValue = parseFloat(rowValue.replace(/[^0-9.]/g,''));
-                                                                    }
-                                                                    var lt = searchObject['lt'];
-                                                                    var match = true;
-                                                                    if(jQuery.isNumeric(lt) && lt !== 0) {
-                                                                        if(lt < rowValue) {
-                                                                            match = false;
+                                                        if(rowValue !== null && typeof rowValue !== 'undefined') {
+                                                            switch(myob.dataDictionary[categoryToMatch]['DataType']) {
+                                                                case 'date':
+                                                                    //to do ....
+                                                                    break;
+                                                                case 'number':
+                                                                    if(typeof searchObject['vtm'] !== 'undefined'){
+                                                                        var vtm = searchObject['vtm'];
+                                                                        if(rowValue == vtm){
+                                                                            rowMatchesForFilterGroup = true;
                                                                         }
-                                                                    }
-                                                                    if(match) {
-                                                                        var gt = searchObject['gt'];
-                                                                        if(jQuery.isNumeric(gt) && gt !== 0) {
-                                                                            if(gt > rowValue) {
+                                                                    } else {
+                                                                        if(typeof rowValue !== 'number') {
+                                                                            rowValue = parseFloat(rowValue.replace(/[^0-9.]/g,''));
+                                                                        }
+                                                                        var lt = searchObject['lt'];
+                                                                        var match = true;
+                                                                        if(jQuery.isNumeric(lt) && lt !== 0) {
+                                                                            if(lt < rowValue) {
                                                                                 match = false;
                                                                             }
                                                                         }
+                                                                        if(match) {
+                                                                            var gt = searchObject['gt'];
+                                                                            if(jQuery.isNumeric(gt) && gt !== 0) {
+                                                                                if(gt > rowValue) {
+                                                                                    match = false;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                        if(match) {
+                                                                            rowMatchesForFilterGroup = true;
+                                                                        }
                                                                     }
-                                                                    if(match) {
+                                                                    break;
+                                                                case 'string':
+                                                                    rowValue = rowValue.raw2safe().toLowerCase();
+                                                                default:
+                                                                    if(rowValue === searchObject['vtm']){
                                                                         rowMatchesForFilterGroup = true;
                                                                     }
-                                                                }
-                                                                break;
-                                                            case 'string':
-                                                                rowValue = rowValue.raw2safe().toLowerCase();
-                                                            default:
-                                                                if(rowValue === searchObject['vtm']){
-                                                                    rowMatchesForFilterGroup = true;
-                                                                }
+                                                            }
+                                                        } else {
+                                                            console.log('START ERROR - null value in ...' + rowID + ' category: ' + categoryToMatch);
+                                                            console.log(rowValue);
+                                                            console.log('END ERROR - null value in ...' + rowID + ' category: ' + categoryToMatch);
                                                         }
                                                         if(rowMatchesForFilterGroup){
                                                             //break out for each loop
