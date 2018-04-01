@@ -162,7 +162,11 @@ class TableFilterSortAPI extends Object
             //js
             $allJS = '';
             foreach ($js as $link) {
-                $link = str_replace('.js', '.min.js', $link);
+                if(Director::isDev()) {
+                    //do nothing
+                } else {
+                    $link = str_replace('.js', '.min.js', $link);
+                }
                 $testFile = $base . $link;
                 if ($includeInPage && file_exists($testFile)) {
                     $allJS .= file_get_contents($testFile);

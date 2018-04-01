@@ -44,7 +44,7 @@ jQuery(document).ready(
              * turn on to see what is going on in console
              * @type {boolean}
              */
-            debug: true,
+            debug: false,
 
             /**
              * set to true if we use a templateRow
@@ -185,9 +185,11 @@ jQuery(document).ready(
             millisecondsBetweenActionsLong: 100,
 
             /**
+             * order matters ...!
+             * object is left out, as is array
              * @type {array}
              */
-            validDataTypes: ['number', 'string', 'date', 'boolean'],
+            validDataTypes: ['date', 'number', 'boolean', 'string'],
 
             /**
              * when trying to establish the data-type
@@ -294,7 +296,7 @@ jQuery(document).ready(
              *    Label: 'Field A'
              *    CanFilter: true
              *    CanSort: false
-             *    DataType: number | string | date | object
+             *    DataType: number | string | date | boolean | object
              *    Options: [A,B,C]
              *    Values: {RowID1: [A], [RowID2]: [B], 3: RowID: [C]}
              *    IsEditable: false
@@ -302,7 +304,7 @@ jQuery(document).ready(
              *    Label: 'Field Bee'
              *    CanFilter: true
              *    CanSort: false
-             *    DataType: number | string | date
+             *    DataType: number | string | date | boolean | object
              *    Options: [A,B,C]
              *    Values: {RowID1: [A], [RowID2]: [B], 3: RowID: [C]}
              *    IsEditable: true
@@ -328,7 +330,7 @@ jQuery(document).ready(
              *
              * @type {boolean}
              */
-            hasKeywords: true,
+            hasKeywordSearch: true,
 
             /**
              * can favourites be selected by user?
@@ -541,18 +543,6 @@ jQuery(document).ready(
              * @type {string}
              */
             lowerThanLabel: '&lt; ',
-
-            /**
-             *
-             * @type {string}
-             */
-            keywordsCategoryTitle: 'Keywords',
-
-            /**
-             *
-             * @type {string}
-             */
-            favouritesCategoryTitle: 'Favourites',
 
             /**
              *
@@ -937,13 +927,12 @@ jQuery(document).ready(
                 myob.holderNumber = holderNumber;
                 myob.myTableHolder = myTableHolder;
 
-                myob.setHTMLandJson();
-                myob.turnHTMLIntoJSON();
+                myob.setHTMLAndTemplateRow();
+                myob.setRowsWithDetails(true);
+                myob.whatIsIncluded();
 
                 //get the rows
-                myob.setRowsWithDetails(true);
                 if(myob.myRowsTotalCount > 0){
-
                     myob.millisecondsBetweenActionsShort = myob.millisecondsBetweenActionsShort * (Math.floor(myob.myRowsTotalCount / 5000) + 1);
                     myob.millisecondsBetweenActionsLong = myob.millisecondsBetweenActionsLong * (Math.floor(myob.myRowsTotalCount / 5000) + 1);
                     if(typeof myob.initFX1 === 'function') {
@@ -952,12 +941,14 @@ jQuery(document).ready(
                     myob.myTableHolder.find(myob.matchRowCountSelector).html('...');
 
                     myob.myTableHolder.addClass(myob.loadingClass);
+
+                    //we reload DOM here to show loading ...
                     window.setTimeout(
                         function() {
-                            // COLLECT AND FIX
-                            // what needs to be done
 
-                            myob.whatIsIncluded();
+                            // COLLECT AND FIX
+                            myob.turnHTMLIntoJSON();
+                            // what needs to be done
 
                             //check data types ...
                             myob.dataSampling();
@@ -1029,7 +1020,7 @@ jQuery(document).ready(
                 }
             },
 
-            setHTMLandJson: function()
+            setHTMLAndTemplateRow: function()
             {
                 if(myob.rowRawData !== null) {
                     myob.useJSON = true;
@@ -1079,153 +1070,6 @@ jQuery(document).ready(
                 }
                 myob.profileStarter('setRows');
             },
-
-            /**
-             * we turn the html into JSON
-             * @return {[type]} [description]
-             */
-            turnHTMLIntoJSON: function()
-            {
-                myob.profileStarter('turnHTMLIntoJSON');
-                if(! myob.useJSON) {
-                    myob.setRows();
-                    myob.rowRawData = {};
-                    myob.myRows.each(
-                        function(i, row) {
-                            var row = jQuery(row);
-                            var rowID = row.attr('id');
-                            myob.rowRawData[rowID] = {};
-                            if(typeof rowID === 'string' && rowID.length > 0) {
-                                //do nothing
-                            } else {
-                                rowID = 'tfs-row-'+i;
-                                row.attr('id', rowID);
-                            }
-                            row.find('[' + myob.filterItemAttribute + ']').each(
-                                function(j, el) {
-                                    el = jQuery(el);
-                                    value = myob.findValueOfObject(el);
-                                    category = el.attr(myob.filterItemAttribute);
-                                    myob.dataDictionaryBuildCategory(category);
-                                    if(value.length > 0) {
-                                        if(typeof myob.rowRawData[rowID][category] === 'undefined') {
-                                            myob.rowRawData[rowID][category] = value;
-                                        } else if(Array.IsArray(myob.rowRawData[rowID][category]) === false) {
-                                            myob.rowRawData[rowID][category] = [myob.rowRawData[rowID][category]];
-                                            myob.rowRawData[rowID][category].push(value)
-                                        }
-
-                                    }
-                                }
-                            );
-                        }
-                    );
-                }
-
-                myob.profileEnder('turnHTMLIntoJSON');
-            },
-
-            /**
-             * we turn the html into JSON
-             * @return {[type]} [description]
-             */
-            dataSampling: function()
-            {
-                myob.profileStarter('dataSampling');
-
-                //work through rowRawData
-                for(rowID in myob.rowRawData) {
-                    if(myob.rowRawData.hasOwnProperty(rowID)) {
-                        //data sampling!
-                        for(category in myob.rowRawData[rowID]) {
-                            if(myob.rowRawData[rowID].hasOwnProperty(category)) {
-
-                                //switch over to actual keys
-                                if(typeof myob.rawDataFieldKey === 'object') {
-                                    if(myob.rawDataFieldKey.hasOwnProperty(category)) {
-                                        var realCategory = myob.rawDataFieldKey[category];
-                                        myob.rowRawData[rowID][realCategory] = myob.rowRawData[rowID][category];
-                                        delete myob.rowRawData[rowID][category];
-                                        category = realCategory;
-                                        //switch
-                                    }
-                                }
-
-                                //start building the category
-                                myob.dataDictionaryBuildCategory(category);
-                                var rawValue = myob.rowRawData[rowID][category];
-                                if(myob.dataDictionary[category]['DataType'] === '') {
-                                    stillLookingForTypes = true;
-                                    var type = myob.findOutType(rawValue);
-
-                                    //if it is an array then we set a few things and recalculate
-                                    if(type === 'array') {
-                                        while(Array.isArray(rawValue[0])) {
-                                            rawValue = rawValue[0];
-                                        }
-                                        var type = myob.findOutType(rawValue[0]);
-                                        myob.dataDictionary[category]['CanSort'] = false;
-                                        myob.dataDictionary[category]['IsEditable'] = false;
-                                    }
-                                    if(type === 'object') {
-                                        myob.dataDictionary[category]['CanFilter'] = false;
-                                        myob.dataDictionary[category]['CanSort'] = false;
-                                        myob.dataDictionary[category]['IsEditable'] = false;
-                                    }
-                                    else {
-                                        myob.dataDictionary[category]['DataType'] = type;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                myob.profileEnder('dataSampling');
-            },
-
-            /**
-             *
-             * @param  {mixed} value    any value you like
-             * @return {string}         array|object|date|number|string
-             */
-            findOutType: function(value)
-            {
-                if(! value) {
-                    return '';
-                }
-
-                //complex items are not
-                if (Array.isArray(value)) {
-                    return 'array';
-                //objects
-                } else if (typeof value === 'object') {
-                    return 'object';
-                //values
-                } else {
-
-                    //is it a date?
-                    var dateValue = myob.validateValue('', value, 'date');
-                    if(dateValue && dateValue !== '') {
-                        return 'date';
-                    }
-
-                    //is it a number?
-                    var numberValue = myob.validateValue('', value, 'number');
-                    if(numberValue && numberValue !== 0) {
-                        return 'number';
-                    }
-
-                    //is it a string?
-                    var stringValue = myob.validateValue('', value, 'string');
-                    if(stringValue && stringValue !== '') {
-                        return 'string';
-                    }
-                }
-                //we are NOT SURE
-                return '';
-                //check number
-            }
 
             /**
              * called after row manipulation to reset rows
@@ -1284,12 +1128,6 @@ jQuery(document).ready(
             },
 
 
-
-
-            //===================================================================
-            // SCRIPT SECTION: *** COLLECTORS
-            //=================================================================
-
             whatIsIncluded: function()
             {
                 //are we saving favourites?
@@ -1321,7 +1159,142 @@ jQuery(document).ready(
                         }
                     );
                 }
+
+                //also check favourites:
+                if(myob.hasFavourites === null) {
+                    myob.hasFavourites = myob.myRows.find(myob.favouriteLinkSelector).length > 0 ? true : false;
+                }
+
+                if(myob.hasKeywordSearch) {
+                    myob.dataDictionaryBuildCategory('Keyword');
+                }
+
+                if(myob.hasFavourites) {
+                    myob.dataDictionaryBuildCategory('Favourites');
+                }
+
             },
+
+            /**
+             * retrieve raw data from HTML for JSON
+             * @return {[type]} [description]
+             */
+            turnHTMLIntoJSON: function()
+            {
+                myob.profileStarter('turnHTMLIntoJSON');
+                if(myob.useJSON) {
+                    //nothing to do
+                } else {
+                    myob.setRows();
+                    myob.rowRawData = {};
+                    myob.myRows.each(
+                        function(i, row) {
+                            var row = jQuery(row);
+                            var rowID = row.attr('id');
+                            myob.rowRawData[rowID] = {};
+                            if(typeof rowID === 'string' && rowID.length > 0) {
+                                //do nothing
+                            } else {
+                                rowID = 'tfs-row-'+i;
+                                row.attr('id', rowID);
+                            }
+                            row.find('[' + myob.filterItemAttribute + ']').each(
+                                function(j, el) {
+                                    el = jQuery(el);
+                                    value = myob.findValueOfObject(el);
+                                    category = el.attr(myob.filterItemAttribute);
+                                    myob.dataDictionaryBuildCategory(category);
+                                    if(value.length > 0) {
+                                        if(typeof myob.rowRawData[rowID][category] === 'undefined') {
+                                            myob.rowRawData[rowID][category] = value;
+                                        } else if(Array.IsArray(myob.rowRawData[rowID][category]) === false) {
+                                            myob.rowRawData[rowID][category] = [myob.rowRawData[rowID][category]];
+                                            myob.rowRawData[rowID][category].push(value)
+                                        }
+
+                                    }
+                                }
+                            );
+                        }
+                    );
+                }
+
+                myob.profileEnder('turnHTMLIntoJSON');
+            },
+
+            /**
+             * we turn the html into JSON
+             */
+            dataSampling: function()
+            {
+                myob.profileStarter('dataSampling');
+                var firstRow = true;
+                //work through rowRawData
+                for(rowID in myob.rowRawData) {
+                    if(myob.rowRawData.hasOwnProperty(rowID)) {
+                        //data sampling!
+                        for(category in myob.rowRawData[rowID]) {
+                            if(myob.rowRawData[rowID].hasOwnProperty(category)) {
+
+                                //switch over to actual keys
+                                if(typeof myob.rawDataFieldKey === 'object') {
+                                    if(myob.rawDataFieldKey.hasOwnProperty(category)) {
+                                        var realCategory = myob.rawDataFieldKey[category];
+                                        myob.rowRawData[rowID][realCategory] = myob.rowRawData[rowID][category];
+                                        delete myob.rowRawData[rowID][category];
+                                        category = realCategory;
+                                        //switch
+                                    }
+                                }
+
+                                //start building the category
+                                if(firstRow === true) {
+                                    myob.dataDictionaryBuildCategory(category);
+                                }
+                                var rawValue = myob.rowRawData[rowID][category];
+                                if(myob.dataDictionary[category]['DataType'] === '') {
+                                    if(category === 'keyword') {
+                                        myob.dataDictionary[category]['DataType'] = 'string';
+                                        myob.dataDictionary[category]['CanFilter'] = true;
+                                        myob.dataDictionary[category]['CanSort'] = false;
+                                        myob.dataDictionary[category]['IsEditable'] = false;
+                                    } else if(category === 'favourites') {
+                                        myob.dataDictionary[category]['DataType'] = 'boolean';
+                                        myob.dataDictionary[category]['CanFilter'] = true;
+                                    }
+                                    stillLookingForTypes = true;
+                                    //if it is an array then we set a few things and recalculate
+                                    while(Array.isArray(rawValue)) {
+                                        rawValue = rawValue[0];
+                                        myob.dataDictionary[category]['CanSort'] = false;
+                                    }
+                                    var type = myob.findDataTypeOfValue(rawValue);
+                                    if(type === 'object') {
+                                        myob.dataDictionary[category]['CanFilter'] = false;
+                                        myob.dataDictionary[category]['CanSort'] = false;
+                                        myob.dataDictionary[category]['IsEditable'] = false;
+                                    }
+                                    //we got to be sure it is not an array...
+                                    if(type === 'array') {
+                                        console.log('ERROR: object can not be an array '+type+'');
+                                        console.log(rawValue);
+                                    }
+                                    myob.dataDictionary[category]['DataType'] = type;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                myob.profileEnder('dataSampling');
+            },
+
+
+
+            //===================================================================
+            // SCRIPT SECTION: *** COLLECTORS
+            //=================================================================
+
 
             /**
              * find the filters ...
@@ -1337,30 +1310,32 @@ jQuery(document).ready(
                     for(rowID in myob.rowRawData) {
                         if(myob.rowRawData.hasOwnProperty(rowID)) {
                             var rowData = myob.rowRawData[rowID];
+                            var keywordString = '';
                             for(category in rowData) {
                                 if(rowData.hasOwnProperty(category)) {
                                     myob.dataDictionaryBuildCategory(category);
                                     var values = rowData[category];
-
                                     //make sure it is an array
                                     if(Array.isArray(values) === false) {
                                         values = [values];
                                     }
                                     for(var i = 0; i < values.length; i++) {
 
-                                        //clean value
-                                        var value = myob.validateValue(category, values[i]);
+                                        //to do? clean value???
+                                        var value = values[i];
                                         myob.addOptionToCategory(category, value);
                                         myob.addValueToRow(category, rowID, value);
+                                        keywordString += myob.joinRecursively(
+                                            value,
+                                            ' '
+                                        );
                                     }
                                 }
                             }
+                            myob.addOptionToCategory('Keyword', keywordString);
+                            myob.addValueToRow('Keyword', rowID, keywordString);
                         }
                     }
-                }
-                //also check favourites:
-                if(myob.hasFavourites === null) {
-                    myob.hasFavourites = myob.myRows.find(myob.favouriteLinkSelector).length > 0 ? true : false;
                 }
 
                 myob.profileEnder('filterItemCollector');
@@ -1374,7 +1349,6 @@ jQuery(document).ready(
             dataDictionaryCollector: function()
             {
                 myob.profileStarter('dataDictionaryCollector');
-
 
                 Object.keys(myob.dataDictionary).forEach(
                     function(category, categoryIndex) {
@@ -1593,39 +1567,107 @@ jQuery(document).ready(
                 myob.dataDictionary[category]['Values'][rowID].splice(index, 1);
             },
 
+            /**
+             *
+             * @param  {mixed} value    any value you like
+             * @return {string}         returns any of these options
+             *                          array|object|date|number|string
+             */
+            findDataTypeOfValue: function(value)
+            {
+                if(myob.isEmptyValue(value)) {
+                    return '';
+                }
+
+                //complex items are not
+                if (Array.isArray(value)) {
+                    return 'array';
+                //objects
+                } else if (typeof value === 'object') {
+                    return 'object';
+                //values
+                } else {
+                    for(var i = 0; i < myob.validDataTypes.length; i++) {
+                        var option = myob.validDataTypes[i];
+                        var testValue = myob.validateValue('', value, option);
+                        if(! myob.isEmptyValue(testValue)) {
+                            return option;
+                        }
+                    }
+                }
+                //we are NOT SURE
+                return '';
+                //check number
+            },
+
+            /**
+             * is this an empty variable?
+             * @param  {mixed} value [description]
+             * @return {boolean}       [description]
+             */
+            isEmptyValue: function(value)
+            {
+                //should be fast if only one needs to match
+                //start with easiest!
+                if(
+                    typeof value === 'undefined' ||
+                    value === '' ||
+                    value === false ||
+                    value === 0 ||
+                    value === '0' ||
+                    value === null ||
+                    (Array.isArray(value)) && value.length === 0 ||
+                    (typeof value === 'object' && JSON.stringify(value) === JSON.stringify({}))
+                ) {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+
+
+
+            /**
+             * makes sure that the values are fit for what the data dictionary tells us.
+             * @param  {string}  category       category in data dictionary
+             * @param  {mixed}   value          value supplied
+             * @param  {string}  forcedDataType specify the data type rather than relying on the category.
+             *
+             * @return {mixed}                [description]
+             */
             validateValue: function(category, value, forcedDataType)
             {
                 if(typeof forcedDataType === 'undefined') {
                     forcedDataType = myob.dataDictionary[category]['DataType'];
                 }
-                //reset all empty values
-                if(typeof value === 'undefined' && !value) {
+                //reset all empty values - we are going to ignore those ...
+                if(myob.isEmptyValue(value)) {
                     value = '';
                 }
                 //arrays
-                if (Array.isArray(value)) {
+                else if (Array.isArray(value)) {
                     for(var i = 0; i < value.length; i++) {
-                        value[i] = myob.validateValue(category, value[i]);
+                        value[i] = myob.validateValue(category, value[i], forcedDataType);
                     }
+                    return value;
                 //objects
                 } else if (typeof value === 'object') {
-                    for(i in value) {
-                        if(value.hasOwnProperty(i)) {
-                            value[i] = myob.validateValue(category, value[i]);
-                        }
-                    }
+                    return value;
                 //values
                 } else {
                     switch(forcedDataType) {
                         case 'date':
-                            // Expect input as d/m/y
-                            var bits = value.split('/');
-                            if(bits.length === 3) {
-                                var d = new Date(bits[2], bits[1] - 1, bits[0]);
-                                var isDate = d && (d.getMonth() + 1) == bits[1];
-                                if(isDate) {
-                                    value = '';
+                            var isDate = false;
+                            if(typeof value === 'string') {
+                                // Expect input as d/m/y
+                                var bits = value.split('/');
+                                if(bits.length === 3) {
+                                    var d = new Date(bits[2], bits[1] - 1, bits[0]);
+                                    var isDate = d && (d.getMonth() + 1) == bits[1];
                                 }
+                            }
+                            if(isDate === false) {
+                                value = '';
                             }
                             break;
                         case 'number':
@@ -1636,12 +1678,22 @@ jQuery(document).ready(
                                 }
                             }
                             break;
+                        case 'boolean':
+                            if(value === true || value === false) {
+                                //do nothing
+                            } else {
+                                value = false;
+                            }
+                            break;
                         case 'string':
+                            if(typeof value !== 'string') {
+                                value = '';
+                            }
                         case '':
                             value = (String(value)+'').trim();
                             break;
                         default:
-                            console.log('ERROR: unknown data type.'+string);
+                            console.log('ERROR: unknown data type.'+forcedDataType+' for '+value);
                     }
                 }
                 return value;
@@ -1878,7 +1930,7 @@ jQuery(document).ready(
                     myob.quickKeywordFilterSelector,
                     function(e) {
                         var val = jQuery(this).val();
-                        myob.myFilterFormInner.find('input[name="Keywords"]')
+                        myob.myFilterFormInner.find('input[name="Keyword"]')
                             .val(val)
                             .change();
                     }
@@ -1887,7 +1939,7 @@ jQuery(document).ready(
                 //update faux keyword field
                 myob.myFilterFormInner.on(
                     'input paste change',
-                    'input[name="Keywords"]',
+                    'input[name="Keyword"]',
                     function(e) {
                         var val = jQuery(this).val();
                         myob.myFilterFormHolder
@@ -2174,6 +2226,7 @@ jQuery(document).ready(
                     myob.mfv.splice(index, 1);
                 }
             },
+
             /**
              * opens modal with data ...
              * data options are
@@ -2316,19 +2369,19 @@ jQuery(document).ready(
                     //add favourites
                     if(myob.hasFavourites) {
                         content += myob.makeSectionHeaderForForm(
-                            'favourites',
-                             myob.favouritesCategoryTitle
+                            'Favourites',
+                            'Favourites',
                         );
-                        content += myob.makeFieldForForm('favourites', myob.favouritesCategoryTitle, tabIndex, 0);
+                        content += myob.makeFieldForForm('favourites', 'Favourites', tabIndex, 0);
                         content += myob.makeSectionFooterForForm();
                         tabIndex++;
                     }
-                    if(myob.hasKeywords) {
+                    if(myob.hasKeywordSearch) {
                         content += myob.makeSectionHeaderForForm(
-                            'keyword',
-                             myob.keywordsCategoryTitle
+                            'Keyword',
+                            'Keyword'
                         );
-                        content += myob.makeFieldForForm('keyword', myob.keywordsCategoryTitle, tabIndex, 0);
+                        content += myob.makeFieldForForm('keyword', 'Keyword', tabIndex, 0);
                         content += myob.makeSectionFooterForForm();
                     }
                     content += '</form>';
@@ -2336,8 +2389,8 @@ jQuery(document).ready(
                     //FINALISE!
                     myob.myFilterFormInner.html(content);
 
-                    if(myob.hasKeywords) {
-                        var keywordVal = myob.myFilterFormInner.find('input[name="Keywords"]').val();
+                    if(myob.hasKeywordSearch) {
+                        var keywordVal = myob.myFilterFormInner.find('input[name="Keyword"]').val();
                         myob.myFilterFormHolder.find(myob.quickKeywordFilterSelector).val(keywordVal);
                     }
                     var i = 0;
@@ -2424,12 +2477,13 @@ jQuery(document).ready(
                             var currentValueForForm = '';
                             var additionToField = '';
                             if(type === 'keyword') {
+                                additionToField = '<label for="' + valueID + '">'+myob.keywordCategoryTitle+'</label>' ;
                                 var extraClass = 'keyword';
                                 if(typeof myob.cfi[category] !== 'undefined') {
                                     if(typeof myob.cfi[category][0] !== 'undefined') {
                                         for(var i = 0; i < myob.cfi[category].length; i++) {
-                                            currentValueForForm = myob.cfi[category][i].vtm;
-                                            currentValueForForm = currentValueForForm.raw2attr();
+                                            currentValueForForm = myob.cfi[category][i].vtm.raw2attr();
+
                                         }
                                     }
                                 }
@@ -2625,7 +2679,9 @@ jQuery(document).ready(
 
 
 
-
+            /**
+             * QUESTION! how clean is VTM when it gets here - do we need to clean it?
+             */
             runCurrentFilter: function()
             {
                 myob.profileStarter('runCurrentFilter');
@@ -2653,6 +2709,7 @@ jQuery(document).ready(
                         if(myob.useJSON) {
                             //do nothing
                         } else {
+                            //we need to keep this for showing / hiding ...
                             var row = myob.myTableBody.find('#'+rowID).first();
                         }
                         //innocent until proven guilty
@@ -2671,87 +2728,76 @@ jQuery(document).ready(
                                         var searchObject = myob.cfi[categoryToMatch][j];
                                         //what is the value .. if it matches, the row is OK and we can go to next category ...
                                         if(stillLookingForValue) {
-                                            if(categoryToMatch === myob.favouritesCategoryTitle) {
-                                                if(typeof rowID !== 'undefined' && rowID.length > 0) {
-                                                    if(myob.mfv.indexOf(rowID) > -1) {
-                                                        rowMatchesForFilterGroup = true;
-                                                    }
-                                                }
-                                            } else if(categoryToMatch === myob.keywordsCategoryTitle) {
-                                                var vtm = searchObject['vtm'];
-                                                var rowText = '';
-                                                for(category in myob.dataDictionary) {
-                                                    if(myob.dataDictionary.hasOwnProperty(category)) {
-                                                        if(typeof myob.dataDictionary[category]['Values'][rowID] !== 'undefined') {
-                                                            rowText += myob.joinRecursively(
-                                                                myob.dataDictionary[category]['Values'][rowID],
-                                                                ' '
-                                                            );
-                                                        }
-                                                    }
-                                                }
-                                                rowText = rowText.toLowerCase();
-                                                var keywords = vtm.split(' ');
-                                                var matches = true;
-                                                for(var k = 0; k < keywords.length; k++) {
-                                                    var keyword = keywords[k].trim().toLowerCase();
-                                                    if(rowText.indexOf(keyword) === -1) {
-                                                        matches = false;
-                                                        break;
-                                                    }
-                                                }
-                                                if(matches === true) {
-                                                    rowMatchesForFilterGroup = true;
-                                                }
-                                            } else {
-                                                if(Array.isArray(myob.dataDictionary[categoryToMatch]['Values'][rowID])) {
-                                                    var myTempValues = myob.dataDictionary[categoryToMatch]['Values'][rowID];
-                                                    for(var myTempValuesCount = 0; myTempValuesCount < myTempValues.length; myTempValuesCount++) {
-                                                        var rowValue = myTempValues[myTempValuesCount];
-                                                        rowValue = myob.validateValue(categoryToMatch, rowValue);
-                                                        switch(myob.dataDictionary[categoryToMatch]['DataType']) {
-                                                            case 'date':
-                                                                //to do ....
-                                                                break;
-                                                            case 'number':
-                                                                if(typeof searchObject['vtm'] !== 'undefined'){
-                                                                    var vtm = searchObject['vtm'];
-                                                                    if(rowValue == vtm){
-                                                                        rowMatchesForFilterGroup = true;
+                                            if(Array.isArray(myob.dataDictionary[categoryToMatch]['Values'][rowID])) {
+                                                var myTempValues = myob.dataDictionary[categoryToMatch]['Values'][rowID];
+                                                for(var myTempValuesCount = 0; myTempValuesCount < myTempValues.length; myTempValuesCount++) {
+                                                    var rowValue = myTempValues[myTempValuesCount];
+                                                    rowValue = myob.validateValue(categoryToMatch, rowValue);
+                                                    switch(myob.dataDictionary[categoryToMatch]['DataType']) {
+                                                        case 'favourites':
+                                                            if(typeof rowID !== 'undefined' && rowID.length > 0) {
+                                                                if(myob.mfv.indexOf(rowID) > -1) {
+                                                                    rowMatchesForFilterGroup = true;
+                                                                }
+                                                            }
+                                                            break;
+                                                        case 'keyword':
+                                                            var vtm = searchObject['vtm'];
+                                                            rowValue = rowValue.toLowerCase();
+                                                            var keywords = vtm.split(' ');
+                                                            var matches = true;
+                                                            for(var k = 0; k < keywords.length; k++) {
+                                                                var keyword = keywords[k].raw2safe().toLowerCase();
+                                                                if(rowValue.indexOf(keyword) === -1) {
+                                                                    matches = false;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if(matches === true) {
+                                                                rowMatchesForFilterGroup = true;
+                                                            }
+                                                            break;
+
+                                                        case 'date':
+                                                            //to do ....
+                                                            break;
+                                                        case 'number':
+                                                            if(typeof searchObject['vtm'] !== 'undefined'){
+                                                                var vtm = searchObject['vtm'];
+                                                                if(rowValue == vtm){
+                                                                    rowMatchesForFilterGroup = true;
+                                                                }
+                                                            } else {
+                                                                var lt = searchObject['lt'];
+                                                                var match = true;
+                                                                if(jQuery.isNumeric(lt) && lt !== 0) {
+                                                                    if(lt < rowValue) {
+                                                                        match = false;
                                                                     }
-                                                                } else {
-                                                                    var lt = searchObject['lt'];
-                                                                    var match = true;
-                                                                    if(jQuery.isNumeric(lt) && lt !== 0) {
-                                                                        if(lt < rowValue) {
+                                                                }
+                                                                if(match) {
+                                                                    var gt = searchObject['gt'];
+                                                                    if(jQuery.isNumeric(gt) && gt !== 0) {
+                                                                        if(gt > rowValue) {
                                                                             match = false;
                                                                         }
                                                                     }
-                                                                    if(match) {
-                                                                        var gt = searchObject['gt'];
-                                                                        if(jQuery.isNumeric(gt) && gt !== 0) {
-                                                                            if(gt > rowValue) {
-                                                                                match = false;
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                    if(match) {
-                                                                        rowMatchesForFilterGroup = true;
-                                                                    }
                                                                 }
-                                                                break;
-                                                            case 'string':
-                                                            default:
-
-                                                                rowValue = rowValue.raw2safe().toLowerCase();
-                                                                if(rowValue === searchObject['vtm']){
+                                                                if(match) {
                                                                     rowMatchesForFilterGroup = true;
                                                                 }
-                                                        }
-                                                        if(rowMatchesForFilterGroup){
-                                                            //break out for each loop
-                                                            return false;
-                                                        }
+                                                            }
+                                                            break;
+                                                        case 'string':
+                                                        default:
+                                                            rowValue = rowValue.raw2safe().toLowerCase();
+                                                            if(rowValue === searchObject['vtm']){
+                                                                rowMatchesForFilterGroup = true;
+                                                            }
+                                                    }
+                                                    if(rowMatchesForFilterGroup){
+                                                        //break out for each loop
+                                                        return false;
                                                     }
                                                 }
                                             }
@@ -3258,11 +3304,6 @@ jQuery(document).ready(
             workOutCurrentFilter: function(){
                 myob.profileStarter('workOutCurrentFilter');
                 var html = "";
-                var categoryHolder;
-                var category = '';
-                var type = '';
-                var ivl = '';
-                var vtm = '';
                 var filterValueArray = [];
                 //reset
                 myob.cfi = {};
@@ -3270,24 +3311,20 @@ jQuery(document).ready(
                     .find(' .' + myob.filterGroupClass)
                     .each(
                         function(i, el){
-                            categoryHolder = jQuery(el);
-                            category = categoryHolder.attr('data-to-filter');
+                            var ivl = '';
+                            var vtm = '';
+                            var categoryHolder = jQuery(el);
+                            var category = categoryHolder.attr('data-to-filter');
                             var fieldType = categoryHolder.attr('field-type')
-                            if(fieldType === 'keyword') {
-                                var dataType = 'keyword';
-                            } else if(fieldType === 'favourites') {
-                                var dataType = 'favourites';
-                            } else {
-                                var dataType = myob.dataDictionary[category]['DataType'];
-                            }
                             var vtms = [];
                             categoryHolder.find('input').each(
                                 function(i, input) {
                                     input = jQuery(input);
                                     var val = input.val();
+                                    console.log(category);
                                     var validatedVal = myob.validateValue(category, val);
-                                    var ivl = val.raw2safe();
-                                    var vtm = ivl.toLowerCase();
+                                    ivl = val.raw2safe();
+                                    vtm = ivl.toLowerCase();
                                     var innerInputVal = '';
                                     var innerValueToMatch = '';
                                     switch(fieldType) {
@@ -3296,31 +3333,21 @@ jQuery(document).ready(
                                                 if(typeof myob.cfi[category] === "undefined") {
                                                     myob.cfi[category] = [];
                                                 }
-                                                if(type === 'keyword') {
-                                                    myob.cfi[category].push(
-                                                        {
-                                                            vtm: vtm,
-                                                            ivl: ivl
-                                                        }
-                                                    );
-                                                    vtms.push(vtm);
-                                                } else {
-                                                    var filterValueArray = vtm.split(",");
-                                                    var i = 0;
-                                                    var len = filterValueArray.length;
-                                                    var tempVal = '';
-                                                    for(i = 0; i < len; i++) {
-                                                        innerInputVal = filterValueArray[i];
-                                                        innerValueToMatch = innerInputVal;
-                                                        if(innerValueToMatch.length > 1) {
-                                                            myob.cfi[category].push(
-                                                                {
-                                                                    vtm: innerValueToMatch,
-                                                                    ivl: innerInputVal
-                                                                }
-                                                            );
-                                                            vtms.push(innerValueToMatch);
-                                                        }
+                                                var filterValueArray = vtm.split(",");
+                                                var i = 0;
+                                                var len = filterValueArray.length;
+                                                var tempVal = '';
+                                                for(i = 0; i < len; i++) {
+                                                    innerInputVal = filterValueArray[i];
+                                                    innerValueToMatch = innerInputVal;
+                                                    if(innerValueToMatch.length > 1) {
+                                                        myob.cfi[category].push(
+                                                            {
+                                                                vtm: innerValueToMatch,
+                                                                ivl: innerInputVal
+                                                            }
+                                                        );
+                                                        vtms.push(innerValueToMatch);
                                                     }
                                                 }
                                             }
@@ -3357,6 +3384,15 @@ jQuery(document).ready(
                                                 myob.myTableHolder.removeClass(myob.hasFavouritesInFilterClass);
                                             }
                                             break;
+                                        case 'date':
+                                            if(validatedVal !== '') {
+                                                if(typeof myob.cfi[category] === "undefined") {
+                                                    myob.cfi[category] = {};
+                                                }
+                                                vtms.push(input.attr('data-label') + validatedVal);
+                                                myob.cfi[category][0][input.attr('data-dir')] = validatedVal;
+                                            }
+                                            break;
                                         case 'number':
                                             if(validatedVal !== 0) {
                                                 if(typeof myob.cfi[category] === "undefined") {
@@ -3369,8 +3405,8 @@ jQuery(document).ready(
                                                 myob.cfi[category][0][input.attr('data-dir')] = validatedVal;
                                             }
                                             break;
-                                        case 'date':
-                                            if(validatedVal !== '') {
+                                        case 'boolean':
+                                            if(validatedVal === false || validatedVal === true) {
                                                 if(typeof myob.cfi[category] === "undefined") {
                                                     myob.cfi[category] = {};
                                                 }
