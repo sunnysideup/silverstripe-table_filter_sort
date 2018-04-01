@@ -1320,7 +1320,6 @@ jQuery(document).ready(
                                         values = [values];
                                     }
                                     for(var i = 0; i < values.length; i++) {
-
                                         //to do? clean value???
                                         var value = values[i];
                                         myob.addOptionToCategory(category, value);
@@ -2370,7 +2369,7 @@ jQuery(document).ready(
                     if(myob.hasFavourites) {
                         content += myob.makeSectionHeaderForForm(
                             'Favourites',
-                            'Favourites',
+                            'Favourites'
                         );
                         content += myob.makeFieldForForm('favourites', 'Favourites', tabIndex, 0);
                         content += myob.makeSectionFooterForForm();
@@ -3837,7 +3836,7 @@ jQuery(document).ready(
             joinRecursively: function(varOfAnyType, glue)
             {
                 var finalResult = [];
-                if(typeof varOfAnyType === 'string') {
+                if(typeof varOfAnyType === 'string' || typeof varOfAnyType === 'number') {
                     finalResult.push(varOfAnyType);
                 } else if (Array.isArray(varOfAnyType)) {
                     for(var i = 0; i < varOfAnyType.length; i++) {
