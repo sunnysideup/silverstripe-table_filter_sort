@@ -44,7 +44,7 @@ jQuery(document).ready(
              * turn on to see what is going on in console
              * @type {boolean}
              */
-            debug: true,
+            debug: false,
 
             /**
              * set to true if we use a templateRow
@@ -176,7 +176,7 @@ jQuery(document).ready(
              * used for releasing
              * @type {boolean}
              */
-            millisecondsBetweenActionsShort: 0,
+            millisecondsBetweenActionsShort: 10,
 
             /**
              * used for setting input updates, scroll updates, etc...
@@ -1977,8 +1977,8 @@ jQuery(document).ready(
                     function(e) {
                         var val = jQuery(this).val();
                         myob.myFilterFormInner.find('input[name="Keyword"]')
-                            .val(val)
-                            .change();
+                            .val(val);
+                        myob.runCurrentFilter();
                     }
                 );
 
@@ -1991,6 +1991,7 @@ jQuery(document).ready(
                         myob.myFilterFormHolder
                             .find(myob.quickKeywordFilterSelector)
                             .val(val);
+                        myob.runCurrentFilter();
                     }
                 );
 
@@ -2772,77 +2773,78 @@ jQuery(document).ready(
                                     for(var j = 0; j < myob.cfi[categoryToMatch].length; j++) {
                                         var searchObject = myob.cfi[categoryToMatch][j];
                                         //what is the value .. if it matches, the row is OK and we can go to next category ...
-                                        if(stillLookingForValue) {
-                                            if(Array.isArray(myob.dataDictionary[categoryToMatch]['Values'][rowID])) {
-                                                var myTempValues = myob.dataDictionary[categoryToMatch]['Values'][rowID];
-                                                for(var myTempValuesCount = 0; myTempValuesCount < myTempValues.length; myTempValuesCount++) {
-                                                    var rowValue = myTempValues[myTempValuesCount];
-                                                    rowValue = myob.validateValue(categoryToMatch, rowValue);
-                                                    switch(myob.dataDictionary[categoryToMatch]['DataType']) {
-                                                        case 'favourites':
-                                                            if(typeof rowID !== 'undefined' && rowID.length > 0) {
-                                                                if(myob.mfv.indexOf(rowID) > -1) {
-                                                                    rowMatchesForFilterGroup = true;
-                                                                }
-                                                            }
-                                                            break;
-                                                        case 'keyword':
+                                        if(stillLookingForValue === true) {
+                                            if(categoryToMatch === 'Favourites') {
+                                                if(typeof rowID !== 'undefined' && rowID.length > 0) {
+                                                    if(myob.mfv.indexOf(rowID) > -1) {
+                                                        rowMatchesForFilterGroup = true;
+                                                    }
+                                                }
+                                            } else {
+                                                if(Array.isArray(myob.dataDictionary[categoryToMatch]['Values'][rowID])) {
+                                                    var myTempValues = myob.dataDictionary[categoryToMatch]['Values'][rowID];
+                                                    for(var myTempValuesCount = 0; myTempValuesCount < myTempValues.length; myTempValuesCount++) {
+                                                        var rowValue = myTempValues[myTempValuesCount];
+                                                        rowValue = myob.validateValue(categoryToMatch, rowValue);
+                                                        if (categoryToMatch === 'Keyword') {
                                                             var vtm = searchObject['vtm'];
                                                             rowValue = rowValue.toLowerCase();
                                                             var keywords = vtm.split(' ');
-                                                            var matches = true;
+                                                            var keywordMatches = true;
                                                             for(var k = 0; k < keywords.length; k++) {
                                                                 var keyword = keywords[k].raw2safe().toLowerCase();
                                                                 if(rowValue.indexOf(keyword) === -1) {
-                                                                    matches = false;
+                                                                    keywordMatches = false;
                                                                     break;
                                                                 }
                                                             }
-                                                            if(matches === true) {
+                                                            if(keywordMatches === true) {
                                                                 rowMatchesForFilterGroup = true;
                                                             }
-                                                            break;
-
-                                                        case 'date':
-                                                            //to do ....
-                                                            break;
-                                                        case 'number':
-                                                            if(typeof searchObject['vtm'] !== 'undefined'){
-                                                                var vtm = searchObject['vtm'];
-                                                                if(rowValue == vtm){
-                                                                    rowMatchesForFilterGroup = true;
-                                                                }
-                                                            } else {
-                                                                var lt = searchObject['lt'];
-                                                                var match = true;
-                                                                if(jQuery.isNumeric(lt) && lt !== 0) {
-                                                                    if(lt < rowValue) {
-                                                                        match = false;
-                                                                    }
-                                                                }
-                                                                if(match) {
-                                                                    var gt = searchObject['gt'];
-                                                                    if(jQuery.isNumeric(gt) && gt !== 0) {
-                                                                        if(gt > rowValue) {
-                                                                            match = false;
+                                                        } else {
+                                                            switch(myob.dataDictionary[categoryToMatch]['DataType']) {
+                                                                case 'date':
+                                                                    //to do ....
+                                                                    break;
+                                                                case 'number':
+                                                                    if(typeof searchObject['vtm'] !== 'undefined'){
+                                                                        var vtm = searchObject['vtm'];
+                                                                        if(rowValue == vtm){
+                                                                            rowMatchesForFilterGroup = true;
+                                                                        }
+                                                                    } else {
+                                                                        var lt = searchObject['lt'];
+                                                                        var match = true;
+                                                                        if(jQuery.isNumeric(lt) && lt !== 0) {
+                                                                            if(lt < rowValue) {
+                                                                                match = false;
+                                                                            }
+                                                                        }
+                                                                        if(match) {
+                                                                            var gt = searchObject['gt'];
+                                                                            if(jQuery.isNumeric(gt) && gt !== 0) {
+                                                                                if(gt > rowValue) {
+                                                                                    match = false;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                        if(match) {
+                                                                            rowMatchesForFilterGroup = true;
                                                                         }
                                                                     }
-                                                                }
-                                                                if(match) {
-                                                                    rowMatchesForFilterGroup = true;
-                                                                }
+                                                                    break;
+                                                                case 'string':
+                                                                default:
+                                                                    rowValue = rowValue.raw2safe().toLowerCase();
+                                                                    if(rowValue === searchObject['vtm']){
+                                                                        rowMatchesForFilterGroup = true;
+                                                                    }
                                                             }
-                                                            break;
-                                                        case 'string':
-                                                        default:
-                                                            rowValue = rowValue.raw2safe().toLowerCase();
-                                                            if(rowValue === searchObject['vtm']){
-                                                                rowMatchesForFilterGroup = true;
-                                                            }
-                                                    }
-                                                    if(rowMatchesForFilterGroup){
-                                                        //break out for each loop
-                                                        return false;
+                                                        }
+                                                        if(rowMatchesForFilterGroup){
+                                                            //break out for each loop
+                                                            return false;
+                                                        }
                                                     }
                                                 }
                                             }
@@ -3360,7 +3362,7 @@ jQuery(document).ready(
                             var vtm = '';
                             var categoryHolder = jQuery(el);
                             var category = categoryHolder.attr('data-to-filter');
-                            var fieldType = categoryHolder.attr('field-type')
+                            var fieldType = categoryHolder.attr('field-type').toLowerCase();
                             var vtms = [];
                             categoryHolder.find('input').each(
                                 function(i, input) {
