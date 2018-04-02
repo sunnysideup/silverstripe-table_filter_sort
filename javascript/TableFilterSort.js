@@ -44,7 +44,7 @@ jQuery(document).ready(
              * turn on to see what is going on in console
              * @type {boolean}
              */
-            debug: false,
+            debug: true,
 
             /**
              * set to true if we use a templateRow
@@ -1322,16 +1322,12 @@ jQuery(document).ready(
                                     for(var i = 0; i < values.length; i++) {
                                         //to do? clean value???
                                         var value = values[i];
-                                        myob.addOptionToCategory(category, value);
                                         myob.addValueToRow(category, rowID, value);
-                                        keywordString += myob.joinRecursively(
-                                            value,
-                                            ' '
-                                        );
+                                        keywordString += myob.joinRecursively(value,' ').trim();
                                     }
                                 }
                             }
-                            myob.addOptionToCategory('Keyword', keywordString);
+                            keywordString = keywordString = keywordString.replace(/  +/g, ' ').trim();
                             myob.addValueToRow('Keyword', rowID, keywordString);
                         }
                     }
@@ -1434,61 +1430,8 @@ jQuery(document).ready(
             {
                 for(var i = 0; i < myob.myRowsMatching.length; i++) {
                     var rowID = myob.myRowsMatching[i];
-                    var oldValue = myob.dataDictionary[category]['Values'][rowID];
-                    myob.replaceOptionInCategory(category, oldValue, newValue);
                     myob.replaceRowValue(category, rowID, newValue);
                 }
-            },
-
-            /**
-             * check if Option has been added to category and add if needed...
-             * @param string category
-             * @param mixed oldValue
-             * @param mixed newValue
-             */
-            replaceOptionInCategory: function(category, oldValue, newValue)
-            {
-                myob.dataDictionaryBuildCategory(category);
-                //first add, as this checks for existence of category
-                myob.addOptionToCategory(category, newValue);
-                myob.removeOptionFromCategory(category, oldValue);
-            },
-
-            /**
-             * check if Option has been added to category and add if needed...
-             * @param string category
-             * @param mixed value
-             */
-            addOptionToCategory: function(category, value)
-            {
-                myob.dataDictionaryBuildCategory(category);
-                value = myob.validateValue(category, value);
-                //is this right or should we set the option as an Array?
-                if(Array.isArray(value)) {
-                    for(var i = 0; i < value.length; i++) {
-                        return myob.addOptionToCategory(category, value[i]);
-                    }
-                }
-                if(myob.dataDictionary[category]['Options'].indexOf(value) === -1) {
-                    //push value
-                    myob.dataDictionary[category]['Options'].push(value);
-                }
-            },
-
-            /**
-             * check if Option has been added to category and add if needed...
-             * @param string category
-             * @param mixed value
-             */
-            removeOptionFromCategory: function(category, value)
-            {
-                myob.dataDictionaryBuildCategory(category);
-                value = myob.validateValue(category, value);
-                var index = myob.dataDictionary[category]['Options'].indexOf(value);
-                if(index > -1) {
-                    myob.dataDictionary[category]['Options'].splice(index, 1);
-                }
-                return;
             },
 
 
@@ -1510,15 +1453,18 @@ jQuery(document).ready(
             },
 
             /**
-             * check if Option has been added to category and add if needed...
-             * @param string category
-             * @param string rowID
-             * @param mixed value
+             * replace ALL the values in a row
+             * @param string  category
+             * @param string  rowID
+             * @param mixed   newValue
              */
-            replaceRowValue: function(category, rowID, value)
+            replaceRowValue: function(category, rowID, newValue)
             {
-                //make sure its all there
+                //set up category
                 myob.dataDictionaryBuildCategory(category);
+
+                var oldValue = myob.dataDictionary[category]['Values'][rowID];
+                myob.removeOptionFromCategory(category, oldValue);
 
                 //reset values
                 if(Array.isArray(myob.dataDictionary[category]['Values'][rowID])) {
@@ -1527,9 +1473,25 @@ jQuery(document).ready(
                 myob.dataDictionary[category]['Values'][rowID] = [];
 
                 //add value back in
-                if(typeof value !== 'undefined') {
-                    myob.addValueToRow(category, rowID, value);
-                }
+                myob.addValueToRow(category, rowID, newValue);
+
+            },
+
+            /**
+             * check if Option has been added to category and add if needed...
+             * @param string category
+             * @param string rowID
+             * @param mixed oldValue
+             * @param mixed newValue
+             */
+            replaceValueInRow: function(category, rowID, oldValue, newValue)
+            {
+
+                myob.removeValueFromRow(category, rowID, oldValue)
+                myob.addValueToRow(category, rowID, newValue);
+
+                //standardise empty ones ...
+                myob.standardiseEmptyRows(category, rowID);
             },
 
             /**
@@ -1540,37 +1502,131 @@ jQuery(document).ready(
              */
             addValueToRow: function(category, rowID, value)
             {
+                //set up category
                 myob.dataDictionaryBuildCategory(category);
-                if(typeof value !== 'undefined') {
-                    myob.dataDictionaryBuildCategory(category);
-                    if(typeof myob.dataDictionary[category]['Values'][rowID] === "undefined") {
+
+                if(myob.isEmptyValue(value)) {
+                    value = '';
+                } else {
+                    if(Array.isArray(myob.dataDictionary[category]['Values'][rowID]) === false) {
                         myob.dataDictionary[category]['Values'][rowID] = [];
                     }
                     myob.dataDictionary[category]['Values'][rowID].push(value);
+                    myob.addOptionToCategory(category, value);
                 }
+
+                //standardise empty ones ...
+                myob.standardiseEmptyRows(category, rowID);
+
             },
 
             /**
-             * remove value from a row
+             * remove one value from a row (it may have other values ...)
              * @param string category
              * @param mixed value
              */
             removeValueFromRow: function(category, rowID, value)
             {
+                //set up category
                 myob.dataDictionaryBuildCategory(category);
-                var index = myob.dataDictionary[category]['Values'][rowID].indexOf(rowID);
-                if(index === -1) {
-                    //push value
+
+                if(myob.dataDictionary[category]['Values'][rowID] === false) {
                     return;
                 }
-                myob.dataDictionary[category]['Values'][rowID].splice(index, 1);
+                var type = typeof value
+                if(value !== Object(value)) {
+                    myob.removeOptionFromCategory(category, value);
+                    var index = myob.dataDictionary[category]['Values'][rowID].indexOf(value);
+                    if(index === -1) {
+                        //already done
+                        return;
+                    }
+                    myob.dataDictionary[category]['Values'][rowID].splice(index, 1);
+                } else {
+                    console.log('ERROR: can only remove primitive values from rows!')
+                }
+
+                myob.standardiseEmptyRows(category, rowID);
+            },
+
+
+            standardiseEmptyRows: function(category, rowID)
+            {
+                //standardise empty ones ...
+                if(myob.isEmptyValue(myob.dataDictionary[category]['Values'][rowID])) {
+                    myob.dataDictionary[category]['Values'][rowID] = false;
+                }
+            },
+
+            /**
+             * check if Option has been added to category and add if needed...
+             * @param string category
+             * @param mixed oldValue
+             * @param mixed newValue
+             */
+            replaceOptionInCategory: function(category, oldValue, newValue)
+            {
+                myob.removeOptionFromCategory(category, oldValue);
+                myob.addOptionToCategory(category, newValue);
+            },
+
+            /**
+             * check if Option has been added to category and add if needed...
+             * @param string category
+             * @param mixed value
+             */
+            addOptionToCategory: function(category, value)
+            {
+                value = myob.validateValue(category, value);
+                if(myob.isEmptyValue(value)) {
+                    return;
+                }
+                //is this right or should we set the option as an Array?
+                if(Array.isArray(value)) {
+                    for(var i = 0; i < value.length; i++) {
+                        return myob.addOptionToCategory(category, value[i]);
+                    }
+                } else if(typeof value === 'object') {
+                    //we do NOT add objects!!!
+                    return;
+                }
+                if(myob.dataDictionary[category]['Options'].indexOf(value) === -1) {
+                    //push value
+                    myob.dataDictionary[category]['Options'].push(value);
+                }
+            },
+
+            /**
+             * check if Option has been added to category and add if needed...
+             * @param string category
+             * @param mixed value
+             */
+            removeOptionFromCategory: function(category, value)
+            {
+                value = myob.validateValue(category, value);
+                if(myob.isEmptyValue(value)) {
+                    return;
+                }
+                //is this right or should we set the option as an Array?
+                if(Array.isArray(value)) {
+                    for(var i = 0; i < value.length; i++) {
+                        return myob.removeOptionFromCategory(category, value[i]);
+                    }
+                } else if(typeof value === 'object') {
+                    //we do NOT add objects!!!
+                    return;
+                }
+                var index = myob.dataDictionary[category]['Options'].indexOf(value);
+                if(index > -1) {
+                    myob.dataDictionary[category]['Options'].splice(index, 1);
+                }
             },
 
             /**
              *
              * @param  {mixed} value    any value you like
              * @return {string}         returns any of these options
-             *                          array|object|date|number|string
+             *                          array|object|date|number|string|'' (not decided)
              */
             findDataTypeOfValue: function(value)
             {
@@ -1586,12 +1642,12 @@ jQuery(document).ready(
                     return 'object';
                 //values
                 } else {
-                    for(var i = 0; i < myob.validDataTypes.length; i++) {
-                        var option = myob.validDataTypes[i];
-                        var testValue = myob.validateValue('', value, option);
-                        if(! myob.isEmptyValue(testValue)) {
-                            return option;
-                        }
+                    if(value === true) {
+                        return 'boolean';
+                    } else if (isNaN(value)) {
+                        return 'string';
+                    } else {
+                        return 'number';
                     }
                 }
                 //we are NOT SURE
@@ -1656,16 +1712,7 @@ jQuery(document).ready(
                 } else {
                     switch(forcedDataType) {
                         case 'date':
-                            var isDate = false;
-                            if(typeof value === 'string') {
-                                // Expect input as d/m/y
-                                var bits = value.split('/');
-                                if(bits.length === 3) {
-                                    var d = new Date(bits[2], bits[1] - 1, bits[0]);
-                                    var isDate = d && (d.getMonth() + 1) == bits[1];
-                                }
-                            }
-                            if(isDate === false) {
+                            if(myob.isDate(value) === false) {
                                 value = '';
                             }
                             break;
@@ -2476,7 +2523,6 @@ jQuery(document).ready(
                             var currentValueForForm = '';
                             var additionToField = '';
                             if(type === 'keyword') {
-                                additionToField = '<label for="' + valueID + '">'+myob.keywordCategoryTitle+'</label>' ;
                                 var extraClass = 'keyword';
                                 if(typeof myob.cfi[category] !== 'undefined') {
                                     if(typeof myob.cfi[category][0] !== 'undefined') {
@@ -3320,7 +3366,6 @@ jQuery(document).ready(
                                 function(i, input) {
                                     input = jQuery(input);
                                     var val = input.val();
-                                    console.log(category);
                                     var validatedVal = myob.validateValue(category, val);
                                     ivl = val.raw2safe();
                                     vtm = ivl.toLowerCase();
@@ -3850,6 +3895,24 @@ jQuery(document).ready(
                     }
                 }
                 return glue + finalResult.join(glue);
+            },
+
+            /**
+             * is the current value a date of dd/mm/yyyy?
+             *
+             * @param  {mixed} value
+             * @return {boolean}
+             */
+            isDate: function(value)
+            {
+                if(typeof value === 'string') {
+                    var bits = value.split('/');
+                    if(bits.length === 3) {
+                        var d = new Date(bits[2], bits[1] - 1, bits[0]);
+                        return isDate = d && (d.getMonth() + 1) == bits[1];
+                    }
+                }
+                return false;
             },
 
             windowTimeoutStoreSetter(name, fx, delay) {
