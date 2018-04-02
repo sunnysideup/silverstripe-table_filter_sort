@@ -4048,7 +4048,6 @@ jQuery(document).ready(
                 return this;
             },
             updateDataDictionary: function(category, rowID, oldValue, newValue){
-                myob.replaceOptionInCategory(category, oldValue, newValue);
                 myob.replaceRowValue(category, rowID, newValue);
                 return this;
             },
