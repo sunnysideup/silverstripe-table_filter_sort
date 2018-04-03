@@ -342,11 +342,6 @@ jQuery(document).ready(
             keywordToFilterFieldArray: [],
 
             /**
-             * @type {object}
-             */
-            currentKeywordToFilterValues: {},
-
-            /**
              * can favourites be selected by user?
              * if not set, it will be set by checking HTML
              * @type {boolean}
