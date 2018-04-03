@@ -1228,7 +1228,8 @@ jQuery(document).ready(
                             if(myob.rowRawData[rowID].hasOwnProperty(category)) {
 
                                 //switch over to actual keys
-                                if(typeof myob.rawDataFieldKey === 'object') {
+                                if(myob.rawDataFieldKey !== null) {
+                                    console.log(myob.rawDataFieldKey);
                                     if(myob.rawDataFieldKey.hasOwnProperty(category)) {
                                         var realCategory = myob.rawDataFieldKey[category];
                                         myob.rowRawData[rowID][realCategory] = myob.rowRawData[rowID][category];
@@ -3406,7 +3407,7 @@ jQuery(document).ready(
                                             }
                                             break;
                                         case 'number':
-                                            if(validatedVal !== 0) {
+                                            if(validatedVal !== 0 && validatedVal !== '') {
                                                 if(typeof myob.cfi[category] === "undefined") {
                                                     myob.cfi[category] = [];
                                                 }
