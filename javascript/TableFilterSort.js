@@ -2987,44 +2987,43 @@ jQuery(document).ready(
             {
                 myob.profileStarter('fixTableHeader');
                 if(myob.hasFixedTableHeader) {
+                    var showFixedHeader = false
+                    var width = myob.myTableHead.width();
+
                     if(myob.myTableHolder.isOnScreen()) {
                         //get basic data about scroll situation...
-
                         var tableOffset = myob.myTableBody.offset().top;
                         var offset = jQuery(window).scrollTop();
-                        //show fixed header if the Page offset is Grater than the table
+                        //show fixed header if the Page offset is greater than the table
                         //ie. the table is above the current scroll point
                         //ie. the table header is no longer visible
-                        var showFixedHeader = offset > tableOffset ? true: false;
+                        showFixedHeader = offset > tableOffset ? true: false;
+                    }
 
-                        //end reset
+                    //if we should show it but it has not been done yet ...
+                    if(showFixedHeader === true && (myob.fixedTableHeaderIsOn === false || myob.fixedTableHeaderIsOn === null)) {
+                        //remove the filter
+                        myob.myTableHolder.removeClass(myob.filterIsOpenClass);
+                        myob.myFilterFormInner.slideUp(0)
+
+                        myob.myTableHolder.addClass(myob.fixedHeaderClass); //class for pos fixed
+
+                        myob.fixedTableHeaderIsOn = true;
+
+                        myob.myFilterFormHolder.width(width);
+                        myob.myFloatingTable.width(width)
+                        // myob.myFloatingTable("thead").width(width)
+
+                        var top = myob.myFilterFormHolder.outerHeight(true)-2;
+                        myob.myFloatingTable.css('top', top); //set offset
+                        myob.myTable.css('margin-top', top);
+                    }
+                    if(showFixedHeader === false && (myob.fixedTableHeaderIsOn === true || myob.fixedTableHeaderIsOn === null)) {
                         var width = myob.myTableHead.width();
-
-                        //if we should show it but it has not been done yet ...
-                        if(showFixedHeader === true && (myob.fixedTableHeaderIsOn === false || myob.fixedTableHeaderIsOn === null)) {
-                            //remove the filter
-                            myob.myTableHolder.removeClass(myob.filterIsOpenClass);
-                            myob.myFilterFormInner.slideUp(0)
-
-                            myob.myTableHolder.addClass(myob.fixedHeaderClass); //class for pos fixed
-
-                            myob.fixedTableHeaderIsOn = true;
-
-                            myob.myFilterFormHolder.width(width);
-                            myob.myFloatingTable.width(width)
-                            // myob.myFloatingTable("thead").width(width)
-
-                            var top = myob.myFilterFormHolder.outerHeight(true)-2;
-                            myob.myFloatingTable.css('top', top); //set offset
-                            myob.myTable.css('margin-top', top);
-                        }
-                        if(showFixedHeader === false && (myob.fixedTableHeaderIsOn === true || myob.fixedTableHeaderIsOn === null)) {
-                            var width = myob.myTableHead.width();
-                            myob.myFilterFormHolder.width(width);
-                            myob.fixedTableHeaderIsOn = false;
-                            myob.myTableHolder.removeClass(myob.fixedHeaderClass);
-                            myob.myTable.css('margin-top', 0);
-                        }
+                        myob.myFilterFormHolder.width(width);
+                        myob.fixedTableHeaderIsOn = false;
+                        myob.myTableHolder.removeClass(myob.fixedHeaderClass);
+                        myob.myTable.css('margin-top', 0);
                     }
                 }
                 myob.profileEnder('fixTableHeader');
