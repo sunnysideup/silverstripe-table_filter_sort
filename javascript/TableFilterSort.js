@@ -473,7 +473,7 @@ jQuery(document).ready(
              * rows to show
              * @type {integer}
              */
-            visibleRowCount: 100,
+            visibleRowCount: 10,
 
 
             /**
