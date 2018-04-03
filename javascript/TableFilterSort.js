@@ -3367,54 +3367,49 @@ jQuery(document).ready(
 
                                                 //split by OR
                                                 for(j = 0; j < len; j++) {
-                                                    var originalFilterValueArray = filterValueArray[j];
-                                                    // check for filter field mapping
-                                                    if(Array.isArray(myob.keywordToFilterFieldArray) && myob.keywordToFilterFieldArray.length > 0) {
-                                                        for(var x = 0; x <  myob.keywordToFilterFieldArray.length; x++) {
-                                                            optionSearchValues = filterValueArray[j].split(' ');
-                                                            if(optionSearchValues.length > 1) {
-                                                                optionSearchValues.push(filterValueArray[j]);
-                                                            }
-                                                            var keywordFilterCategory = myob.keywordToFilterFieldArray[x];
-                                                            var options = myob.dataDictionary[keywordFilterCategory].Options;
-                                                            for(var n = 0; n < optionSearchValues.length; n++) {
-                                                                optionTempVal = optionSearchValues[n].trim();
-
+                                                    var filterValueArrayItem = filterValueArray[j].trim();
+                                                    if(filterValueArrayItem.length > 1) {
+                                                        var originalFilterValueArrayItem = filterValueArrayItem;
+                                                        // check for filter field mapping
+                                                        if(Array.isArray(myob.keywordToFilterFieldArray) && myob.keywordToFilterFieldArray.length > 0) {
+                                                            for(var x = 0; x <  myob.keywordToFilterFieldArray.length; x++) {
                                                                 //avoid very small words as this could be annoying
-                                                                if(optionTempVal.length > 2) {
-                                                                    var index = options.indexOf(optionTempVal);
+                                                                if(filterValueArrayItem.length > 2) {
+                                                                    var keywordFilterCategory = myob.keywordToFilterFieldArray[x];
+                                                                    var options = myob.dataDictionary[keywordFilterCategory].Options;
+                                                                    var index = options.indexOf(filterValueArrayItem);
                                                                     if(index > -1) {
                                                                         if(typeof myob.cfi[keywordFilterCategory] === "undefined") {
                                                                             myob.cfi[keywordFilterCategory] = [];
                                                                         }
                                                                         myob.cfi[keywordFilterCategory].push(
                                                                             {
-                                                                                vtm: optionTempVal,
-                                                                                ivl: optionTempVal
+                                                                                vtm: filterValueArrayItem,
+                                                                                ivl: filterValueArrayItem
                                                                             }
                                                                         );
 
                                                                         //remove what has been matched!
-                                                                        filterValueArray[j] = filterValueArray[j].replace(optionTempVal, '').trim();
+                                                                        filterValueArrayItem = '';
                                                                     }
                                                                 }
                                                             }
                                                         }
-                                                    }
-                                                    innerInputVal = filterValueArray[j];
-                                                    innerValueToMatch = innerInputVal;
-                                                    if(innerValueToMatch.length > 1) {
-                                                        if(typeof myob.cfi[category] === "undefined") {
-                                                            myob.cfi[category] = [];
-                                                        }
-                                                        myob.cfi[category].push(
-                                                            {
-                                                                vtm: innerValueToMatch,
-                                                                ivl: innerInputVal
+                                                        if(filterValueArrayItem.length > 1) {
+                                                            innerInputVal = filterValueArrayItem;
+                                                            innerValueToMatch = innerInputVal;
+                                                            if(typeof myob.cfi[category] === "undefined") {
+                                                                myob.cfi[category] = [];
                                                             }
-                                                        );
+                                                            myob.cfi[category].push(
+                                                                {
+                                                                    vtm: innerValueToMatch,
+                                                                    ivl: innerInputVal
+                                                                }
+                                                            );
+                                                        }
+                                                        vtms.push(originalFilterValueArrayItem);
                                                     }
-                                                    vtms.push(originalFilterValueArray);
                                                 }
                                             }
                                             break;
