@@ -1229,7 +1229,6 @@ jQuery(document).ready(
 
                                 //switch over to actual keys
                                 if(myob.rawDataFieldKey !== null) {
-                                    console.log(myob.rawDataFieldKey);
                                     if(myob.rawDataFieldKey.hasOwnProperty(category)) {
                                         var realCategory = myob.rawDataFieldKey[category];
                                         myob.rowRawData[rowID][realCategory] = myob.rowRawData[rowID][category];
@@ -2142,28 +2141,7 @@ jQuery(document).ready(
                         var myEl = jQuery(this);
                         var category = myEl.attr(myob.filterItemAttribute);
                         var filterValue = myob.findValueOfObject(myEl).toLowerCase();
-                        var filterHolder = myob.myFilterFormInner
-                            .find('.'+myob.filterGroupClass+'[data-to-filter="'+category+'"]');
-                        var fieldType = filterHolder.attr('field-type');
-                        var filterToTriger = filterHolder
-                            .find('input[value="'+ filterValue + '"].checkbox')
-                            .first();
-                        if(filterToTriger && filterToTriger.length > 0) {
-                            if(filterToTriger.is(':checkbox')){
-                                if(filterToTriger.prop('checked') === true){
-                                    filterToTriger.prop('checked', false).trigger('change');
-                                }
-                                else {
-                                    filterToTriger.prop('checked', true).trigger('change');
-                                }
-                            }
-                        } else if(fieldType === 'tag')  {
-                            myob.makeCheckboxSection(
-                                filterHolder.find('input.awesomplete').first(),
-                                filterValue
-                            );
-                        }
-
+                        myob.addDirectlyToFilter(category, filterValue);
                         myob.runCurrentFilter();
 
                         return false;
@@ -2171,6 +2149,35 @@ jQuery(document).ready(
                 );
             },
 
+            addDirectlyToFilter: function(category, filterValue, alwaysTurnOn)
+            {
+                if(typeof alwaysTurnOn === 'boolean' && alwaysTurnOn === true) {
+                    //do nothing
+                } else {
+                    alwaysTurnOn = false;
+                }
+                var filterHolder = myob.myFilterFormInner
+                    .find('.'+myob.filterGroupClass+'[data-to-filter="'+category+'"]');
+                var fieldType = filterHolder.attr('field-type');
+                var filterToTriger = filterHolder
+                    .find('input[value="'+ filterValue + '"].checkbox')
+                    .first();
+                if(filterToTriger && filterToTriger.length > 0) {
+                    if(filterToTriger.is(':checkbox')){
+                        if(filterToTriger.prop('checked') === true && alwaysTurnOn === false){
+                            filterToTriger.prop('checked', false).trigger('change');
+                        }
+                        else {
+                            filterToTriger.prop('checked', true).trigger('change');
+                        }
+                    }
+                } else if(fieldType === 'tag')  {
+                    myob.makeCheckboxSection(
+                        filterHolder.find('input.awesomplete').first(),
+                        filterValue
+                    );
+                }
+            },
 
             formElementsListener: function()
             {
@@ -3346,6 +3353,7 @@ jQuery(document).ready(
                                                 if(typeof myob.cfi[category] === "undefined") {
                                                     myob.cfi[category] = [];
                                                 }
+                                                vtm.replace(' OR ', ',');
                                                 var filterValueArray = vtm.split(",");
                                                 var i = 0;
                                                 var len = filterValueArray.length;
@@ -3353,6 +3361,24 @@ jQuery(document).ready(
                                                 for(i = 0; i < len; i++) {
                                                     innerInputVal = filterValueArray[i];
                                                     innerValueToMatch = innerInputVal;
+                                                    optionSearchValues = innerInputVal.split(' ');
+                                                    for(keywordFilterCategory in myob.dataDictionary) {
+                                                        if(myob.dataDictionary.hasOwnProperty(keywordFilterCategory)) {
+                                                            if(myob.dataDictionary[keywordFilterCategory].CanFilter === true) {
+                                                                var options = myob.dataDictionary[keywordFilterCategory].Options;
+                                                                for(var n = 0; n < optionSearchValues.length; n++) {
+                                                                    var index = options.indexOf(optionSearchValues[n]);
+                                                                    if(index > -1) {
+                                                                        var newValue = vtm.replace(optionSearchValues[n], '').trim();
+                                                                        //line below does NOT work!!
+                                                                        input.val(newValue);
+                                                                        myob.addDirectlyToFilter(keywordFilterCategory, optionSearchValues[n], true);
+                                                                        return myob.workOutCurrentFilter();
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
                                                     if(innerValueToMatch.length > 1) {
                                                         myob.cfi[category].push(
                                                             {
