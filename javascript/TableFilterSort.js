@@ -176,13 +176,13 @@ jQuery(document).ready(
              * used for releasing
              * @type {boolean}
              */
-            millisecondsBetweenActionsShort: 10,
+            millisecondsBetweenActionsShort: 20,
 
             /**
              * used for setting input updates, scroll updates, etc...
              * @type {boolean}
              */
-            millisecondsBetweenActionsLong: 100,
+            millisecondsBetweenActionsLong: 300,
 
             /**
              * order matters ...!
@@ -322,9 +322,9 @@ jQuery(document).ready(
 
             /**
              * Has the fixed header been set at the moment???
-             * @type {boolean}
+             * @type {boolean|null}
              */
-            hasFixedTableHeaderSet: false,
+            fixedTableHeaderIsOn: null,
 
             /**
              *
@@ -926,6 +926,7 @@ jQuery(document).ready(
                 //get the holders
                 myob.holderNumber = holderNumber;
                 myob.myTableHolder = myTableHolder;
+                myob.myTableHolder.addClass(myob.loadingClass);
 
                 myob.setHTMLAndTemplateRow();
                 myob.setRowsWithDetails(true);
@@ -933,14 +934,11 @@ jQuery(document).ready(
 
                 //get the rows
                 if(myob.myRowsTotalCount > 0){
-                    myob.millisecondsBetweenActionsShort = myob.millisecondsBetweenActionsShort * (Math.floor(myob.myRowsTotalCount / 5000) + 1);
-                    myob.millisecondsBetweenActionsLong = myob.millisecondsBetweenActionsLong * (Math.floor(myob.myRowsTotalCount / 5000) + 1);
+
                     if(typeof myob.initFX1 === 'function') {
                         myob.initFX1();
                     }
                     myob.myTableHolder.find(myob.matchRowCountSelector).html('...');
-
-                    myob.myTableHolder.addClass(myob.loadingClass);
 
                     //we reload DOM here to show loading ...
                     window.setTimeout(
@@ -962,53 +960,46 @@ jQuery(document).ready(
                             //look for cols that are the same
                             myob.hideIdenticalCols();
 
-                            window.setTimeout(
-                                function() {
-                                    //now we can hide table ...
+                            //MASSAGE DATA AND FIND SORT
 
-                                    //MASSAGE DATA AND FIND SORT
+                            //find defaultSort
+                            myob.findDefaultSort();
 
-                                    //find defaultSort
-                                    myob.findDefaultSort();
+                            //build floating header after we have finished cols
+                            myob.buildFloatingHeaderTable()
 
-                                    //build floating header after we have finished cols
-                                    myob.buildFloatingHeaderTable()
+                            //LISTENERS ...
+                            myob.fixTableHeaderListener();
+                            myob.setupFilterFormListeners();
+                            myob.setupSortListeners();
+                            myob.paginationListeners();
+                            myob.setupMoreDetailsListener();
+                            myob.openServerModalWindowListener();
+                            myob.favouriteLinkListener();
+                            myob.directFilterLinkListener();
+                            myob.formElementsListener();
+                            myob.addURLChangeListener();
 
-                                    //LISTENERS ...
-                                    myob.fixTableHeaderListener();
-                                    myob.setupFilterFormListeners();
-                                    myob.setupSortListeners();
-                                    myob.paginationListeners();
-                                    myob.setupMoreDetailsListener();
-                                    myob.openServerModalWindowListener();
-                                    myob.favouriteLinkListener();
-                                    myob.directFilterLinkListener();
-                                    myob.formElementsListener();
-                                    myob.addURLChangeListener();
+                            //LOAD DATA FROM SERVER
+                            //check for data in local cookie
+                            myob.retrieveLocalCookie();
+                            //check for data in local cookie
+                            myob.retrieveDataFromFragment();
+                            //check for data on server
+                            myob.retrieveDataFromGetVar();
+                            //we need to process this here one more time ... in case of the cookie data
+                            myob.retrieveDataFromServer();
 
-                                    //LOAD DATA FROM SERVER
-                                    //check for data in local cookie
-                                    myob.retrieveLocalCookie();
-                                    //check for data in local cookie
-                                    myob.retrieveDataFromFragment();
-                                    //check for data on server
-                                    myob.retrieveDataFromGetVar();
-                                    //we need to process this here one more time ... in case of the cookie data
-                                    myob.retrieveDataFromServer();
+                            //we are now ready!
+                            myob.myTableHolder.removeClass(myob.loadingClass);
 
-                                    //we are now ready!
-                                    myob.myTableHolder.removeClass(myob.loadingClass);
+                            //set table width
+                            window.scroll();
 
-                                    //set table width
-                                    myob.setTableWidth();
-
-                                    if(typeof myob.initFX2 === 'function') {
-                                        myob.initFX2();
-                                    }
-                                    myob.canPushState = true;
-                                },
-                                myob.millisecondsBetweenActionsShort
-                            );
+                            if(typeof myob.initFX2 === 'function') {
+                                myob.initFX2();
+                            }
+                            myob.canPushState = true;
 
                             //ADD SCROLL AND OTHER STUFF ...
 
@@ -1901,13 +1892,22 @@ jQuery(document).ready(
             fixTableHeaderListener: function()
             {
                 myob.profileStarter('fixTableHeaderListener');
-                if(myob.fixedHeaderClass) {
+                if(myob.hasFixedTableHeader) {
+                    jQuery(window).delayedOn(
+                        "load resize",
+                        function(e) {
+                            //now we need to reset the table header
+                            myob.fixedTableHeaderIsOn = null;
+                        },
+                        myob.millisecondsBetweenActionsShort
+                    );
                     jQuery(window).delayedOn(
                         "load scroll resize",
                         function(e) {
-                            myob.setTableWidthAndFixHeader();
+                            //now we need to reset the table header
+                            myob.fixTableHeader();
                         },
-                        myob.millisecondsBetweenActionsLong
+                        myob.millisecondsBetweenActionsShort
                     );
                 }
                 myob.profileEnder('fixTableHeaderListener');
@@ -1929,8 +1929,8 @@ jQuery(document).ready(
                     function(event) {
                         event.preventDefault();
                         myob.myFilterFormInner.slideToggle(
-                            // if currently has table header open, then immediate swap
-                            myob.hasFixedTableHeaderSet ? 0 : "fast",
+                            // // if currently has table header open, then immediate swap
+                            // myob.fixedTableHeaderIsOn ? 0 : "fast",
                             function() {
                                 //set the height of the filter form
                                 myob.myTableHolder.toggleClass(myob.filterIsOpenClass);
@@ -1965,7 +1965,7 @@ jQuery(document).ready(
                             function() {
                                 myob.runCurrentFilter();
                             },
-                            myob.millisecondsBetweenActionsLong
+                            myob.millisecondsBetweenActionsShort
                         );
                     }
                 );
@@ -2453,7 +2453,7 @@ jQuery(document).ready(
                                 list: myob.dataDictionary[category]['Options'],
                                 autoFirst: true,
                                 filter: function(text, input) {
-                                    return Awesomplete.FILTER_CONTAINS(text, input) && Awesomplete.blackList.indexOf(text.value) === -1;;
+                                    return Awesomplete.FILTER_CONTAINS(text, input) && Awesomplete.blackList.indexOf(text.value) === -1;
                                 },
                                 replace: function(text) {
                                     // var before = this.input.value.match(/^.+,\s*|/)[0];
@@ -2465,6 +2465,15 @@ jQuery(document).ready(
                                     this.input.value = '';
                                     Awesomplete.blackList.push(text.value);
                                     myob.runCurrentFilter();
+                                }
+                            }
+                        );
+                        input.addEventListener(
+                            "awesomplete-close",
+                            function(e) {
+                                if(e.reason === 'nomatches') {
+                                    var val = jQuery(e.srcElement).val();
+                                    jQuery(e.srcElement).val('');
                                 }
                             }
                         );
@@ -2974,57 +2983,11 @@ jQuery(document).ready(
                  myob.scrollToTopAtPageOpening = true;
              },
 
-
-            setTableWidthAndFixHeader: function()
-            {
-                myob.windowTimeoutStoreSetter(
-                    'setTableWidthInFuture',
-                    function() {
-                        myob.setTableWidth();
-                        myob.fixTableHeader();
-                    },
-                    myob.millisecondsBetweenActionsShort
-                );
-            },
-
-            setTableWidth: function()
-            {
-                myob.profileStarter('setTableWidth');
-                if(myob.fixedHeaderClass) {
-                    myob.removeFixedTableHeader();
-                    // //just in case ...
-                    // if(myob.myTableHolder.isOnScreen()) {
-                    //
-                    // }
-                    // //THIS HAS BEEN REMOVED AS ALL FLOATING HEADER LOGIC IS IN FIXTABLEHEADER
-                    // var filterFormIsOpen = myob.myTableHolder.hasClass(myob.filterIsOpenClass);
-                    // if(filterFormIsOpen === false) {
-                    //     //weird? why add twice?????
-                    //     // if(myob.myTableHolder.find('.tfspushdowndiv').length === 0) {
-                    //     //     jQuery('<div class="tfspushdowndiv"></div>').insertBefore(myob.myTable);
-                    //     // }
-                    // } else {
-                    //     if(myob.myTableHolder.find('.tfspushdowndiv').length > 0) {
-                    //         //remove tfspushdowndiv
-                    //     }
-                    // }
-                }
-                myob.profileEnder('setTableWidth');
-            },
-
-            removeFixedTableHeader: function()
-            {
-                myob.myTableHolder.removeClass(myob.fixedHeaderClass);
-                myob.myTableHolder.find('#tableHolder').css('margin-top', 0);
-                myob.hasFixedTableHeaderSet = false;
-            },
-
             fixTableHeader: function()
             {
                 myob.profileStarter('fixTableHeader');
-                if(myob.myTableHolder.isOnScreen()) {
-
-                    if(myob.hasFixedTableHeader) {
+                if(myob.hasFixedTableHeader) {
+                    if(myob.myTableHolder.isOnScreen()) {
                         //get basic data about scroll situation...
 
                         var tableOffset = myob.myTableBody.offset().top;
@@ -3035,28 +2998,32 @@ jQuery(document).ready(
                         var showFixedHeader = offset > tableOffset ? true: false;
 
                         //end reset
-                        if(showFixedHeader === true && myob.hasFixedTableHeaderSet === false) {
+                        var width = myob.myTableHead.width();
+
+                        //if we should show it but it has not been done yet ...
+                        if(showFixedHeader === true && (myob.fixedTableHeaderIsOn === false || myob.fixedTableHeaderIsOn === null)) {
                             //remove the filter
                             myob.myTableHolder.removeClass(myob.filterIsOpenClass);
                             myob.myFilterFormInner.slideUp(0)
 
                             myob.myTableHolder.addClass(myob.fixedHeaderClass); //class for pos fixed
 
-                            myob.hasFixedTableHeaderSet = true;
+                            myob.fixedTableHeaderIsOn = true;
 
-                            var width = myob.myTableHead.width();
                             myob.myFilterFormHolder.width(width);
                             myob.myFloatingTable.width(width)
                             // myob.myFloatingTable("thead").width(width)
 
                             var top = myob.myFilterFormHolder.outerHeight(true)-2;
                             myob.myFloatingTable.css('top', top); //set offset
-                            myob.myTableHolder.find('#tableHolder').css('margin-top', myob.myFilterFormHolder.outerHeight(true)+9);
-                        } else {
-                            if(myob.hasFixedTableHeaderSet === true) {
-                                myob.hasFixedTableHeaderSet = false;
-                                myob.myTableHolder.removeClass(myob.fixedHeaderClass);
-                            }
+                            myob.myTable.css('margin-top', top);
+                        }
+                        if(showFixedHeader === false && (myob.fixedTableHeaderIsOn === true || myob.fixedTableHeaderIsOn === null)) {
+                            var width = myob.myTableHead.width();
+                            myob.myFilterFormHolder.width(width);
+                            myob.fixedTableHeaderIsOn = false;
+                            myob.myTableHolder.removeClass(myob.fixedHeaderClass);
+                            myob.myTable.css('margin-top', 0);
                         }
                     }
                 }
@@ -3174,7 +3141,7 @@ jQuery(document).ready(
                         function() {
                             myob.scrollToTopOfHolder();
                         },
-                        myob.millisecondsBetweenActionsShort
+                        myob.millisecondsBetweenActionsLong
                     );
                 }
 
@@ -3918,16 +3885,18 @@ jQuery(document).ready(
             },
 
             windowTimeoutStoreSetter(name, fx, delay) {
-                if(typeof delay === 'undefined') {
-                    delay = myob.millisecondsBetweenActionsShort;
-                }
                 if(typeof myob.windowTimeoutStore[name] !== 'undefined') {
                     window.clearTimeout(myob.windowTimeoutStore[name]);
                 }
-                myob.windowTimeoutStore[name] = window.setTimeout(
-                    fx,
-                    delay
-                );
+                if(typeof delay === 'undefined') {
+                    delay = myob.millisecondsBetweenActionsShort;
+                }
+                if(typeof fx !== 'undefined') {
+                    myob.windowTimeoutStore[name] = window.setTimeout(
+                        fx,
+                        delay
+                    );
+                }
             },
 
             profileStarter: function(name)

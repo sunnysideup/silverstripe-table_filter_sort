@@ -6,11 +6,12 @@
 /**********************************************
  * Filters
  */
- .tfs-filter-form-inner .tfs-filter-column.tagFilter {
+.tfs-filter-form-inner .tfs-filter-column.tagFilter {
     overflow: visible;
     min-height: 7em!important;
     height: auto!important;
- }
+}
+
 
 /***********************************************
  *sort
