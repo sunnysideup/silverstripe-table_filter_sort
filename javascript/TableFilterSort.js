@@ -333,6 +333,20 @@ jQuery(document).ready(
             hasKeywordSearch: true,
 
             /**
+             * Filter Fields that are completed based on Keywords...
+             *
+             * e.g. if the Filter Field = Tag and the user enters a keyword
+             * that matches a Tag then the keyword is used as a Tag filter
+             * @type {array}
+             */
+            keywordToFilterFieldArray: [],
+
+            /**
+             * @type {object}
+             */
+            currentKeywordToFilterValues: {},
+
+            /**
              * can favourites be selected by user?
              * if not set, it will be set by checking HTML
              * @type {boolean}
@@ -3350,44 +3364,62 @@ jQuery(document).ready(
                                     switch(fieldType) {
                                         case 'keyword':
                                             if(vtm.length > 1) {
-                                                if(typeof myob.cfi[category] === "undefined") {
-                                                    myob.cfi[category] = [];
-                                                }
                                                 vtm.replace(' OR ', ',');
                                                 var filterValueArray = vtm.split(",");
-                                                var i = 0;
+                                                var j = 0;
                                                 var len = filterValueArray.length;
                                                 var tempVal = '';
-                                                for(i = 0; i < len; i++) {
-                                                    innerInputVal = filterValueArray[i];
-                                                    innerValueToMatch = innerInputVal;
-                                                    optionSearchValues = innerInputVal.split(' ');
-                                                    for(keywordFilterCategory in myob.dataDictionary) {
-                                                        if(myob.dataDictionary.hasOwnProperty(keywordFilterCategory)) {
-                                                            if(myob.dataDictionary[keywordFilterCategory].CanFilter === true) {
-                                                                var options = myob.dataDictionary[keywordFilterCategory].Options;
-                                                                for(var n = 0; n < optionSearchValues.length; n++) {
-                                                                    var index = options.indexOf(optionSearchValues[n]);
+
+                                                //split by OR
+                                                for(j = 0; j < len; j++) {
+                                                    var originalFilterValueArray = filterValueArray[j];
+                                                    // check for filter field mapping
+                                                    if(Array.isArray(myob.keywordToFilterFieldArray) && myob.keywordToFilterFieldArray.length > 0) {
+                                                        for(var x = 0; x <  myob.keywordToFilterFieldArray.length; x++) {
+                                                            optionSearchValues = filterValueArray[j].split(' ');
+                                                            if(optionSearchValues.length > 1) {
+                                                                optionSearchValues.push(filterValueArray[j]);
+                                                            }
+                                                            var keywordFilterCategory = myob.keywordToFilterFieldArray[x];
+                                                            var options = myob.dataDictionary[keywordFilterCategory].Options;
+                                                            for(var n = 0; n < optionSearchValues.length; n++) {
+                                                                optionTempVal = optionSearchValues[n].trim();
+
+                                                                //avoid very small words as this could be annoying
+                                                                if(optionTempVal.length > 2) {
+                                                                    var index = options.indexOf(optionTempVal);
                                                                     if(index > -1) {
-                                                                        var newValue = vtm.replace(optionSearchValues[n], '').trim();
-                                                                        //line below does NOT work!!
-                                                                        input.val(newValue);
-                                                                        myob.addDirectlyToFilter(keywordFilterCategory, optionSearchValues[n], true);
-                                                                        return myob.workOutCurrentFilter();
+                                                                        if(typeof myob.cfi[keywordFilterCategory] === "undefined") {
+                                                                            myob.cfi[keywordFilterCategory] = [];
+                                                                        }
+                                                                        myob.cfi[keywordFilterCategory].push(
+                                                                            {
+                                                                                vtm: optionTempVal,
+                                                                                ivl: optionTempVal
+                                                                            }
+                                                                        );
+
+                                                                        //remove what has been matched!
+                                                                        filterValueArray[j] = filterValueArray[j].replace(optionTempVal, '').trim();
                                                                     }
                                                                 }
                                                             }
                                                         }
                                                     }
+                                                    innerInputVal = filterValueArray[j];
+                                                    innerValueToMatch = innerInputVal;
                                                     if(innerValueToMatch.length > 1) {
+                                                        if(typeof myob.cfi[category] === "undefined") {
+                                                            myob.cfi[category] = [];
+                                                        }
                                                         myob.cfi[category].push(
                                                             {
                                                                 vtm: innerValueToMatch,
                                                                 ivl: innerInputVal
                                                             }
                                                         );
-                                                        vtms.push(innerValueToMatch);
                                                     }
+                                                    vtms.push(originalFilterValueArray);
                                                 }
                                             }
                                             break;
@@ -3456,7 +3488,7 @@ jQuery(document).ready(
                                     }
                                 }
                             );
-                            if(typeof myob.cfi[category] !== "undefined") {
+                            if(vtms.length > 0) {
                                 var leftLabel = myob.getCategoryLabel(category);
                                 html += "<li class=\"category\"><strong>" + leftLabel + ":</strong> <span>" + vtms.join('</span><span>') + "</span></li>";
                             }
