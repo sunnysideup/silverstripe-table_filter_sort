@@ -191,7 +191,7 @@ jQuery(document).ready(
              * if we have more than the rows specified then we do not search for identicals
              * @type {integer}
              */
-            maximumRowsForHideIdentical: 500,
+            maximumRowsForHideIdentical: 5000,
 
             /**
              * categories to be included in filter ...
@@ -1430,6 +1430,7 @@ jQuery(document).ready(
             {
                 myob.profileStarter('hideIdenticalCols');
                 if(myob.myRowsTotalCount > myob.maximumRowsForHideIdentical) {
+                    myob.myTableHolder.find('.' + myob.commonContentHolderClass).remove();
                     return;
                 }
                 var commonContentExists = false;
