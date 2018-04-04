@@ -44,7 +44,7 @@ jQuery(document).ready(
              * turn on to see what is going on in console
              * @type {boolean}
              */
-            debug: false,
+            debug: true,
 
             /**
              * set to true if we use a templateRow
@@ -1191,13 +1191,13 @@ jQuery(document).ready(
                         function(i, row) {
                             var row = jQuery(row);
                             var rowID = row.attr('id');
-                            myob.rowRawData[rowID] = {};
                             if(typeof rowID === 'string' && rowID.length > 0) {
                                 //do nothing
                             } else {
                                 rowID = 'tfs-row-'+i;
                                 row.attr('id', rowID);
                             }
+                            myob.rowRawData[rowID] = {'ID': rowID};
                             row.find('[' + myob.filterItemAttribute + ']').each(
                                 function(j, el) {
                                     el = jQuery(el);
@@ -1252,6 +1252,16 @@ jQuery(document).ready(
                                     myob.dataDictionaryBuildCategory(category);
                                 }
                                 var rawValue = myob.rowRawData[rowID][category];
+                                if(myob.dataDictionary[category]['IsEditable'] === null) {
+                                    if(myob.useJSON) {
+                                        var row = jQuery(myob.templateRow);
+                                    } else {
+                                        var row = myob.myTableBody.find('tr').first();
+                                    }
+                                    var elementSelectorInner = '[' + myob.filterItemAttribute + '="'+category+'"]';
+                                    var elementSelector = 'input'+elementSelectorInner+', select'+elementSelectorInner+', textarea'+elementSelectorInner;
+                                    myob.dataDictionary[category]['IsEditable'] = row.find(elementSelector).length > 0 ? true : false;
+                                }
                                 if(myob.dataDictionary[category]['DataType'] === '') {
                                     if(category === 'keyword') {
                                         myob.dataDictionary[category]['DataType'] = 'string';
@@ -1280,6 +1290,7 @@ jQuery(document).ready(
                                         console.log(rawValue);
                                     }
                                     myob.dataDictionary[category]['DataType'] = type;
+
                                 }
                             }
                         }
@@ -1464,10 +1475,10 @@ jQuery(document).ready(
                 myob.dataDictionaryBuildCategory(category);
 
                 var oldValue = myob.dataDictionary[category]['Values'][rowID];
-                myob.removeOptionFromCategory(category, oldValue);
+                //myob.removeOptionFromCategory(category, oldValue);
 
                 //reset values
-                if(Array.isArray(myob.dataDictionary[category]['Values'][rowID])) {
+                if(Array.isArray(oldValue)) {
                     myob.dataDictionary[category]['Values'][rowID].length = 0;
                 }
                 myob.dataDictionary[category]['Values'][rowID] = [];
@@ -1505,15 +1516,11 @@ jQuery(document).ready(
                 //set up category
                 myob.dataDictionaryBuildCategory(category);
 
-                if(myob.isEmptyValue(value)) {
-                    value = '';
-                } else {
-                    if(Array.isArray(myob.dataDictionary[category]['Values'][rowID]) === false) {
-                        myob.dataDictionary[category]['Values'][rowID] = [];
-                    }
-                    myob.dataDictionary[category]['Values'][rowID].push(value);
-                    myob.addOptionToCategory(category, value);
+                if(Array.isArray(myob.dataDictionary[category]['Values'][rowID]) === false) {
+                    myob.dataDictionary[category]['Values'][rowID] = [];
                 }
+                myob.dataDictionary[category]['Values'][rowID].push(value);
+                myob.addOptionToCategory(category, value);
 
                 //standardise empty ones ...
                 myob.standardiseEmptyRows(category, rowID);
@@ -1533,9 +1540,8 @@ jQuery(document).ready(
                 if(myob.dataDictionary[category]['Values'][rowID] === false) {
                     return;
                 }
-                var type = typeof value
                 if(value !== Object(value)) {
-                    myob.removeOptionFromCategory(category, value);
+                    //myob.removeOptionFromCategory(category, value);
                     var index = myob.dataDictionary[category]['Values'][rowID].indexOf(value);
                     if(index === -1) {
                         //already done
@@ -1554,7 +1560,8 @@ jQuery(document).ready(
             {
                 //standardise empty ones ...
                 if(myob.isEmptyValue(myob.dataDictionary[category]['Values'][rowID])) {
-                    myob.dataDictionary[category]['Values'][rowID] = false;
+                    var standardEmptyValue = myob.validateValue(category, myob.dataDictionary[category]['Values'][rowID]);
+                    myob.dataDictionary[category]['Values'][rowID] = standardEmptyValue;
                 }
             },
 
@@ -1566,7 +1573,7 @@ jQuery(document).ready(
              */
             replaceOptionInCategory: function(category, oldValue, newValue)
             {
-                myob.removeOptionFromCategory(category, oldValue);
+                //myob.removeOptionFromCategory(category, oldValue);
                 myob.addOptionToCategory(category, newValue);
             },
 
@@ -1697,7 +1704,23 @@ jQuery(document).ready(
                 }
                 //reset all empty values - we are going to ignore those ...
                 if(myob.isEmptyValue(value)) {
-                    value = '';
+                    switch(forcedDataType) {
+                        case 'date':
+                            return '';
+                            break;
+                        case 'number':
+                            return 0;
+                            break;
+                        case 'boolean':
+                            return false;
+                            break;
+                        case 'string':
+                        case '':
+                            return '';
+                            break;
+                        default:
+                            console.log('ERROR: unknown data type.'+forcedDataType+' for '+value);
+                    }
                 }
                 //arrays
                 else if (Array.isArray(value)) {
@@ -4066,7 +4089,7 @@ jQuery(document).ready(
                 myob.gotoPage(0, true);
                 return this;
             },
-            updateDataDictionary: function(category, rowID, oldValue, newValue){
+            updateDataDictionaryForCategoryRow: function(category, rowID, newValue){
                 myob.replaceRowValue(category, rowID, newValue);
                 return this;
             },
