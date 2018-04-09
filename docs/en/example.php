@@ -4,7 +4,7 @@ function create_test()
 {
 
     $useJSON = true;
-    if(isset($_GET['nojson']) && $_GET['nojson'] === 1) {
+    if(isset($_GET['nojson']) && $_GET['nojson'] === '1') {
         $useJSON = false;
     }
     $templateRow = '';
@@ -121,7 +121,7 @@ function create_test()
     }
     return [
         'HTML' => $html,
-        'Data' => $jsonArray,
+        'Data' => ($useJSON ? $jsonArray : []),
         'useJSON' => $useJSON
     ];
 }
@@ -359,7 +359,7 @@ $useJSON = $data['useJSON'];
                 {
                     debug: true,
                     mySelector: ".tfs-holder",
-                    rowRawData: <?php echo json_encode($jsonArray); ?>,
+                    rowRawData: <?php echo ($useJSON ? json_encode($jsonArray) : 'null'); ?>,
                     filtersParentPageID: 'Test Filter',
                     favouritesParentPageID: 'Test Favourites',
                     dataDictionary: {

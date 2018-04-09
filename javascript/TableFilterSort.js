@@ -46,6 +46,12 @@ jQuery(document).ready(
             debug: false,
 
             /**
+             * turn on to see what is going on in console
+             * @type {boolean}
+             */
+            profile: false,
+
+            /**
              * set to true if we use a templateRow
              * and rowRawData
              * @type {Boolean}
@@ -202,7 +208,7 @@ jQuery(document).ready(
              * if we have more than the rows specified then we do not search for identicals
              * @type {integer}
              */
-            maximumRowsForHideIdentical: 500,
+            maximumRowsForHideIdentical: 5000,
 
             /**
              * categories to be included in filter ...
@@ -265,18 +271,19 @@ jQuery(document).ready(
             myTableBody: null,
 
             /**
-             * [myRows description]
-             * @type {jQuery}
-             */
-            myFloatingTable: null,
-
-            /**
              * the rows as HTML
              * if we use JSON then this is the template row
              * if we do not use JSON then this is a jQuery object of all rows
              * @type {jQuery}
              */
             myRows: null,
+
+            /**
+             * [myRows description]
+             * @type {jQuery}
+             */
+            myFloatingTable: null,
+
 
 
 
@@ -1027,6 +1034,7 @@ jQuery(document).ready(
 
             setHTMLAndTemplateRow: function()
             {
+                myob.profileStarter('setHTMLAndTemplateRow');
                 if(myob.rowRawData !== null) {
                     myob.useJSON = true;
                 }
@@ -1045,21 +1053,16 @@ jQuery(document).ready(
                 myob.myTable.css('table-layout', 'fixed');
                 //base URL
                 myob.baseURL = location.protocol + '//' + location.host + location.pathname + location.search;
+                myob.profileEnder('setHTMLAndTemplateRow');
             },
 
-            buildTemplateRow: function()
-            {
-                myob.templateRow = myob.myTableBody.clone().html();
-                myob.templateRowCompiled = doT.template(myob.templateRow);
-                myob.myTableBody.empty();
-            },
 
             buildFloatingHeaderTable: function()
             {
-                myob.profileStarter('buildFloatingHeaderTable')
+                myob.profileStarter('buildFloatingHeaderTable');
                 myob.myFloatingTable = myob.myTable.clone();
-                myob.myFloatingTable.appendTo(myob.myTableHolder)
-                myob.myFloatingTable.addClass("floating-table")
+                myob.myFloatingTable.appendTo(myob.myTableHolder);
+                myob.myFloatingTable.addClass("floating-table");
                 myob.profileEnder('buildFloatingHeaderTable');
             },
 
@@ -1073,7 +1076,7 @@ jQuery(document).ready(
                 } else {
                     myob.myRows = myob.myTable.find(myob.rowSelector);
                 }
-                myob.profileStarter('setRows');
+                myob.profileEnder('setRows');
             },
 
             /**
@@ -1196,13 +1199,13 @@ jQuery(document).ready(
                         function(i, row) {
                             var row = jQuery(row);
                             var rowID = row.attr('id');
-                            myob.rowRawData[rowID] = {};
                             if(typeof rowID === 'string' && rowID.length > 0) {
                                 //do nothing
                             } else {
                                 rowID = 'tfs-row-'+i;
                                 row.attr('id', rowID);
                             }
+                            myob.rowRawData[rowID] = {'ID': rowID};
                             row.find('[' + myob.filterItemAttribute + ']').each(
                                 function(j, el) {
                                     el = jQuery(el);
@@ -1212,7 +1215,7 @@ jQuery(document).ready(
                                     if(value.length > 0) {
                                         if(typeof myob.rowRawData[rowID][category] === 'undefined') {
                                             myob.rowRawData[rowID][category] = value;
-                                        } else if(Array.IsArray(myob.rowRawData[rowID][category]) === false) {
+                                        } else if(Array.isArray(myob.rowRawData[rowID][category]) === false) {
                                             myob.rowRawData[rowID][category] = [myob.rowRawData[rowID][category]];
                                             myob.rowRawData[rowID][category].push(value)
                                         }
@@ -1233,7 +1236,7 @@ jQuery(document).ready(
             dataSampling: function()
             {
                 myob.profileStarter('dataSampling');
-                var firstRow = true;
+                var isFirstRow = true;
                 //work through rowRawData
                 for(rowID in myob.rowRawData) {
                     if(myob.rowRawData.hasOwnProperty(rowID)) {
@@ -1253,10 +1256,20 @@ jQuery(document).ready(
                                 }
 
                                 //start building the category
-                                if(firstRow === true) {
+                                if(isFirstRow === true) {
                                     myob.dataDictionaryBuildCategory(category);
                                 }
                                 var rawValue = myob.rowRawData[rowID][category];
+                                if(myob.dataDictionary[category]['IsEditable'] === null) {
+                                    if(myob.useJSON) {
+                                        var firstRow = jQuery(myob.templateRow);
+                                    } else {
+                                        var firstRow = myob.myTableBody.find('tr').first();
+                                    }
+                                    var elementSelectorInner = '[' + myob.filterItemAttribute + '="'+category+'"]';
+                                    var elementSelector = 'input'+elementSelectorInner+', select'+elementSelectorInner+', textarea'+elementSelectorInner;
+                                    myob.dataDictionary[category]['IsEditable'] = firstRow.find(elementSelector).length > 0 ? true : false;
+                                }
                                 if(myob.dataDictionary[category]['DataType'] === '') {
                                     if(category === 'keyword') {
                                         myob.dataDictionary[category]['DataType'] = 'string';
@@ -1285,9 +1298,11 @@ jQuery(document).ready(
                                         console.log(rawValue);
                                     }
                                     myob.dataDictionary[category]['DataType'] = type;
+
                                 }
                             }
                         }
+                        isFirstRow = false;
                     }
                 }
 
@@ -1311,30 +1326,28 @@ jQuery(document).ready(
                 var value = '';
                 var category = '';
                 var rowID = '';
-                if(myob.useJSON) {
-                    for(rowID in myob.rowRawData) {
-                        if(myob.rowRawData.hasOwnProperty(rowID)) {
-                            var rowData = myob.rowRawData[rowID];
-                            var keywordString = '';
-                            for(category in rowData) {
-                                if(rowData.hasOwnProperty(category)) {
-                                    myob.dataDictionaryBuildCategory(category);
-                                    var values = rowData[category];
-                                    //make sure it is an array
-                                    if(Array.isArray(values) === false) {
-                                        values = [values];
-                                    }
-                                    for(var i = 0; i < values.length; i++) {
-                                        //to do? clean value???
-                                        var value = values[i];
-                                        myob.addValueToRow(category, rowID, value);
-                                        keywordString += myob.joinRecursively(value,' ').trim();
-                                    }
+                for(rowID in myob.rowRawData) {
+                    if(myob.rowRawData.hasOwnProperty(rowID)) {
+                        var rowData = myob.rowRawData[rowID];
+                        var keywordString = '';
+                        for(category in rowData) {
+                            if(rowData.hasOwnProperty(category)) {
+                                myob.dataDictionaryBuildCategory(category);
+                                var values = rowData[category];
+                                //make sure it is an array
+                                if(Array.isArray(values) === false) {
+                                    values = [values];
+                                }
+                                for(var i = 0; i < values.length; i++) {
+                                    //to do? clean value???
+                                    var value = values[i];
+                                    myob.addValueToRow(category, rowID, value);
+                                    keywordString += ' '+myob.joinRecursively(value,' ').trim()+' ';
                                 }
                             }
-                            keywordString = keywordString = keywordString.replace(/  +/g, ' ').trim();
-                            myob.addValueToRow('Keyword', rowID, keywordString);
                         }
+                        keywordString = keywordString.replace(/  +/g, ' ').trim();
+                        myob.addValueToRow('Keyword', rowID, keywordString);
                     }
                 }
 
@@ -1366,26 +1379,29 @@ jQuery(document).ready(
 
                         //can it be filtered?
                         if(typeof myob.dataDictionary[category]['CanFilter'] === "undefined" || myob.dataDictionary[category]['CanFilter'] === null) {
-                            //if includeInFilter has items and category is not one of them, disable
-                            if(myob.includeInFilter.length > 0 && myob.includeInFilter.indexOf(category) === -1) {
-                                myob.dataDictionary[category]['CanFilter'] = false;
-                            }
-                            //if explicit exclude
-                            else if(myob.excludeFromFilter.length > 0 && myob.excludeFromFilter.indexOf(category) > -1) {
-                                myob.dataDictionary[category]['CanFilter'] = false;
-                            //set depending on data type etc
+                            if(category === 'Keyword' || category === 'ID') {
+                                myob.dataDictionary[category]['CanFilter']  = false;
                             } else {
-                                if(sortLink && sortLink.attr('data-sort-only') == 'true') {
+                                //if includeInFilter has items and category is not one of them, disable
+                                if(myob.includeInFilter.length > 0 && myob.includeInFilter.indexOf(category) === -1) {
                                     myob.dataDictionary[category]['CanFilter'] = false;
+                                }
+                                //if explicit exclude
+                                else if(myob.excludeFromFilter.length > 0 && myob.excludeFromFilter.indexOf(category) > -1) {
+                                    myob.dataDictionary[category]['CanFilter'] = false;
+                                //set depending on data type etc
                                 } else {
-                                    myob.dataDictionary[category]['CanFilter'] = myob.dataDictionary[category]['Options'].length > 1 || myob.dataDictionary[category]['IsEditable'] ? true : false;
+                                    if(sortLink && sortLink.attr('data-sort-only') == 'true') {
+                                        myob.dataDictionary[category]['CanFilter'] = false;
+                                    } else {
+                                        myob.dataDictionary[category]['CanFilter'] = myob.dataDictionary[category]['Options'].length > 1 || myob.dataDictionary[category]['IsEditable'] ? true : false;
+                                    }
                                 }
                             }
                         }
 
                     }
                 );
-
                 //if includeInFilter empty, fill with dataDict CanFilter
                 if(myob.includeInFilter.length === 0) {
                     myob.includeInFilter = Object.keys(myob.dataDictionary).filter(category => myob.dataDictionary[category]['CanFilter'])
@@ -1469,10 +1485,10 @@ jQuery(document).ready(
                 myob.dataDictionaryBuildCategory(category);
 
                 var oldValue = myob.dataDictionary[category]['Values'][rowID];
-                myob.removeOptionFromCategory(category, oldValue);
+                //myob.removeOptionFromCategory(category, oldValue);
 
                 //reset values
-                if(Array.isArray(myob.dataDictionary[category]['Values'][rowID])) {
+                if(Array.isArray(oldValue)) {
                     myob.dataDictionary[category]['Values'][rowID].length = 0;
                 }
                 myob.dataDictionary[category]['Values'][rowID] = [];
@@ -1510,15 +1526,11 @@ jQuery(document).ready(
                 //set up category
                 myob.dataDictionaryBuildCategory(category);
 
-                if(myob.isEmptyValue(value)) {
-                    value = '';
-                } else {
-                    if(Array.isArray(myob.dataDictionary[category]['Values'][rowID]) === false) {
-                        myob.dataDictionary[category]['Values'][rowID] = [];
-                    }
-                    myob.dataDictionary[category]['Values'][rowID].push(value);
-                    myob.addOptionToCategory(category, value);
+                if(Array.isArray(myob.dataDictionary[category]['Values'][rowID]) === false) {
+                    myob.dataDictionary[category]['Values'][rowID] = [];
                 }
+                myob.dataDictionary[category]['Values'][rowID].push(value);
+                myob.addOptionToCategory(category, value);
 
                 //standardise empty ones ...
                 myob.standardiseEmptyRows(category, rowID);
@@ -1538,9 +1550,8 @@ jQuery(document).ready(
                 if(myob.dataDictionary[category]['Values'][rowID] === false) {
                     return;
                 }
-                var type = typeof value
                 if(value !== Object(value)) {
-                    myob.removeOptionFromCategory(category, value);
+                    //myob.removeOptionFromCategory(category, value);
                     var index = myob.dataDictionary[category]['Values'][rowID].indexOf(value);
                     if(index === -1) {
                         //already done
@@ -1559,7 +1570,8 @@ jQuery(document).ready(
             {
                 //standardise empty ones ...
                 if(myob.isEmptyValue(myob.dataDictionary[category]['Values'][rowID])) {
-                    myob.dataDictionary[category]['Values'][rowID] = false;
+                    var standardEmptyValue = myob.validateValue(category, myob.dataDictionary[category]['Values'][rowID]);
+                    myob.dataDictionary[category]['Values'][rowID] = standardEmptyValue;
                 }
             },
 
@@ -1571,7 +1583,7 @@ jQuery(document).ready(
              */
             replaceOptionInCategory: function(category, oldValue, newValue)
             {
-                myob.removeOptionFromCategory(category, oldValue);
+                //myob.removeOptionFromCategory(category, oldValue);
                 myob.addOptionToCategory(category, newValue);
             },
 
@@ -1702,7 +1714,23 @@ jQuery(document).ready(
                 }
                 //reset all empty values - we are going to ignore those ...
                 if(myob.isEmptyValue(value)) {
-                    value = '';
+                    switch(forcedDataType) {
+                        case 'date':
+                            return '';
+                            break;
+                        case 'number':
+                            return 0;
+                            break;
+                        case 'boolean':
+                            return false;
+                            break;
+                        case 'string':
+                        case '':
+                            return '';
+                            break;
+                        default:
+                            console.log('ERROR: unknown data type.'+forcedDataType+' for '+value);
+                    }
                 }
                 //arrays
                 else if (Array.isArray(value)) {
@@ -2671,10 +2699,11 @@ jQuery(document).ready(
 
             runCurrentSort: function()
             {
+                myob.profileStarter('runCurrentSort');
+
                 // clear endRowManipulation just because we are going to run it in the end again - anyway ...
                 myob.windowTimeoutStoreSetter('endRowManipulation');
 
-                myob.profileStarter('runCurrentSort');
                 myob.sfr = 0;
                 myob.myTableHead.find(myob.sortLinkSelector)
                     .removeClass(myob.sortAscClass)
@@ -3178,6 +3207,13 @@ jQuery(document).ready(
             },
 
 
+            buildTemplateRow: function()
+            {
+                myob.templateRow = myob.myTableBody.clone().html();
+                myob.templateRowCompiled = doT.template(myob.templateRow);
+                myob.myTableBody.empty();
+            },
+
             buildRows: function()
             {
                 myob.profileStarter('buildRows');
@@ -3651,9 +3687,9 @@ jQuery(document).ready(
                         }
                     );
                 }
-                myob.processRetrievedData(forceFavs);
-
                 myob.profileEnder('retrieveDataFromServer');
+
+                myob.processRetrievedData(forceFavs);
             },
 
             processRetrievedData: function(forceFavs)
@@ -3954,26 +3990,30 @@ jQuery(document).ready(
 
             profileStarter: function(name)
             {
-                if(myob.debug) {
-                    console.log('-----------------------');
+                if(myob.debug === true) {
+                    console.log('_______________________');
                     console.count(name);
-                    console.time(name)
-                    console.profile(name);
+                    console.time(name);
+                    if(myob.profile === true) {
+                        console.profile(name);
+                    }
                 }
             },
 
             profileEnder: function(name)
             {
-                if(myob.debug) {
-                    console.profileEnd(name);
+                if(myob.debug === true) {
+                    if(myob.profile === true) {
+                        console.profileEnd(name);
+                    }
                     console.timeEnd(name);
-                    console.log('_______________________');
+                    console.log('-----------------------');
                 }
             },
 
             debugger: function(name)
             {
-                if(myob.debug) {
+                if(myob.debug === true) {
                     console.log('_______________________');
                     console.log('_______________________ SORTED');
                     console.log(myob.myRowsSorted);
@@ -4071,7 +4111,7 @@ jQuery(document).ready(
                 myob.gotoPage(0, true);
                 return this;
             },
-            updateDataDictionary: function(category, rowID, oldValue, newValue){
+            updateDataDictionaryForCategoryRow: function(category, rowID, newValue){
                 myob.replaceRowValue(category, rowID, newValue);
                 return this;
             },
