@@ -197,14 +197,6 @@ jQuery(document).ready(
             validDataTypes: ['date', 'number', 'boolean', 'string'],
 
             /**
-             * when trying to establish the data-type
-             * max
-             * @type {int}
-             */
-            maxNumberOfValuesToCheck: 500,
-
-
-            /**
              * if we have more than the rows specified then we do not search for identicals
              * @type {integer}
              */
