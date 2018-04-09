@@ -31,7 +31,6 @@ jQuery(document).ready(
 
         var myob = {
 
-
             /**
              *
              *
@@ -590,7 +589,7 @@ jQuery(document).ready(
              * this should be an input field
              * @type {string}
              */
-            visibleRowCountSelector: ".total-showing-row-number input",
+            visibleRowCountSelector: ".total-showing-row-number select",
 
             /**
              * class for an element that holds the pagination
@@ -1009,6 +1008,12 @@ jQuery(document).ready(
                                 myob.initFX2();
                             }
                             myob.canPushState = true;
+                            window.setTimeout(
+                                function() {
+                                    myob.myFilterFormHolder.find('.' + myob.openAndCloseFilterFormClass).first().click();
+                                },
+                                300
+                            );
 
                             //ADD SCROLL AND OTHER STUFF ...
 
