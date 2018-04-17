@@ -2471,7 +2471,7 @@ jQuery(document).ready(
                             'Keyword'
                         );
                         content += myob.makeFieldForForm('keyword', 'Keyword', tabIndex, 0);
-                        content += myob.makeSectionFooterForForm();
+                        content += myob.makeSectionFooterForForm('keyword');
                     }
                     content += '</form>';
 
@@ -2572,15 +2572,16 @@ jQuery(document).ready(
                             break;
                         case 'keyword':
                         case 'tag':
+                            var placeholder = '';
                             var currentValueForForm = '';
                             var additionToField = '';
                             if(type === 'keyword') {
+                                placeholder = 'separate entries by comma';
                                 var extraClass = 'keyword';
                                 if(typeof myob.cfi[category] !== 'undefined') {
                                     if(typeof myob.cfi[category][0] !== 'undefined') {
                                         for(var i = 0; i < myob.cfi[category].length; i++) {
                                             currentValueForForm = myob.cfi[category][i].vtm.raw2attr();
-
                                         }
                                     }
                                 }
@@ -2598,7 +2599,7 @@ jQuery(document).ready(
                                 var extraClass = 'awesomplete';
                             }
                             return startString +
-                                    '<input class="text ' + extraClass + '" type="text" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" value="'+currentValueForForm+'" />' +
+                                    '<input class="text ' + extraClass + '" type="text" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" value="'+currentValueForForm+'" placeholder="'+placeholder.raw2attr()+'" />' +
                                     additionToField +
                                     endString;
                         case 'checkbox':
@@ -2642,9 +2643,16 @@ jQuery(document).ready(
                 }
             },
 
-            makeSectionFooterForForm: function()
+            makeSectionFooterForForm: function(type)
             {
-                return '</ul></div>';
+                var html = '';
+                if(typeof type === 'string') {
+                    switch(type) {
+                        case 'keyword':
+                    }
+                }
+                html += '</ul></div>';
+                return html;
             },
 
             makeCheckboxSection: function(input, valueIndex)
@@ -3052,9 +3060,10 @@ jQuery(document).ready(
                         myob.myTableHolder.addClass(myob.fixedHeaderClass); //class for pos fixed
 
                         myob.fixedTableHeaderIsOn = true;
-
-                        myob.myFilterFormHolder.width(width);
-                        myob.myFloatingTable.width(width)
+                        if(width > 100) {
+                            myob.myFilterFormHolder.width(width);
+                            myob.myFloatingTable.width(width)
+                        }
                         // myob.myFloatingTable("thead").width(width)
 
                         var top = myob.myFilterFormHolder.outerHeight(true)-2;
@@ -3063,7 +3072,9 @@ jQuery(document).ready(
                     }
                     if(showFixedHeader === false && (myob.fixedTableHeaderIsOn === true || myob.fixedTableHeaderIsOn === null)) {
                         var width = myob.myTableHead.width();
-                        myob.myFilterFormHolder.width(width);
+                        if(width > 100) {
+                            myob.myFilterFormHolder.width(width);
+                        }
                         myob.fixedTableHeaderIsOn = false;
                         myob.myTableHolder.removeClass(myob.fixedHeaderClass);
                         myob.myTable.css('margin-top', 0);
@@ -3071,9 +3082,6 @@ jQuery(document).ready(
                 }
                 myob.profileEnder('fixTableHeader');
             },
-
-
-
 
 
 
