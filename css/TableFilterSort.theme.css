@@ -349,8 +349,8 @@ li.tfs-save-and-load.save.filters,
     height: 24px;
     width: auto;
     vertical-align: top;
-    display: block!important;
-    width: 210px!important;
+    width: 20vw!important;
+    min-width: 180!important;
     float: right;
 }
 
