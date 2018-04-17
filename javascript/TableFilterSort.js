@@ -1001,7 +1001,7 @@ jQuery(document).ready(
                             myob.myTableHolder.removeClass(myob.loadingClass);
 
                             //set table width
-                            window.scroll();
+                            jQuery('body').scroll();
 
                             if(typeof myob.initFX2 === 'function') {
                                 myob.initFX2();
@@ -1715,6 +1715,9 @@ jQuery(document).ready(
                             break;
                         case 'boolean':
                             return false;
+                            break;
+                        case 'object':
+                            return null;
                             break;
                         case 'string':
                         case '':
