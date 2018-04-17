@@ -2579,7 +2579,7 @@ jQuery(document).ready(
                             var currentValueForForm = '';
                             var additionToField = '';
                             if(type === 'keyword') {
-                                placeholder = 'separate entries by comma';
+                                placeholder = 'separate phrases by comma';
                                 var extraClass = 'keyword';
                                 if(typeof myob.cfi[category] !== 'undefined') {
                                     if(typeof myob.cfi[category][0] !== 'undefined') {
