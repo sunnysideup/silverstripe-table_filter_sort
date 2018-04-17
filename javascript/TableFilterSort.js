@@ -3043,7 +3043,9 @@ jQuery(document).ready(
                 if(myob.hasFixedTableHeader) {
                     var showFixedHeader = false
                     var width = myob.myTableHead.width();
-
+                    if(width > 100) {
+                        myob.myFilterFormHolder.width(width);
+                    }
                     if(myob.myTableHolder.isOnScreen()) {
                         //get basic data about scroll situation...
                         var tableOffset = myob.myTableBody.offset().top;
@@ -3064,7 +3066,6 @@ jQuery(document).ready(
 
                         myob.fixedTableHeaderIsOn = true;
                         if(width > 100) {
-                            myob.myFilterFormHolder.width(width);
                             myob.myFloatingTable.width(width)
                         }
                         // myob.myFloatingTable("thead").width(width)
@@ -3074,10 +3075,6 @@ jQuery(document).ready(
                         myob.myTable.css('margin-top', top);
                     }
                     if(showFixedHeader === false && (myob.fixedTableHeaderIsOn === true || myob.fixedTableHeaderIsOn === null)) {
-                        var width = myob.myTableHead.width();
-                        if(width > 100) {
-                            myob.myFilterFormHolder.width(width);
-                        }
                         myob.fixedTableHeaderIsOn = false;
                         myob.myTableHolder.removeClass(myob.fixedHeaderClass);
                         myob.myTable.css('margin-top', 0);
