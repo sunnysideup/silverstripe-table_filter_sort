@@ -176,6 +176,11 @@ jQuery(document).ready(
              */
             scrollToTopAtPageOpening: true,
 
+            /**
+             *
+             * @type {boolean}
+             */
+             startWithOpenFilter: false,
 
             /**
              * used for releasing
@@ -1007,15 +1012,21 @@ jQuery(document).ready(
                                 myob.initFX2();
                             }
                             myob.canPushState = true;
+                            if(myob.startWithOpenFilter) {
+                                window.setTimeout(
+                                    function() {
+                                        myob.myFilterFormHolder.find('.' + myob.openAndCloseFilterFormClass).first().click();
+                                    },
+                                    300
+                                );
+                            }
+                            //ADD SCROLL AND OTHER STUFF ...
                             window.setTimeout(
                                 function() {
-                                    myob.myFilterFormHolder.find('.' + myob.openAndCloseFilterFormClass).first().click();
+                                    myob.scrollToTopAtPageOpening = true;
                                 },
-                                300
+                                1000
                             );
-
-                            //ADD SCROLL AND OTHER STUFF ...
-
                         },
                         myob.millisecondsBetweenActionsShort
                     );
@@ -3028,13 +3039,12 @@ jQuery(document).ready(
                          },
                          myob.millisecondsBetweenActionsLong
                      );
+                     myob.scrollToTopAtPageOpening = true;
                  } else {
                      //fire scroll event in any case ...
                      window.scrollTo(window.scrollX, window.scrollY);
                  }
-
                  //we now allow scrolls
-                 myob.scrollToTopAtPageOpening = true;
              },
 
             fixTableHeader: function()
