@@ -2111,9 +2111,13 @@ jQuery(document).ready(
                                 if(val !== false) {
                                     if(myob.visibleRowCount !== val) {
                                         myob.visibleRowCount = val;
-                                        if(typeof Cookies !== 'undefined') {
-                                            Cookies.set('visibleRowCount', myob.visibleRowCount, {path: myob.baseURL, expires: 180});
-                                        }
+                                        window.localStorage.setItem(
+                                            'TFS_visibleRowCount',
+                                            myob.visibleRowCount
+                                        );
+                                        // if(typeof Cookies !== 'undefined') {
+                                        //     Cookies.set('visibleRowCount', myob.visibleRowCount, {path: myob.baseURL, expires: 180});
+                                        // }
                                         myob.gotoPage(0, true);
                                     }
                                 }
@@ -2315,9 +2319,13 @@ jQuery(document).ready(
                         myob.mfv.splice(i, 1);
                     }
                 }
-                if(typeof Cookies !== 'undefined') {
-                    Cookies.set('mfv', myob.mfv, {path: myob.baseURL, expires: 180});
-                }
+                window.localStorage.setItem(
+                    'TFS_mfv',
+                    myob.mfv
+                );
+                // if(typeof Cookies !== 'undefined') {
+                //     // Cookies.set('mfv', , {path: myob.baseURL, expires: 180});
+                // }
             },
 
             toggleIdInFavourites: function(id)
@@ -3600,19 +3608,20 @@ jQuery(document).ready(
             retrieveLocalCookie: function()
             {
                 //get favourites data
-                if(typeof Cookies !== 'undefined') {
-                    myob.mfv = Cookies.getJSON('mfv');
-                    if(typeof myob.mfv === 'undefined') {
-                        myob.mfv = [];
-                    } else {
-                        myob.serverDataToApply['mfv'] = true;
-                    }
-                    var v = Cookies.getJSON('visibleRowCount');
-                    visibleRowCount = myob.visibleRowCountValidator(v);
-                    if(visibleRowCount !== false) {
-                        myob.visibleRowCount = v;
-                    }
+                // if(typeof Cookies !== 'undefined') {
+
+                myob.mfv = window.localStorage.getItem('TFS_mfv');
+                if(myob.mfv === 'undefined' || Array.isArray(myob.mfv) === false) {
+                    myob.mfv = [];
+                } else {
+                    myob.serverDataToApply['mfv'] = true;
                 }
+                var v = window.localStorage.getItem('TFS_visibleRowCount');
+                visibleRowCount = myob.visibleRowCountValidator(v);
+                if(visibleRowCount !== false) {
+                    myob.visibleRowCount = v;
+                }
+                // }
             },
 
             /**
