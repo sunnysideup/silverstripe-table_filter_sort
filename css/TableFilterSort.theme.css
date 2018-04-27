@@ -41,12 +41,12 @@
  * BACKGROUND-COLOUR
  */
 
-.header-block {
+.tfs-holder .header-block {
     background-color: #555;
     border-bottom: 2px solid #fff;
     clear: both;
 }
-.header-block * {
+.tfs-holder .header-block * {
     color: #fff;
 }
 
@@ -381,7 +381,7 @@ li.tfs-save-and-load.save.filters,
     clear: both;
 }
 
-.header-block .tfs-filter-column {
+.tfs-holder .header-block .tfs-filter-column {
     margin: 10px 10px 10px 0;
     border-left: 1px solid rgba(255,255,255,0.3);
     border-top: 1px solid  rgba(255,255,255,0.3);
@@ -417,37 +417,37 @@ li.tfs-save-and-load.save.filters,
 }
 
 
-.header-block .tfs-filter-column ul,
-.header-block .tfs-filter-column ul li {
+.tfs-holder .header-block .tfs-filter-column ul,
+.tfs-holder .header-block .tfs-filter-column ul li {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.header-block .tfs-filter-column.tagFilter div.awesomplete {
+.tfs-holder .header-block .tfs-filter-column.tagFilter div.awesomplete {
     display: block;
 }
 
-.header-block .tfs-filter-column input.text,
-.header-block .tfs-filter-column input.number,
-.header-block .tfs-filter-column input.awesomplete,
-.header-block .quick-keyword input
+.tfs-holder .header-block .tfs-filter-column input.text,
+.tfs-holder .header-block .tfs-filter-column input.number,
+.tfs-holder .header-block .tfs-filter-column input.awesomplete,
+.tfs-holder .header-block .quick-keyword input
 {
     width: 3em;
     border: 1px solid rgba(255,255,255,0.9);
     background-color: rgba(255,255,255,0.7);
     border-radius: 3px;
 }
-.header-block .tfs-filter-column input.text:focus,
-.header-block .tfs-filter-column input.number:focus,
-.header-block .tfs-filter-column input.awesomplete:focus,
-.header-block .quick-keyword input:focus
+.tfs-holder .header-block .tfs-filter-column input.text:focus,
+.tfs-holder .header-block .tfs-filter-column input.number:focus,
+.tfs-holder .header-block .tfs-filter-column input.awesomplete:focus,
+.tfs-holder .header-block .quick-keyword input:focus
 {
     background-color: #fff;
 }
 
-.header-block .tfs-filter-column input.awesomplete,
-.header-block .tfs-filter-column input.keyword,
+.tfs-holder .header-block .tfs-filter-column input.awesomplete,
+.tfs-holder .header-block .tfs-filter-column input.keyword,
 .tfs-filter-form-holder .quick-keyword input
  {
     display: block;
@@ -458,19 +458,19 @@ li.tfs-save-and-load.save.filters,
 }
 
 
-.header-block .tfs-filter-column.tagFilter .awesomplete>ul {
+.tfs-holder .header-block .tfs-filter-column.tagFilter .awesomplete>ul {
     min-width: auto!important;
 }
 
-.header-block .tfs-filter-column.tagFilter .awesomplete>ul li {
+.tfs-holder .header-block .tfs-filter-column.tagFilter .awesomplete>ul li {
     padding: 10px;
 }
 
-.header-block .tfs-filter-column.tagFilter input.tag {
+.tfs-holder .header-block .tfs-filter-column.tagFilter input.tag {
     width: 95%
 }
 
-.header-block .tfs-filter-column.numberFilter input {
+.tfs-holder .header-block .tfs-filter-column.numberFilter input {
     width: 3em;
 }
 
@@ -890,16 +890,16 @@ body .loading p {
     .tfs-holder body {
         padding: 1em;
     }
-    .header-block .tfs-filter-column {
+    .tfs-holder .header-block .tfs-filter-column {
         width: calc(33% - 20px);
         float: left;
     }
 
-    .header-block .tfs-filter-column:nth-child(3n) {
+    .tfs-holder .header-block .tfs-filter-column:nth-child(3n) {
         margin-right: 0px;
     }
 
-    .header-block .tfs-filter-column:nth-child(3n+1) {
+    .tfs-holder .header-block .tfs-filter-column:nth-child(3n+1) {
         clear: left;
     }
 }
@@ -908,16 +908,16 @@ body .loading p {
     .tfs-holder body {
         padding: 2em;
     }
-    .header-block .tfs-filter-column {
+    .tfs-holder .header-block .tfs-filter-column {
         width: calc(20% - 20px);
         float: left;
     }
 
-    .header-block .tfs-filter-column:nth-child(5n) {
+    .tfs-holder .header-block .tfs-filter-column:nth-child(5n) {
         margin-right: 0px;
     }
 
-    .header-block .tfs-filter-column:nth-child(5n+1) {
+    .tfs-holder .header-block .tfs-filter-column:nth-child(5n+1) {
         clear: left;
     }
 }
