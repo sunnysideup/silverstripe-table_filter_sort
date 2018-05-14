@@ -56,33 +56,32 @@ class TableFilterSortAPI extends Object
         $includeInPage = false,
         $jsSettings = null
     ) {
-        if($jsSettings === null) {
+        if ($jsSettings === null) {
             $jsSettings = self::$js_settings;
         }
         if (is_array($jsSettings)) {
-            if(isset($jsSettings['rowRawData'])) {
-
+            if (isset($jsSettings['rowRawData'])) {
                 $rawDataFieldKey = [];
                 $firstRow = true;
                 $categoryIndex = 0;
-                foreach($jsSettings['rowRawData'] as $rowID => $categories) {
-                    if($firstRow) {
+                foreach ($jsSettings['rowRawData'] as $rowID => $categories) {
+                    if ($firstRow) {
                         $rowCount = count($categories);
                     } else {
-                        if($rowCount !== count($categories)) {
+                        if ($rowCount !== count($categories)) {
                             user_error('Bad number of entries in '.$rowID);
                         }
                     }
-                    foreach($categories as $category => $values) {
-                        if($firstRow) {
+                    foreach ($categories as $category => $values) {
+                        if ($firstRow) {
                             $shortKey = self::num_2_alpha($categoryIndex);
                             $categoryIndex++;
-                            if(array_key_exists($shortKey, $jsSettings['rowRawData'][$rowID])) {
+                            if (array_key_exists($shortKey, $jsSettings['rowRawData'][$rowID])) {
                                 user_error('You are using an illegal key in the raw data, namely: '.$shortKey);
                             }
                             $rawDataFieldKey[$category] = $shortKey;
                         } else {
-                            if(isset($category, $jsSettings['rowRawData'][$rowID])) {
+                            if (isset($category, $jsSettings['rowRawData'][$rowID])) {
                                 $shortKey = $rawDataFieldKey[$category];
                             } else {
                                 user_error('Your rows are not identical: '.$rowID.' has an unknown category: '.$category);
@@ -161,7 +160,7 @@ class TableFilterSortAPI extends Object
             //js
             $allJS = '';
             foreach ($js as $link) {
-                if(Director::isDev()) {
+                if (Director::isDev()) {
                     //do nothing
                 } else {
                     $link = str_replace('.js', '.min.js', $link);
@@ -179,10 +178,9 @@ class TableFilterSortAPI extends Object
 
     protected static function num_2_alpha($n)
     {
-        for($r = ""; $n >= 0; $n = intval($n / 26) - 1) {
+        for ($r = ""; $n >= 0; $n = intval($n / 26) - 1) {
             $r = chr($n%26 + 0x41) . $r;
         }
         return $r;
     }
-
 }
