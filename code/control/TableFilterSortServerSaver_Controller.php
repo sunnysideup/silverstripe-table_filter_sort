@@ -158,7 +158,7 @@ class TableFilterSortServerSaver_Controller extends Controller
                     }
                 }
                 Session::clear('TableFilterSortPostData');
-                //$form->setMessage('Saved successfully', 'good');
+                // $form->setMessage('Saved successfully', 'good');
             } else {
                 $form->setMessage('An Error Occurred', 'bad');
             }
