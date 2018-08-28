@@ -2,13 +2,12 @@
 
 function create_test()
 {
-
     $useJSON = true;
-    if(isset($_GET['nojson']) && $_GET['nojson'] === '1') {
+    if (isset($_GET['nojson']) && $_GET['nojson'] === '1') {
         $useJSON = false;
     }
     $templateRow = '';
-    if($useJSON) {
+    if ($useJSON) {
         $templateRow = '
         <tr class="tfstr" id="{{=it.RowID}}">
             <td><a href="#" class="more">+</a></td>
@@ -59,17 +58,17 @@ function create_test()
     $colours = RandomTestValues::get_sample_array_by_type('colours');
     $veg = RandomTestValues::get_sample_array_by_type('veg');
     $sizes = RandomTestValues::get_sample_array_by_type('sizes');
-    for($i = 0; $i < $limit; $i++) {
+    for ($i = 0; $i < $limit; $i++) {
         $id = 'tfs'.$i;
         $jsonArray[$id] = [
             'SKU' => ($i+1),
             'Type' => $type,
             'OriginalProducer' => $producer,
             'Colour' => $colours[rand(0, count($colours)-1)],
-            'Size' => $sizes[rand(0,count($sizes)-1)],
-            'Weight' => rand(1,100),
-            'Price' => (rand(0,99999)/100),
-            'Rating' => rand(1,5),
+            'Size' => $sizes[rand(0, count($sizes)-1)],
+            'Weight' => rand(1, 100),
+            'Price' => (rand(0, 99999)/100),
+            'Rating' => rand(1, 5),
             'Tags' => [
                 $veg[rand(0, count($veg)-1)],
                 $veg[rand(0, count($veg)-1)],
@@ -79,7 +78,7 @@ function create_test()
             'SelectValue' => 'yes'
         ];
         $rowData = $jsonArray[$id];
-        if($useJSON) {
+        if ($useJSON) {
             $html = $templateRow;
         } else {
             $html .= '
@@ -138,10 +137,10 @@ $useJSON = $data['useJSON'];
     <head>
         <meta charset="UTF-8">
         <title>Example Filter Table</title>
-        <link rel="stylesheet" type="text/css" href="../../css/awesomplete.css?x=<?php echo rand(0,9999999999) ?>">
-        <link rel="stylesheet" type="text/css" href="../../css/awesomplete.theme.css?x=<?php echo rand(0,9999999999) ?>">
-        <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.css?x=<?php echo rand(0,9999999999) ?>">
-        <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.theme.css?x=<?php echo rand(0,9999999999) ?>">
+        <link rel="stylesheet" type="text/css" href="../../css/awesomplete.css?x=<?php echo rand(0, 9999999999) ?>">
+        <link rel="stylesheet" type="text/css" href="../../css/awesomplete.theme.css?x=<?php echo rand(0, 9999999999) ?>">
+        <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.css?x=<?php echo rand(0, 9999999999) ?>">
+        <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.theme.css?x=<?php echo rand(0, 9999999999) ?>">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
         <style>
             form.update-page-form {width: 400px; margin-left: auto; margin-right: auto; box-sizing: border-box; background-color: #ccc; border: 1px solid #999; border-radius: 5px;}
@@ -158,8 +157,8 @@ $useJSON = $data['useJSON'];
         <header>
             <h1>Example of a Filter and Sort Table ... </h1>
             <form action="?submitted" method="get" class="update-page-form">
-                <div><input type="number" name="i" value="<?php echo (isset($_GET['i']) ? intval($_GET['i']) : 300);  ?>"/><label for="i">number of rows</label></div>
-                <div><input type="checkbox" name="nojson" value="1" <?php echo (isset($_GET['nojson']) && $_GET['nojson'] == 1 ? 'checked="checked"' : '');  ?> /><label for="nojson">without json data</label></div>
+                <div><input type="number" name="i" value="<?php echo(isset($_GET['i']) ? intval($_GET['i']) : 300);  ?>"/><label for="i">number of rows</label></div>
+                <div><input type="checkbox" name="nojson" value="1" <?php echo(isset($_GET['nojson']) && $_GET['nojson'] == 1 ? 'checked="checked"' : '');  ?> /><label for="nojson">without json data</label></div>
                 <div><input type="submit" value="reload" /></div>
             </form>
             <p>Below the table is an examle of the <a href="#html">HTML</a> you need to use.</p>
@@ -345,12 +344,12 @@ $useJSON = $data['useJSON'];
         </main>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script src="../../javascript/jsurl.js?x=<?php echo rand(0,9999999999) ?>"></script>
-        <script src="../../javascript/jquery.simplemodal-1.4.5?x=<?php echo rand(0,9999999999) ?>"></script>
-        <script src="../../javascript/js.cookies.js?x=<?php echo rand(0,9999999999) ?>"></script>
-        <script src="../../javascript/awesomplete.js?x=<?php echo rand(0,9999999999) ?>"></script>
-        <script src="../../javascript/doT.js?x=<?php echo rand(0,9999999999) ?>"></script>
-        <script src="../../javascript/TableFilterSort.js?x=<?php echo rand(0,9999999999) ?>"></script>
+        <script src="../../javascript/jsurl.js?x=<?php echo rand(0, 9999999999) ?>"></script>
+        <script src="../../javascript/jquery.simplemodal-1.4.5?x=<?php echo rand(0, 9999999999) ?>"></script>
+        <script src="../../javascript/js.cookies.js?x=<?php echo rand(0, 9999999999) ?>"></script>
+        <script src="../../javascript/awesomplete.js?x=<?php echo rand(0, 9999999999) ?>"></script>
+        <script src="../../javascript/doT.js?x=<?php echo rand(0, 9999999999) ?>"></script>
+        <script src="../../javascript/TableFilterSort.js?x=<?php echo rand(0, 9999999999) ?>"></script>
         <script type="text/javascript">
             if(! Array.isArray(TableFilterSortVars)) {
                 var TableFilterSortVars = [];
@@ -359,7 +358,7 @@ $useJSON = $data['useJSON'];
                 {
                     debug: true,
                     mySelector: ".tfs-holder",
-                    rowRawData: <?php echo ($useJSON ? json_encode($jsonArray) : 'null'); ?>,
+                    rowRawData: <?php echo($useJSON ? json_encode($jsonArray) : 'null'); ?>,
                     filtersParentPageID: 'Test Filter',
                     favouritesParentPageID: 'Test Favourites',
                     dataDictionary: {
@@ -546,12 +545,14 @@ class RandomTestValues
         ]
     ];
 
-    public static function get_sample_array_by_type($type) {
+    public static function get_sample_array_by_type($type)
+    {
         $obj = new RandomTestValues();
         return $obj->getData($type);
     }
 
-    public function  getData($type) {
+    public function getData($type)
+    {
         return $this->data[$type];
     }
 }
