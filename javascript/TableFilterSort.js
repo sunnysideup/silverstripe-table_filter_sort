@@ -176,6 +176,11 @@ jQuery(document).ready(
              */
             scrollToTopAtPageOpening: true,
 
+            /**
+             *
+             * @type {boolean}
+             */
+             startWithOpenFilter: false,
 
             /**
              * used for releasing
@@ -1001,21 +1006,27 @@ jQuery(document).ready(
                             myob.myTableHolder.removeClass(myob.loadingClass);
 
                             //set table width
-                            window.scroll();
+                            jQuery('body').scroll();
 
                             if(typeof myob.initFX2 === 'function') {
                                 myob.initFX2();
                             }
                             myob.canPushState = true;
+                            if(myob.startWithOpenFilter) {
+                                window.setTimeout(
+                                    function() {
+                                        myob.myFilterFormHolder.find('.' + myob.openAndCloseFilterFormClass).first().click();
+                                    },
+                                    300
+                                );
+                            }
+                            //ADD SCROLL AND OTHER STUFF ...
                             window.setTimeout(
                                 function() {
-                                    myob.myFilterFormHolder.find('.' + myob.openAndCloseFilterFormClass).first().click();
+                                    myob.scrollToTopAtPageOpening = true;
                                 },
-                                300
+                                1000
                             );
-
-                            //ADD SCROLL AND OTHER STUFF ...
-
                         },
                         myob.millisecondsBetweenActionsShort
                     );
@@ -1716,6 +1727,9 @@ jQuery(document).ready(
                         case 'boolean':
                             return false;
                             break;
+                        case 'object':
+                            return null;
+                            break;
                         case 'string':
                         case '':
                             return '';
@@ -2097,9 +2111,13 @@ jQuery(document).ready(
                                 if(val !== false) {
                                     if(myob.visibleRowCount !== val) {
                                         myob.visibleRowCount = val;
-                                        if(typeof Cookies !== 'undefined') {
-                                            Cookies.set('visibleRowCount', myob.visibleRowCount, {path: myob.baseURL, expires: 180});
-                                        }
+                                        window.localStorage.setItem(
+                                            'TFS_visibleRowCount',
+                                            myob.visibleRowCount
+                                        );
+                                        // if(typeof Cookies !== 'undefined') {
+                                        //     Cookies.set('visibleRowCount', myob.visibleRowCount, {path: myob.baseURL, expires: 180});
+                                        // }
                                         myob.gotoPage(0, true);
                                     }
                                 }
@@ -2301,9 +2319,13 @@ jQuery(document).ready(
                         myob.mfv.splice(i, 1);
                     }
                 }
-                if(typeof Cookies !== 'undefined') {
-                    Cookies.set('mfv', myob.mfv, {path: myob.baseURL, expires: 180});
-                }
+                window.localStorage.setItem(
+                    'TFS_mfv',
+                    myob.mfv
+                );
+                // if(typeof Cookies !== 'undefined') {
+                //     // Cookies.set('mfv', , {path: myob.baseURL, expires: 180});
+                // }
             },
 
             toggleIdInFavourites: function(id)
@@ -2471,7 +2493,7 @@ jQuery(document).ready(
                             'Keyword'
                         );
                         content += myob.makeFieldForForm('keyword', 'Keyword', tabIndex, 0);
-                        content += myob.makeSectionFooterForForm();
+                        content += myob.makeSectionFooterForForm('keyword');
                     }
                     content += '</form>';
 
@@ -2572,15 +2594,16 @@ jQuery(document).ready(
                             break;
                         case 'keyword':
                         case 'tag':
+                            var placeholder = '';
                             var currentValueForForm = '';
                             var additionToField = '';
                             if(type === 'keyword') {
+                                placeholder = 'separate phrases by comma';
                                 var extraClass = 'keyword';
                                 if(typeof myob.cfi[category] !== 'undefined') {
                                     if(typeof myob.cfi[category][0] !== 'undefined') {
                                         for(var i = 0; i < myob.cfi[category].length; i++) {
                                             currentValueForForm = myob.cfi[category][i].vtm.raw2attr();
-
                                         }
                                     }
                                 }
@@ -2598,7 +2621,7 @@ jQuery(document).ready(
                                 var extraClass = 'awesomplete';
                             }
                             return startString +
-                                    '<input class="text ' + extraClass + '" type="text" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" value="'+currentValueForForm+'" />' +
+                                    '<input class="text ' + extraClass + '" type="text" name="'+category.raw2attr()+'" id="'+valueID+'" tabindex="'+tabIndex+'" value="'+currentValueForForm+'" placeholder="'+placeholder.raw2attr()+'" />' +
                                     additionToField +
                                     endString;
                         case 'checkbox':
@@ -2642,9 +2665,16 @@ jQuery(document).ready(
                 }
             },
 
-            makeSectionFooterForForm: function()
+            makeSectionFooterForForm: function(type)
             {
-                return '</ul></div>';
+                var html = '';
+                if(typeof type === 'string') {
+                    switch(type) {
+                        case 'keyword':
+                    }
+                }
+                html += '</ul></div>';
+                return html;
             },
 
             makeCheckboxSection: function(input, valueIndex)
@@ -3017,13 +3047,12 @@ jQuery(document).ready(
                          },
                          myob.millisecondsBetweenActionsLong
                      );
+                     myob.scrollToTopAtPageOpening = true;
                  } else {
                      //fire scroll event in any case ...
                      window.scrollTo(window.scrollX, window.scrollY);
                  }
-
                  //we now allow scrolls
-                 myob.scrollToTopAtPageOpening = true;
              },
 
             fixTableHeader: function()
@@ -3032,7 +3061,9 @@ jQuery(document).ready(
                 if(myob.hasFixedTableHeader) {
                     var showFixedHeader = false
                     var width = myob.myTableHead.width();
-
+                    if(width > 100) {
+                        myob.myFilterFormHolder.width(width);
+                    }
                     if(myob.myTableHolder.isOnScreen()) {
                         //get basic data about scroll situation...
                         var tableOffset = myob.myTableBody.offset().top;
@@ -3052,9 +3083,9 @@ jQuery(document).ready(
                         myob.myTableHolder.addClass(myob.fixedHeaderClass); //class for pos fixed
 
                         myob.fixedTableHeaderIsOn = true;
-
-                        myob.myFilterFormHolder.width(width);
-                        myob.myFloatingTable.width(width)
+                        if(width > 100) {
+                            myob.myFloatingTable.width(width)
+                        }
                         // myob.myFloatingTable("thead").width(width)
 
                         var top = myob.myFilterFormHolder.outerHeight(true)-2;
@@ -3062,8 +3093,6 @@ jQuery(document).ready(
                         myob.myTable.css('margin-top', top);
                     }
                     if(showFixedHeader === false && (myob.fixedTableHeaderIsOn === true || myob.fixedTableHeaderIsOn === null)) {
-                        var width = myob.myTableHead.width();
-                        myob.myFilterFormHolder.width(width);
                         myob.fixedTableHeaderIsOn = false;
                         myob.myTableHolder.removeClass(myob.fixedHeaderClass);
                         myob.myTable.css('margin-top', 0);
@@ -3071,9 +3100,6 @@ jQuery(document).ready(
                 }
                 myob.profileEnder('fixTableHeader');
             },
-
-
-
 
 
 
@@ -3582,19 +3608,20 @@ jQuery(document).ready(
             retrieveLocalCookie: function()
             {
                 //get favourites data
-                if(typeof Cookies !== 'undefined') {
-                    myob.mfv = Cookies.getJSON('mfv');
-                    if(typeof myob.mfv === 'undefined') {
-                        myob.mfv = [];
-                    } else {
-                        myob.serverDataToApply['mfv'] = true;
-                    }
-                    var v = Cookies.getJSON('visibleRowCount');
-                    visibleRowCount = myob.visibleRowCountValidator(v);
-                    if(visibleRowCount !== false) {
-                        myob.visibleRowCount = v;
-                    }
+                // if(typeof Cookies !== 'undefined') {
+
+                myob.mfv = window.localStorage.getItem('TFS_mfv');
+                if(myob.mfv === 'undefined' || Array.isArray(myob.mfv) === false) {
+                    myob.mfv = [];
+                } else {
+                    myob.serverDataToApply['mfv'] = true;
                 }
+                var v = window.localStorage.getItem('TFS_visibleRowCount');
+                visibleRowCount = myob.visibleRowCountValidator(v);
+                if(visibleRowCount !== false) {
+                    myob.visibleRowCount = v;
+                }
+                // }
             },
 
             /**
