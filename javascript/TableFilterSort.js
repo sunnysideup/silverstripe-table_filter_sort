@@ -2537,7 +2537,8 @@ jQuery(document).ready(
                             function(e) {
                                 if(e.reason === 'nomatches') {
                                     var val = jQuery(e.srcElement).val();
-                                    jQuery(e.srcElement).val('');
+                                    //remove last character
+                                    jQuery(e.srcElement).val(val.slice(0,-1));
                                 }
                             }
                         );
