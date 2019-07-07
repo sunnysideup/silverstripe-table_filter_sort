@@ -11,24 +11,8 @@ class TableFilterSortTag extends DataObject
 
     private static $plural_name = 'Tags';
 
-    /**
-     * ### @@@@ START REPLACEMENT @@@@ ###
-     * OLD: private static $db (case sensitive)
-     * NEW:
-    private static $db (COMPLEX)
-     * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
-     * ### @@@@ STOP REPLACEMENT @@@@ ###
-     */
     private static $table_name = 'TableFilterSortTag';
 
-    /**
-     * ### @@@@ START REPLACEMENT @@@@ ###
-     * WHY: upgrade to SS4
-     * OLD: private static $db = (case sensitive)
-     * NEW: private static $db = (COMPLEX)
-     * EXP: Make sure to add a private static $table_name!
-     * ### @@@@ STOP REPLACEMENT @@@@ ###
-     */
     private static $db = [
         'Title' => 'Varchar(50)',
     ];
