@@ -1,5 +1,12 @@
 <?php
 
+namespace Sunnysideup\TableFilterSort\Model;
+
+use DataObject;
+use Config;
+use Convert;
+
+
 
 class TableFilterSortServerSaver extends DataObject
 {

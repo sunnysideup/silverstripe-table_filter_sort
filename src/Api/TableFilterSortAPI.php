@@ -1,5 +1,13 @@
 <?php
 
+namespace Sunnysideup\TableFilterSort\Api;
+
+use ViewableData;
+use Requirements;
+use Config;
+use Director;
+
+
 
 
 /**

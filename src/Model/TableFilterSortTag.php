@@ -1,5 +1,11 @@
 <?php
 
+namespace Sunnysideup\TableFilterSort\Model;
+
+use DataObject;
+use Config;
+
+
 
 class TableFilterSortTag extends DataObject
 {

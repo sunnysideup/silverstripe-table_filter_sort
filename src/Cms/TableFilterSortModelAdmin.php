@@ -1,4 +1,9 @@
 <?php
+
+namespace Sunnysideup\TableFilterSort\Cms;
+
+use ModelAdmin;
+
 /**
  *@ author nicolaas[at] sunny side up .co .nz
  *

@@ -1,5 +1,26 @@
 <?php
 
+namespace Sunnysideup\TableFilterSort\Control;
+
+use Controller;
+use Director;
+use Config;
+use Convert;
+use Requirements;
+use TableFilterSortAPI;
+use TableFilterSortServerSaver;
+use TableFilterSortTag;
+use DataObject;
+use Injector;
+use FieldList;
+use TextField;
+use TextareaField;
+use FormAction;
+use RequiredFields;
+use Form;
+use session;
+
+
 class TableFilterSortServerSaver_Controller extends Controller
 {
 
