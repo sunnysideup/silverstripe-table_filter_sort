@@ -1,25 +1,38 @@
 <?php
 
+namespace Sunnysideup\TableFilterSort\Api;
 
-class TableFilterSortAPI extends Object
+use SilverStripe\Control\Director;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\View\Requirements;
+use SilverStripe\View\ViewableData;
+
+/**
+ * ### @@@@ START REPLACEMENT @@@@ ###
+ * WHY: upgrade to SS4
+ * OLD:  extends Object (ignore case)
+ * NEW:  extends ViewableData (COMPLEX)
+ * EXP: This used to extend Object, but object does not exist anymore. You can also manually add use Extensible, use Injectable, and use Configurable
+ * ### @@@@ STOP REPLACEMENT @@@@ ###
+ */
+class TableFilterSortAPI extends ViewableData
 {
-    private static $js = array(
+    private static $js = [
         'table_filter_sort/javascript/jsurl.js',
         'table_filter_sort/javascript/jquery.simplemodal-1.4.5.js',
         'table_filter_sort/javascript/awesomplete.js',
         'table_filter_sort/javascript/doT.js',
-        'table_filter_sort/javascript/TableFilterSort.js'
-    );
+        'table_filter_sort/javascript/TableFilterSort.js',
+    ];
 
-    private static $css = array(
+    private static $css = [
         'awesomplete',
         'awesomplete.theme',
         'TableFilterSort',
-        'TableFilterSort.theme'
-    );
+        'TableFilterSort.theme',
+    ];
 
     private static $js_settings = [];
-
 
     public static function add_setting($key, $value)
     {
@@ -28,7 +41,7 @@ class TableFilterSortAPI extends Object
 
     public static function add_settings($array)
     {
-        self::$js_settings = self::$js_settings + $array;
+        self::$js_settings += $array;
     }
 
     public static function remove_setting($key)
@@ -42,7 +55,6 @@ class TableFilterSortAPI extends Object
     }
 
     /**
-     *
      * @param  string $tableSelector              e.g. #MyTableHolder
      * @param  array $blockArray                  files not to include (both CSS and JS)
      * @param  string $jqueryLocation             if you like to include jQuery then add link here...
@@ -51,7 +63,7 @@ class TableFilterSortAPI extends Object
      */
     public static function include_requirements(
         $tableSelector = '.tfs-holder',
-        $blockArray = array(),
+        $blockArray = [],
         $jqueryLocation = '',
         $includeInPage = false,
         $jsSettings = null
@@ -69,7 +81,7 @@ class TableFilterSortAPI extends Object
                         $rowCount = count($categories);
                     } else {
                         if ($rowCount !== count($categories)) {
-                            user_error('Bad number of entries in '.$rowID);
+                            user_error('Bad number of entries in ' . $rowID);
                         }
                     }
                     foreach ($categories as $category => $values) {
@@ -77,14 +89,14 @@ class TableFilterSortAPI extends Object
                             $shortKey = self::num_2_alpha($categoryIndex);
                             $categoryIndex++;
                             if (array_key_exists($shortKey, $jsSettings['rowRawData'][$rowID])) {
-                                user_error('You are using an illegal key in the raw data, namely: '.$shortKey);
+                                user_error('You are using an illegal key in the raw data, namely: ' . $shortKey);
                             }
                             $rawDataFieldKey[$category] = $shortKey;
                         } else {
                             if (isset($category, $jsSettings['rowRawData'][$rowID])) {
                                 $shortKey = $rawDataFieldKey[$category];
                             } else {
-                                user_error('Your rows are not identical: '.$rowID.' has an unknown category: '.$category);
+                                user_error('Your rows are not identical: ' . $rowID . ' has an unknown category: ' . $category);
                                 print_r($rowID);
                                 print_r($values);
                                 print_r($jsSettings['rowRawData'][$rowID]);
@@ -109,14 +121,14 @@ class TableFilterSortAPI extends Object
                     if(Array.isArray(TableFilterSortVars) === false) {
                         var TableFilterSortVars = [];
                     }
-                    TableFilterSortVars.push('.$jsSettings.');
-                    TableFilterSortVars[TableFilterSortVars.length - 1].mySelector = "'.$mySelector.'";
+                    TableFilterSortVars.push(' . $jsSettings . ');
+                    TableFilterSortVars[TableFilterSortVars.length - 1].mySelector = "' . $mySelector . '";
                 ',
                 'table_filter_sort'
             );
         }
-        $js = Config::inst()->get('TableFilterSortAPI', 'js');
-        $css = Config::inst()->get('TableFilterSortAPI', 'css');
+        $js = Config::inst()->get(self::class, 'js');
+        $css = Config::inst()->get(self::class, 'css');
         if ($jqueryLocation) {
             array_unshift($js, $jqueryLocation);
         }
@@ -132,19 +144,28 @@ class TableFilterSortAPI extends Object
                 Requirements::javascript($link);
             }
         } else {
-            $base = Director::baseFolder().'/';
+            $base = Director::baseFolder() . '/';
             //css
             $allCss = '';
             foreach ($css as $link) {
                 $link .= '.min';
-                $testFiles = array(
-                    SSViewer::get_theme_folder().'_table_filter_sort/css/'.$link,
-                    'table_filter_sort/css/'.$link
-                );
+                $testFiles = [
+
+                    /**
+                     * ### @@@@ START REPLACEMENT @@@@ ###
+                     * WHY: upgrade to SS4
+                     * OLD: SSViewer::get_theme_folder() (ignore case)
+                     * NEW: SilverStripe\View\ThemeResourceLoader::inst()->getPath('NAME-OF-THEME-GOES-HERE') (COMPLEX)
+                     * EXP: Please review update and fix as required. Note: $themesFilePath = SilverStripe\View\ThemeResourceLoader::inst()->findThemedResource('css/styles.css');
+                     * ### @@@@ STOP REPLACEMENT @@@@ ###
+                     */
+                    SilverStripe\View\ThemeResourceLoader::inst()->getPath('NAME-OF-THEME-GOES-HERE') . '_table_filter_sort/css/' . $link,
+                    'table_filter_sort/css/' . $link,
+                ];
                 $hasBeenIncluded = false;
                 if ($includeInPage) {
                     foreach ($testFiles as $testFile) {
-                        $testFile = $base . $testFile.'.css';
+                        $testFile = $base . $testFile . '.css';
                         if (file_exists($testFile)) {
                             $hasBeenIncluded = true;
                             $allCss .= file_get_contents($testFile);
@@ -178,8 +199,8 @@ class TableFilterSortAPI extends Object
 
     protected static function num_2_alpha($n)
     {
-        for ($r = ""; $n >= 0; $n = intval($n / 26) - 1) {
-            $r = chr($n%26 + 0x41) . $r;
+        for ($r = ''; $n >= 0; $n = intval($n / 26) - 1) {
+            $r = chr($n % 26 + 0x41) . $r;
         }
         return $r;
     }
