@@ -6,15 +6,8 @@ use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\View\Requirements;
 use SilverStripe\View\ViewableData;
+use SilverStripe\View\ThemeResourceLoader;
 
-/**
- * ### @@@@ START REPLACEMENT @@@@ ###
- * WHY: upgrade to SS4
- * OLD:  extends Object (ignore case)
- * NEW:  extends ViewableData (COMPLEX)
- * EXP: This used to extend Object, but object does not exist anymore. You can also manually add use Extensible, use Injectable, and use Configurable
- * ### @@@@ STOP REPLACEMENT @@@@ ###
- */
 class TableFilterSortAPI extends ViewableData
 {
     private static $js = [
@@ -150,17 +143,8 @@ class TableFilterSortAPI extends ViewableData
             foreach ($css as $link) {
                 $link .= '.min';
                 $testFiles = [
-
-                    /**
-                     * ### @@@@ START REPLACEMENT @@@@ ###
-                     * WHY: upgrade to SS4
-                     * OLD: SSViewer::get_theme_folder() (ignore case)
-                     * NEW: SilverStripe\View\ThemeResourceLoader::inst()->getPath('NAME-OF-THEME-GOES-HERE') (COMPLEX)
-                     * EXP: Please review update and fix as required. Note: $themesFilePath = SilverStripe\View\ThemeResourceLoader::inst()->findThemedResource('css/styles.css');
-                     * ### @@@@ STOP REPLACEMENT @@@@ ###
-                     */
-                    SilverStripe\View\ThemeResourceLoader::inst()->getPath('NAME-OF-THEME-GOES-HERE') . '_table_filter_sort/css/' . $link,
-                    'table_filter_sort/css/' . $link,
+                    ThemeResourceLoader::inst()->getPath('_table_filter_sort/css/' . $link),
+                    ThemeResourceLoader::inst()->getPath('table_filter_sort/css/' . $link),
                 ];
                 $hasBeenIncluded = false;
                 if ($includeInPage) {

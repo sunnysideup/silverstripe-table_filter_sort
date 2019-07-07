@@ -25,16 +25,7 @@
 <tbody>
     <% loop MyList %>
 <tr class="tfstr hide" id="tfs$ID">
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: .Format( (case sensitive)
-  * NEW: .Format( (COMPLEX)
-  * EXP: Format function for dates have changed! Please consider something like: PHPNativeFormat as an extension
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-<td>$Created.Ago<span data-filter="Created" style="display: none;">$Created.Format(U)</span></td>
+<td>$Created.Ago<span data-filter="Created" style="display: none;">$Created.getTimestamp</span></td>
 <td>
     <a href="$URLSegment" class="load">
         <span data-filter="Title">$Title</span>

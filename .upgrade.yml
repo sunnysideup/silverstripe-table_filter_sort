@@ -1,5 +1,5 @@
 mappings:
-  TableFilterSortServerSaver_Controller: Sunnysideup\TableFilterSort\Control\TableFilterSortServerSaver_Controller
+  TableFilterSortServerSaverController: Sunnysideup\TableFilterSort\Control\TableFilterSortServerSaverController
   TableFilterSortModelAdmin: Sunnysideup\TableFilterSort\Cms\TableFilterSortModelAdmin
   TableFilterSortAPI: Sunnysideup\TableFilterSort\Api\TableFilterSortAPI
   TableFilterSortServerSaver: Sunnysideup\TableFilterSort\Model\TableFilterSortServerSaver
