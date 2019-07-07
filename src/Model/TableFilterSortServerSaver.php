@@ -2,9 +2,15 @@
 
 namespace Sunnysideup\TableFilterSort\Model;
 
-use DataObject;
-use Config;
-use Convert;
+
+
+
+use SilverStripe\Core\Config\Config;
+use Sunnysideup\TableFilterSort\Model\TableFilterSortServerSaver;
+use Sunnysideup\TableFilterSort\Model\TableFilterSortTag;
+use SilverStripe\Core\Convert;
+use SilverStripe\ORM\DataObject;
+
 
 
 
@@ -14,14 +20,14 @@ class TableFilterSortServerSaver extends DataObject
 
     public function i18n_singular_name()
     {
-        return Config::inst()->get('TableFilterSortServerSaver', 'singular_name');
+        return Config::inst()->get(TableFilterSortServerSaver::class, 'singular_name');
     }
 
     private static $plural_name = 'Server Data';
 
     public function i18n_plural_name()
     {
-        return Config::inst()->get('TableFilterSortServerSaver', 'plural_name');
+        return Config::inst()->get(TableFilterSortServerSaver::class, 'plural_name');
     }
 
 
@@ -58,7 +64,7 @@ class TableFilterSortServerSaver extends DataObject
     );
 
     private static $many_many = array(
-        'Tags' => 'TableFilterSortTag'
+        'Tags' => TableFilterSortTag::class
     );
 
     private static $default_sort = array(

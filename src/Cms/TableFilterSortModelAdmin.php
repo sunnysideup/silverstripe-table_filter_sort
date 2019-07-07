@@ -2,7 +2,10 @@
 
 namespace Sunnysideup\TableFilterSort\Cms;
 
-use ModelAdmin;
+
+use Sunnysideup\TableFilterSort\Model\TableFilterSortServerSaver;
+use SilverStripe\Admin\ModelAdmin;
+
 
 /**
  *@ author nicolaas[at] sunny side up .co .nz
@@ -13,7 +16,7 @@ use ModelAdmin;
 class TableFilterSortModelAdmin extends ModelAdmin
 {
     private static $managed_models = array(
-        'TableFilterSortServerSaver'
+        TableFilterSortServerSaver::class
     );
 
     private static $url_segment = 'table-filter-sort';

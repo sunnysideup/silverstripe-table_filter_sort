@@ -2,10 +2,16 @@
 
 namespace Sunnysideup\TableFilterSort\Api;
 
-use ViewableData;
-use Requirements;
-use Config;
-use Director;
+
+
+
+
+use SilverStripe\View\Requirements;
+use SilverStripe\Core\Config\Config;
+use Sunnysideup\TableFilterSort\Api\TableFilterSortAPI;
+use SilverStripe\Control\Director;
+use SilverStripe\View\ViewableData;
+
 
 
 
@@ -132,8 +138,8 @@ class TableFilterSortAPI extends ViewableData
                 'table_filter_sort'
             );
         }
-        $js = Config::inst()->get('TableFilterSortAPI', 'js');
-        $css = Config::inst()->get('TableFilterSortAPI', 'css');
+        $js = Config::inst()->get(TableFilterSortAPI::class, 'js');
+        $css = Config::inst()->get(TableFilterSortAPI::class, 'css');
         if ($jqueryLocation) {
             array_unshift($js, $jqueryLocation);
         }

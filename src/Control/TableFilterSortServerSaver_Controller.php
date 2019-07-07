@@ -2,23 +2,40 @@
 
 namespace Sunnysideup\TableFilterSort\Control;
 
-use Controller;
-use Director;
-use Config;
-use Convert;
-use Requirements;
-use TableFilterSortAPI;
-use TableFilterSortServerSaver;
-use TableFilterSortTag;
-use DataObject;
-use Injector;
-use FieldList;
-use TextField;
-use TextareaField;
-use FormAction;
-use RequiredFields;
-use Form;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 use session;
+use SilverStripe\Control\Director;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Control\Controller;
+use SilverStripe\Core\Convert;
+use SilverStripe\View\Requirements;
+use Sunnysideup\TableFilterSort\Api\TableFilterSortAPI;
+use Sunnysideup\TableFilterSort\Model\TableFilterSortServerSaver;
+use Sunnysideup\TableFilterSort\Model\TableFilterSortTag;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\TextareaField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\RequiredFields;
+use SilverStripe\Forms\Form;
+
 
 
 class TableFilterSortServerSaver_Controller extends Controller
@@ -265,7 +282,7 @@ class TableFilterSortServerSaver_Controller extends Controller
         $this->getResponse()->addHeader('Content-Type', 'application/json');
         $urlSegment = Convert::raw2sql($request->param('ID'));
         $obj = DataObject::get_one(
-            'TableFilterSortServerSaver',
+            TableFilterSortServerSaver::class,
             array('URLSegment' => $urlSegment)
         );
         if ($obj) {
@@ -294,7 +311,7 @@ class TableFilterSortServerSaver_Controller extends Controller
         if (
             $this->dataToSave()
         ) {
-            $singleton = Injector::inst()->get('TableFilterSortServerSaver');
+            $singleton = Injector::inst()->get(TableFilterSortServerSaver::class);
             $fieldLabels = $singleton->FieldLabels();
             $fieldList = FieldList::create(
                 TextField::create('Title', $fieldLabels['Title'])
