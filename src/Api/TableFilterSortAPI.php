@@ -98,7 +98,7 @@ class TableFilterSortAPI extends ViewableData
             $css = array_diff($css, $blockArray);
         }
 
-        if (Director::isDev() && ! $includeInPage) {
+        if (Director::isDev() || ! $includeInPage) {
 
             //simple inclusion
             foreach ($css as $link) {
@@ -159,7 +159,7 @@ class TableFilterSortAPI extends ViewableData
                     $testFile = $base . '/'. $testFile;
                     if (file_exists($testFile)) {
                         $hasBeenIncluded = true;
-                        $allCss .= "\n\n".file_get_contents($testFile);
+                        $allJS .= "\n\n".file_get_contents($testFile);
                         break;
                     }
                 }
