@@ -22,7 +22,5 @@
     "require": {
         "silverstripe/recipe-cms": "^4.4"
     },
-    "extra": {
-        "installer-name": "table_filter_sort"
-    }
+    "extra": []
 }
