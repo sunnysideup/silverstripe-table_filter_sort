@@ -2,6 +2,6 @@
 Name: 'TableFilterSortRoutes'
 After: framework
 ---
-Director:
+SilverStripe\Control\Director:
   rules:
-    'tfs//$Action/$ID/$OtherID/$Version': TableFilterSortServerSaver_Controller
+    'tfs//$Action/$ID/$OtherID/$Version': TableFilterSortServerSaverController

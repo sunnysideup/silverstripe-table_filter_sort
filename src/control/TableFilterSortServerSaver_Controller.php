@@ -69,7 +69,16 @@ class TableFilterSortServerSaver_Controller extends Controller
     {
         parent::init();
         $this->parentPageID = Convert::raw2sql($this->request->param('ID'));
-        Requirements::javascript(FRAMEWORK_DIR . '/thirdparty/jquery/jquery.js');
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: upgrade to SS4
+  * OLD: FRAMEWORK_DIR (ignore case)
+  * NEW: SilverStripe\Core\Manifest\ModuleLoader::getModule('silverstripe/framework')->getResource('UPGRADE-FIX-REQUIRED.php')->getRelativePath() (COMPLEX)
+  * EXP: Please review update and fix as required
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+        Requirements::javascript(SilverStripe\Core\Manifest\ModuleLoader::getModule('silverstripe/framework')->getResource('UPGRADE-FIX-REQUIRED.php')->getRelativePath() . '/thirdparty/jquery/jquery.js');
         TableFilterSortAPI::include_requirements();
         Requirements::customScript('
             jQuery(document).ready(
@@ -112,7 +121,16 @@ class TableFilterSortServerSaver_Controller extends Controller
         $postData = $request->postVars();
         if ($postData) {
             //just in case ...
-            Session::clear('TableFilterSortPostData');
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: upgrade to SS4
+  * OLD: Session:: (case sensitive)
+  * NEW: SilverStripe\Control\Controller::curr()->getRequest()->getSession()-> (COMPLEX)
+  * EXP: If THIS is a controller than you can write: $this->getRequest(). You can also try to access the HTTPRequest directly. 
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+            SilverStripe\Control\Controller::curr()->getRequest()->getSession()->clear('TableFilterSortPostData');
             if (isset($postData['ParentPageID'])) {
                 $this->parentPageID = $postData['ParentPageID'];
                 return Director::absoluteURL($this->Link('find/'.$this->parentPageID));
@@ -125,14 +143,32 @@ class TableFilterSortServerSaver_Controller extends Controller
     {
         $this->myTitle = 'Find ' . $this->parentPageID . ' ... ';
 
-        return $this->renderWith($this->class);
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: upgrade to SS4
+  * OLD: ->RenderWith( (ignore case)
+  * NEW: ->RenderWith( (COMPLEX)
+  * EXP: Check that the template location is still valid!
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+        return $this->RenderWith(get_class($this));
     }
 
     public function start($request)
     {
         $postData = $request->postVars();
         if ($postData) {
-            Session::set('TableFilterSortPostData', $postData);
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: upgrade to SS4
+  * OLD: Session:: (case sensitive)
+  * NEW: SilverStripe\Control\Controller::curr()->getRequest()->getSession()-> (COMPLEX)
+  * EXP: If THIS is a controller than you can write: $this->getRequest(). You can also try to access the HTTPRequest directly. 
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+            SilverStripe\Control\Controller::curr()->getRequest()->getSession()->set('TableFilterSortPostData', $postData);
             return Director::absoluteURL($this->Link('save'));
         }
         return '404';
@@ -142,7 +178,16 @@ class TableFilterSortServerSaver_Controller extends Controller
     {
         if ($this->dataToSave()) {
             $this->myTitle = 'Save ' . $this->parentPageID . ' ... ';
-            return $this->renderWith($this->class);
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: upgrade to SS4
+  * OLD: ->RenderWith( (ignore case)
+  * NEW: ->RenderWith( (COMPLEX)
+  * EXP: Check that the template location is still valid!
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+            return $this->RenderWith(get_class($this));
         }
         return 'NO DATA TO BE SAVED ...';
     }
@@ -158,14 +203,23 @@ class TableFilterSortServerSaver_Controller extends Controller
                 $obj->Description = Convert::raw2sql($data["Description"]);
                 $obj->Author = Convert::raw2sql($data["Author"]);
                 $obj->write();
-                $tags = array();
+                $tags = [];
                 foreach ($data['TagsTempField'] as $tag) {
                     $tag = trim($tag);
                     if ($tag) {
                         $tagObject = TableFilterSortTag::find_or_create($tag, $obj);
                     }
                 }
-                Session::clear('TableFilterSortPostData');
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: upgrade to SS4
+  * OLD: Session:: (case sensitive)
+  * NEW: SilverStripe\Control\Controller::curr()->getRequest()->getSession()-> (COMPLEX)
+  * EXP: If THIS is a controller than you can write: $this->getRequest(). You can also try to access the HTTPRequest directly. 
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+                SilverStripe\Control\Controller::curr()->getRequest()->getSession()->clear('TableFilterSortPostData');
             } else {
                 $form->setMessage('An Error Occurred', 'bad');
             }
@@ -173,7 +227,16 @@ class TableFilterSortServerSaver_Controller extends Controller
             $form->setMessage('Please provide title', 'bad');
         }
 
-        return $this->renderWith($this->class);
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: upgrade to SS4
+  * OLD: ->RenderWith( (ignore case)
+  * NEW: ->RenderWith( (COMPLEX)
+  * EXP: Check that the template location is still valid!
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+        return $this->RenderWith(get_class($this));
     }
 
     public function load($request)

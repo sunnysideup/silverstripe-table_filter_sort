@@ -1,7 +1,16 @@
 <?php
 
 
-class TableFilterSortAPI extends Object
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: upgrade to SS4
+  * OLD:  extends Object (ignore case)
+  * NEW:  extends ViewableData (COMPLEX)
+  * EXP: This used to extend Object, but object does not exist anymore. You can also manually add use Extensible, use Injectable, and use Configurable
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+class TableFilterSortAPI extends ViewableData
 {
     private static $js = array(
         'table_filter_sort/javascript/jsurl.js',
@@ -138,7 +147,16 @@ class TableFilterSortAPI extends Object
             foreach ($css as $link) {
                 $link .= '.min';
                 $testFiles = array(
-                    SSViewer::get_theme_folder().'_table_filter_sort/css/'.$link,
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: upgrade to SS4
+  * OLD: SSViewer::get_theme_folder() (ignore case)
+  * NEW: SilverStripe\View\ThemeResourceLoader::inst()->getPath('NAME-OF-THEME-GOES-HERE') (COMPLEX)
+  * EXP: Please review update and fix as required. Note: $themesFilePath = SilverStripe\View\ThemeResourceLoader::inst()->findThemedResource('css/styles.css');
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+                    SilverStripe\View\ThemeResourceLoader::inst()->getPath('NAME-OF-THEME-GOES-HERE').'_table_filter_sort/css/'.$link,
                     'table_filter_sort/css/'.$link
                 );
                 $hasBeenIncluded = false;

@@ -31,6 +31,15 @@ class TableFilterSortTag extends DataObject
     
     private static $table_name = 'TableFilterSortTag';
 
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: upgrade to SS4
+  * OLD: private static $db = (case sensitive)
+  * NEW: private static $db = (COMPLEX)
+  * EXP: Make sure to add a private static $table_name!
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
     private static $db = array(
         'Title' => 'Varchar(50)'
     );
