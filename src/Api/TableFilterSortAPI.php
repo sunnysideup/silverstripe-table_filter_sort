@@ -115,27 +115,25 @@ class TableFilterSortAPI extends ViewableData
 
             //css
             $allCss = '';
-            if ($includeInPage) {
-                foreach ($css as $link) {
-                    if (Director::isDev() === false) {
-                        $link .= '.min';
+            foreach ($css as $link) {
+                if (Director::isDev() === false) {
+                    $link .= '.min';
+                }
+                $testFiles = [
+                    ThemeResourceLoader::inst()->findThemedCSS($link, $themes),
+                    'vendor/sunnysideup/table_filter_sort/client/css/'.$link.'.css'
+                ];
+                $hasBeenIncluded = false;
+                foreach ($testFiles as $testFile) {
+                    $testFile = $base . '/'. $testFile;
+                    if (file_exists($testFile)) {
+                        $hasBeenIncluded = true;
+                        $allCss .= "\n\n".file_get_contents($testFile);
+                        break;
                     }
-                    $testFiles = [
-                        ThemeResourceLoader::inst()->findThemedCSS($link, $themes),
-                        'vendor/sunnysideup/table_filter_sort/client/css/'.$link.'.css'
-                    ];
-                    $hasBeenIncluded = false;
-                    foreach ($testFiles as $testFile) {
-                        $testFile = $base . '/'. $testFile;
-                        if (file_exists($testFile)) {
-                            $hasBeenIncluded = true;
-                            $allCss .= "\n\n".file_get_contents($testFile);
-                            break;
-                        }
-                    }
-                    if (! $hasBeenIncluded) {
-                        Requirements::themedCSS($link, 'table_filter_sort');
-                    }
+                }
+                if (! $hasBeenIncluded) {
+                    Requirements::themedCSS($link, 'table_filter_sort');
                 }
             }
             if($allCss) {
