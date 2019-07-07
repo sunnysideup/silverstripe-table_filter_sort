@@ -102,10 +102,10 @@ class TableFilterSortAPI extends ViewableData
 
             //simple inclusion
             foreach ($css as $link) {
-                Requirements::themedCSS($link, 'table_filter_sort');
+                Requirements::themedCSS('client/css/'.$link, 'table_filter_sort');
             }
             foreach ($js as $link) {
-                Requirements::themedJavascript('sunnysideup/table_filter_sort: client/javascript/'.$link.'.js');
+                Requirements::themedJavascript('client/javascript/'.$link, 'table_filter_sort');
             }
         } else {
 
