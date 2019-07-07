@@ -1,0 +1,7 @@
+SilverStripe\ORM\DatabaseAdmin:
+  classname_value_remapping:
+    TableFilterSortServerSaver_Controller: Sunnysideup\TableFilterSort\Control\TableFilterSortServerSaver_Controller
+    TableFilterSortModelAdmin: Sunnysideup\TableFilterSort\Cms\TableFilterSortModelAdmin
+    TableFilterSortAPI: Sunnysideup\TableFilterSort\Api\TableFilterSortAPI
+    TableFilterSortServerSaver: Sunnysideup\TableFilterSort\Model\TableFilterSortServerSaver
+    TableFilterSortTag: Sunnysideup\TableFilterSort\Model\TableFilterSortTag
