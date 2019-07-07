@@ -13,6 +13,7 @@ class TableFilterSortAPI extends ViewableData
     private static $js = [
         'jsurl',
         'jquery.simplemodal-1.4.5',
+        'js.cookies.js',
         'awesomplete',
         'doT',
         'TableFilterSort',
@@ -64,10 +65,8 @@ class TableFilterSortAPI extends ViewableData
         if ($jsSettings === null) {
             $jsSettings = self::$js_settings;
         }
-        if (is_array($jsSettings)) {
-            if (isset($jsSettings['rowRawData'])) {
-                $jsSettings = self::workOutJSSettings($jsSettings);
-            }
+        if (isset($jsSettings['rowRawData'])) {
+            $jsSettings = self::workOutJSSettings($jsSettings);
         }
         $jsSettings = json_encode($jsSettings);
         //this must come first
