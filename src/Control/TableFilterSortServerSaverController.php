@@ -119,11 +119,10 @@ class TableFilterSortServerSaverController extends Controller
                 $obj->Description = Convert::raw2sql($data['Description']);
                 $obj->Author = Convert::raw2sql($data['Author']);
                 $obj->write();
-                $tags = [];
                 foreach ($data['TagsTempField'] as $tag) {
                     $tag = trim($tag);
                     if ($tag) {
-                        $tagObject = TableFilterSortTag::find_or_create($tag, $obj);
+                        TableFilterSortTag::find_or_create($tag, $obj);
                     }
                 }
 

@@ -5,11 +5,13 @@ namespace Sunnysideup\TableFilterSort\Api;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\View\Requirements;
-use SilverStripe\View\ViewableData;
 use SilverStripe\View\ThemeResourceLoader;
+use SilverStripe\View\ViewableData;
 
 class TableFilterSortAPI extends ViewableData
 {
+    protected static $js_settings = [];
+
     private static $js = [
         'jsurl',
         'jquery.simplemodal-1.4.5',
@@ -25,8 +27,6 @@ class TableFilterSortAPI extends ViewableData
         'TableFilterSort',
         'TableFilterSort.theme',
     ];
-
-    protected static $js_settings = [];
 
     public static function add_setting($key, $value)
     {
@@ -99,16 +99,14 @@ class TableFilterSortAPI extends ViewableData
         }
 
         if (Director::isDev() || ! $includeInPage) {
-
             //simple inclusion
             foreach ($css as $link) {
-                Requirements::themedCSS('client/css/'.$link, 'table_filter_sort');
+                Requirements::themedCSS('client/css/' . $link, 'table_filter_sort');
             }
             foreach ($js as $link) {
-                Requirements::themedJavascript('client/javascript/'.$link, 'table_filter_sort');
+                Requirements::themedJavascript('client/javascript/' . $link, 'table_filter_sort');
             }
         } else {
-
             //inline inclusion
             $base = Director::baseFolder() . '/';
             $themes = HTMLEditorConfig::getThemes() ?: SSViewer::get_themes();
@@ -121,14 +119,14 @@ class TableFilterSortAPI extends ViewableData
                 }
                 $testFiles = [
                     ThemeResourceLoader::inst()->findThemedCSS($link, $themes),
-                    'vendor/sunnysideup/table_filter_sort/client/css/'.$link.'.css'
+                    'vendor/sunnysideup/table_filter_sort/client/css/' . $link . '.css',
                 ];
                 $hasBeenIncluded = false;
                 foreach ($testFiles as $testFile) {
-                    $testFile = $base . '/'. $testFile;
+                    $testFile = $base . '/' . $testFile;
                     if (file_exists($testFile)) {
                         $hasBeenIncluded = true;
-                        $allCss .= "\n\n".file_get_contents($testFile);
+                        $allCss .= "\n\n" . file_get_contents($testFile);
                         break;
                     }
                 }
@@ -136,10 +134,9 @@ class TableFilterSortAPI extends ViewableData
                     Requirements::themedCSS($link, 'table_filter_sort');
                 }
             }
-            if($allCss) {
+            if ($allCss) {
                 Requirements::customCSS($allCss, 'table_filter_sort_css');
             }
-
 
             //js
             $allJS = '';
@@ -149,28 +146,27 @@ class TableFilterSortAPI extends ViewableData
                 }
                 $testFile = $base . $link;
                 $testFiles = [
-                    ThemeResourceLoader::inst()->findThemedJavascript($link.'js', $themes),
-                    'vendor/sunnysideup/table_filter_sort/client/javascript/'.$link.'.js'
+                    ThemeResourceLoader::inst()->findThemedJavascript($link . 'js', $themes),
+                    'vendor/sunnysideup/table_filter_sort/client/javascript/' . $link . '.js',
                 ];
                 $hasBeenIncluded = false;
                 foreach ($testFiles as $testFile) {
-                    $testFile = $base . '/'. $testFile;
+                    $testFile = $base . '/' . $testFile;
                     if (file_exists($testFile)) {
                         $hasBeenIncluded = true;
-                        $allJS .= "\n\n".file_get_contents($testFile);
+                        $allJS .= "\n\n" . file_get_contents($testFile);
                         break;
                     }
                 }
                 if (! $hasBeenIncluded) {
-                    Requirements::themedJavascript('sunnysideup/table_filter_sort: client/javascript/'.$link.'.js');
+                    Requirements::themedJavascript('sunnysideup/table_filter_sort: client/javascript/' . $link . '.js');
                 }
             }
-            if($allJS) {
+            if ($allJS) {
                 Requirements::customScript($allJS, 'table_filter_sort_js');
             }
         }
     }
-
 
     protected static function workOutJSSettings($jsSettings)
     {
@@ -215,7 +211,6 @@ class TableFilterSortAPI extends ViewableData
         return $jsSettings;
     }
 
-
     protected static function num_2_alpha($n)
     {
         for ($r = ''; $n >= 0; $n = intval($n / 26) - 1) {
@@ -223,5 +218,4 @@ class TableFilterSortAPI extends ViewableData
         }
         return $r;
     }
-
 }
