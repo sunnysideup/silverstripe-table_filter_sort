@@ -1,4 +1,6 @@
 
+
+
 /*
  * **********************************************
  * BASICS
@@ -6,7 +8,7 @@
 .tfs-holder * {
     font-family: sans-serif;
     font-size: 13px;
-    color: #222;
+    color: #2e003e;
 }
 
 .tfs-holder h1 {
@@ -42,7 +44,7 @@
  */
 
 .tfs-holder .header-block {
-    background-color: #555;
+    background-color: #115429;
     border-bottom: 2px solid #fff;
     clear: both;
 }
@@ -50,15 +52,31 @@
     color: #fff;
 }
 
+.tfs-holder .header-block input,
+.tfs-holder .header-block select,
+.tfs-holder .header-block .awesomplete ul li,
+.tfs-holder .header-block .awesomplete ul li * {
+    color: #222;
+}
+.tfs-holder .header-block .awesomplete ul li[aria-selected='true'] {
+    color: #fff;
+}
+.tfs-holder .header-block .awesomplete ul li[aria-selected='true'] mark {
+    color: #222;
+}
+
 .tfs-holder table thead td,
 .tfs-holder table thead th
 {
-    background-color: #777;
+    background-color: #338a52;
     padding: 0.4vw;
 }
 
+.tfs-holder .tfs-filter-form-holder {
+    background-color: #554363;
+}
 .filter-is-open.tfs-holder .tfs-filter-form-holder {
-    background-color: #333;
+    background-color: #3d2352;
 }
 
 /*
@@ -88,8 +106,8 @@
 }
 
 .total-showing-row-number input {
-    width: 5em;
-    border: 1px solid #bbb;
+    width: 5rem;
+    border: 1px solid #e4dcf1;
     background-color: #eee;
     border-radius: 3px;
     text-align: right;
@@ -134,7 +152,7 @@
 }
 
 .tfs-holder .tfs-common-content-holder ul li{
-    height: 3em;
+    height: 3rem;
 }
 
 .no-matches-message {
@@ -290,8 +308,7 @@
 /* hide save unless filter is open */
 
 li.tfs-save-and-load.save.filters,
-.filter-is-open .quick-keyword,
-.tfs-has-filter .quick-keyword {
+.filter-is-open .quick-keyword {
     display: none;
 }
 
@@ -327,7 +344,7 @@ li.tfs-save-and-load.save.filters,
 
 .tfs-open-filter-form.tfs-action.open-filter {
     clear: none;
-    margin-right: 1em;
+    margin-right: 1rem;
 }
 
 /*
@@ -350,24 +367,24 @@ li.tfs-save-and-load.save.filters,
     width: auto;
     vertical-align: top;
     width: 20vw!important;
-    min-width: 180!important;
+    min-width: 180px!important;
     float: right;
 }
 
 
 
 .tfs-filter-form-holder .quick-keyword input::-webkit-input-placeholder { /* Chrome */
-  color: #555;
+  color: #3d1e6d;
 }
 .tfs-filter-form-holder .quick-keyword input:-ms-input-placeholder { /* IE 10+ */
-  color: #555;
+  color: #3d1e6d;
 }
 .tfs-filter-form-holder .quick-keyword input::-moz-placeholder { /* Firefox 19+ */
-  color: #555;
+  color: #3d1e6d;
   opacity: 1;
 }
 .tfs-filter-form-holder .quick-keyword input:-moz-placeholder { /* Firefox 4 - 18 */
-  color: #555;
+  color: #3d1e6d;
   opacity: 1;
 }
 /*
@@ -386,9 +403,7 @@ li.tfs-save-and-load.save.filters,
     border-left: 1px solid rgba(255,255,255,0.3);
     border-top: 1px solid  rgba(255,255,255,0.3);
     padding: 10px 0 0 10px;
-    height: 7em;
-    overflow-y: auto;
-    overflow-x: hidden;
+    height: 7rem;
 }
 
 .tfs-filter-form-inner label.tfs-group-label {
@@ -433,10 +448,13 @@ li.tfs-save-and-load.save.filters,
 .tfs-holder .header-block .tfs-filter-column input.awesomplete,
 .tfs-holder .header-block .quick-keyword input
 {
-    width: 3em;
+    width: 3rem;
     border: 1px solid rgba(255,255,255,0.9);
     background-color: rgba(255,255,255,0.7);
     border-radius: 3px;
+}
+.tfs-holder .header-block .quick-keyword input {
+    width: 10rem;
 }
 .tfs-holder .header-block .tfs-filter-column input.text:focus,
 .tfs-holder .header-block .tfs-filter-column input.number:focus,
@@ -444,6 +462,9 @@ li.tfs-save-and-load.save.filters,
 .tfs-holder .header-block .quick-keyword input:focus
 {
     background-color: #fff;
+}
+.tfs-holder .header-block .quick-keyword input:focus {
+    width: 100%;
 }
 
 .tfs-holder .header-block .tfs-filter-column input.awesomplete,
@@ -471,7 +492,7 @@ li.tfs-save-and-load.save.filters,
 }
 
 .tfs-holder .header-block .tfs-filter-column.numberFilter input {
-    width: 3em;
+    width: 3rem;
 }
 
 
@@ -508,12 +529,12 @@ li.tfs-save-and-load.save.filters,
     color: #fff;
 }
 .tfs-current-search-holder {
-    margin-top: 0.5em;
+    margin-top: 0.5rem;
 }
 .tfs-current-search-holder ul li span:after {
     content: '/';
     display: inline-block;
-    padding: 0 0.4em 0 0.4em;
+    padding: 0 0.4em 0 0.4rem;
 }
 
 .tfs-current-search-holder ul li span:last-child:after {
@@ -601,7 +622,10 @@ li.tfs-save-and-load.save.filters,
 
 .tfs-holder tbody span.dl-on {
     color: #fff!important;
-    background-color: green!important;
+    background-color: #338a52!important;
+    display: inline-block;
+    border-radius: 3px;
+    padding: 0.3rem;
 }
 
 
@@ -658,7 +682,7 @@ li.tfs-save-and-load.save.filters,
 }
 
 .tfs-more-entries-always-show * {
-    color: #555;
+    color: #3d1e6d;
 }
 
 /*
@@ -702,7 +726,7 @@ li.tfs-save-and-load.save.filters,
 #tfs-modal-pop-up h1 {
     background-color: #3498db;
     color: #fff;
-    padding: 1em;
+    padding: 1rem;
     margin: 0;
 }
 
@@ -717,7 +741,7 @@ li.tfs-save-and-load.save.filters,
 }
 
 #tfs-modal-pop-up #wrapper {
-    padding: 1em;
+    padding: 1rem;
 }
 
 #tfs-modal-pop-up fieldset {
@@ -749,7 +773,7 @@ li.tfs-save-and-load.save.filters,
 
 #tfs-modal-pop-up .field.textarea textarea {
     width: 90%;
-    height: 2em;
+    height: 2rem;
 }
 
 #tfs-modal-pop-up .save, #tfs-modal-pop-up .load, #tfs-modal-pop-up .tfs-current-favourites {
@@ -784,7 +808,7 @@ li.tfs-save-and-load.save.filters,
 
 body .loading p {
     text-align: center;
-    color: #222;
+    color: #2e003e;
 }
 
 .tfs-holder .load-bar {
@@ -888,7 +912,7 @@ body .loading p {
 
 @media screen and (min-width: 550px) and (max-width: 949px) {
     .tfs-holder body {
-        padding: 1em;
+        padding: 1rem;
     }
     .tfs-holder .header-block .tfs-filter-column {
         width: calc(33% - 20px);
@@ -906,7 +930,7 @@ body .loading p {
 
 @media screen and (min-width: 950px) {
     .tfs-holder body {
-        padding: 2em;
+        padding: 2rem;
     }
     .tfs-holder .header-block .tfs-filter-column {
         width: calc(20% - 20px);

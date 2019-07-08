@@ -6,8 +6,13 @@
 /**********************************************
  * Filters
  */
+
+ .tfs-holder .header-block .tfs-filter-column {
+     overflow-y: auto;
+     overflow-x: hidden;
+ }
 .tfs-filter-form-inner .tfs-filter-column.tagFilter {
-    overflow: visible;
+    overflow: visible!important;
     min-height: 7em!important;
     height: auto!important;
 }
