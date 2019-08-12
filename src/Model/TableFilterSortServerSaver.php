@@ -53,7 +53,13 @@ class TableFilterSortServerSaver extends DataObject
     ];
 
     private static $indexes = [
-        'Title_ParentPageID' => ['type' => 'unique', 'value' => '"ParentPageID", "Title"'],
+        'Title_ParentPageIDUnique' => [
+            'type' => 'unique',
+            'columns' => [
+                'ParentPageID',
+                'Title'
+            ]
+        ],
         'Title' => true,
         'ParentPageID' => true,
     ];
