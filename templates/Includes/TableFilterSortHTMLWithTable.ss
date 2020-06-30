@@ -13,7 +13,6 @@
 <div class="tfs-add-form">
     $AddForm
 </div>
-
 <% else_if $ShareLink  %>
 
 <% else %>

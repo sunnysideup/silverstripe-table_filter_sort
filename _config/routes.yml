@@ -4,4 +4,4 @@ After: framework
 ---
 SilverStripe\Control\Director:
   rules:
-    'tfs//$Action/$ID/$OtherID/$Version': TableFilterSortServerSaverController
+    'tfs//$Action/$ID/$OtherID/$Version': Sunnysideup\TableFilterSort\Control\TableFilterSortServerSaverController

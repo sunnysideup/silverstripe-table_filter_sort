@@ -86,7 +86,7 @@ class TableFilterSortServerSaverController extends Controller
     {
         $this->myTitle = 'Find ' . $this->parentPageID . ' ... ';
 
-        return $this->renderWith(static::class);
+        return $this->renderWith('TableFilterSortServerSaverController');
     }
 
     public function start($request)
@@ -103,7 +103,7 @@ class TableFilterSortServerSaverController extends Controller
     {
         if ($this->dataToSave()) {
             $this->myTitle = 'Save ' . $this->parentPageID . ' ... ';
-            return $this->renderWith(static::class);
+            return $this->renderWith('TableFilterSortServerSaverController ');
         }
         return 'NO DATA TO BE SAVED ...';
     }
@@ -133,16 +133,7 @@ class TableFilterSortServerSaverController extends Controller
         } else {
             $form->setMessage('Please provide title', 'bad');
         }
-
-        /**
-         * ### @@@@ START REPLACEMENT @@@@ ###
-         * WHY: upgrade to SS4
-         * OLD: ->RenderWith( (ignore case)
-         * NEW: ->RenderWith( (COMPLEX)
-         * EXP: Check that the template location is still valid!
-         * ### @@@@ STOP REPLACEMENT @@@@ ###
-         */
-        return $this->RenderWith(static::class);
+        return $this->RenderWith('TableFilterSortServerSaverController ');
     }
 
     public function load($request)
@@ -262,7 +253,7 @@ class TableFilterSortServerSaverController extends Controller
      */
     protected function dataToSave()
     {
-        $data = session::get('TableFilterSortPostData');
+        $data = $this->getRequest()->getSession()->get('TableFilterSortPostData');
         if ($data) {
             if (isset($data['ParentPageID'])) {
                 $this->parentPageID = $data['ParentPageID'];
