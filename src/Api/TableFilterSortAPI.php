@@ -11,21 +11,9 @@ use SilverStripe\View\ThemeResourceLoader;
 
 class TableFilterSortAPI extends ViewableData
 {
-    private static $js = [
-        'jsurl',
-        'jquery.simplemodal-1.4.5',
-        'js.cookies',
-        'awesomplete',
-        'doT',
-        'TableFilterSort',
-    ];
+    private static $js = [];
 
-    private static $css = [
-        'awesomplete',
-        'awesomplete.theme',
-        'TableFilterSort',
-        'TableFilterSort.theme',
-    ];
+    private static $css = [];
 
     protected static $js_settings = [];
 
@@ -139,7 +127,8 @@ class TableFilterSortAPI extends ViewableData
                     }
                 }
                 if (! $hasBeenIncluded) {
-                    Requirements::themedCSS($link, 'table_filter_sort');
+                    //upgrade to do fix this
+                    //Requirements::themedCSS($link, 'table_filter_sort');
                 }
             }
             if($allCss) {
