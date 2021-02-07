@@ -11,9 +11,21 @@ use SilverStripe\View\ThemeResourceLoader;
 
 class TableFilterSortAPI extends ViewableData
 {
-    private static $js = [];
+    private static $js = [
+        'jsurl',
+        'jquery.simplemodal-1.4.5',
+        'js.cookies',
+        'awesomplete',
+        'doT',
+        'TableFilterSort',
+    ];
 
-    private static $css = [];
+    private static $css = [
+        'awesomplete',
+        'awesomplete.theme',
+        'TableFilterSort',
+        'TableFilterSort.theme',
+    ];
 
     protected static $js_settings = [];
 
@@ -40,7 +52,7 @@ class TableFilterSortAPI extends ViewableData
     /**
      * @param  string $tableSelector              e.g. #MyTableHolder
      * @param  array $blockArray                  files not to include (both CSS and JS)
-     * @param  string $jqueryLocation             if you like to include jQuery then add link here... or set to false to not include jQuery at all 
+     * @param  string $jqueryLocation             if you like to include jQuery then add link here... or set to false to not include jQuery at all
      * @param  boolean $includeInPage             would you like to include the css / js on the page itself?
      * @param  string | array $jsSettings         add JS snippet for settings ...
      */

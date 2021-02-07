@@ -1,0 +1,146 @@
+
+
+
+.tfs-holder .hidden {display: none;}
+
+/**********************************************
+ * Filters
+ */
+
+ .tfs-holder .header-block .tfs-filter-column {
+     overflow-y: auto;
+     overflow-x: hidden;
+ }
+.tfs-filter-form-inner .tfs-filter-column.tagFilter {
+    overflow: visible!important;
+    min-height: 7em!important;
+    height: auto!important;
+}
+
+
+/***********************************************
+ *sort
+ */
+.tfs-holder .sort-asc:after {
+    content: " △";
+}
+
+.tfs-holder .sort-desc:after {
+    content: " ▽";
+}
+
+
+
+/***********************************************
+ * no matches
+ */
+.tfs-holder .no-matches-message {
+    display: none;
+}
+
+
+
+/***********************************************
+ * direct links
+ */
+.tfs-holder span.dl {
+    cursor: pointer;
+}
+
+
+
+/***********************************************
+ * table
+ */
+.tfs-holder table {
+    table-layout: fixed;
+}
+
+.tfs-holder td,
+.tfs-holder th {
+    word-wrap: break-word;
+}
+
+.tfs-holder table,
+.tfs-holder thead,
+.tfs-holder tbody {
+    border-collapse: collapse;
+}
+/***********************************************
+ * hidden data
+ */
+.tfs-holder tr.hide,
+.tfs-holder tr.no-match,
+.tfs-holder table.hide {
+    display: none!important;
+}
+
+.tfs-holder tr.show {
+    display: table-row!important;
+}
+
+/***********************************************
+ * loading
+ */
+
+.tfs-holder.loading {
+    position: relative;
+}
+
+.tfs-holder.loading > div,
+.tfs-holder.loading > table,
+.tfs-holder.loading > form
+{
+    display: none;
+}
+
+
+.tfs-holder .loading-screen {
+    display: none;
+}
+
+.tfs-holder.loading .loading-screen {
+    display: block;
+    position: absolute;
+    background-color: #fff;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 99999;
+}
+
+
+/***********************************************
+ * fixed header
+ */
+
+.floating-table{
+    visibility: collapse;
+    z-index: 7;
+}
+
+/* hide pesky extra data if it comes in */
+.floating-table tbody, .floating-table tfoot{
+    display: none;
+}
+
+.tfs-holder.fixed-header .floating-table th{
+    /* border: 0; */
+}
+
+.fixed-header .tfs-filter-form-holder{
+    z-index: 8;
+}
+
+.fixed-header .tfs-current-search-holder{
+    color: #fff;
+}
+
+.fixed-header .tfs-filter-form-holder,
+.fixed-header .floating-table{
+    position: fixed;
+    top: 0;
+    visibility: visible;
+    margin-bottom: 0;
+}
