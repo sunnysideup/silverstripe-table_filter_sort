@@ -40,7 +40,7 @@ class TableFilterSortAPI extends ViewableData
     /**
      * @param  string $tableSelector              e.g. #MyTableHolder
      * @param  array $blockArray                  files not to include (both CSS and JS)
-     * @param  string $jqueryLocation             if you like to include jQuery then add link here...
+     * @param  string $jqueryLocation             if you like to include jQuery then add link here... or set to false to not include jQuery at all 
      * @param  boolean $includeInPage             would you like to include the css / js on the page itself?
      * @param  string | array $jsSettings         add JS snippet for settings ...
      */
@@ -77,8 +77,12 @@ class TableFilterSortAPI extends ViewableData
         $css = Config::inst()->get(self::class, 'css');
 
         //remove jQuery
-        if ($jqueryLocation) {
-            Requirements::javascript('https://code.jquery.com/jquery-3.4.1.min.js');
+        if ($jqueryLocation !== '') {
+            if($jqueryLocation) {
+                Requirements::javascript($jqueryLocation);
+            }
+        } else {
+            Requirements::javascript('https://code.jquery.com/jquery-3.5.1.min.js');
         }
 
         //block
