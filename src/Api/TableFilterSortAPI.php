@@ -110,13 +110,13 @@ class TableFilterSortAPI extends ViewableData
                 if (Director::isDev() === false) {
                     $link .= '.min';
                 }
-                Requirements::css('vendor/sunnysideup/table_filter_sort/client/css/'.$link.'.css', 'table_filter_sort');
+                Requirements::css('sunnysideup/table_filter_sort: client/css/'.$link.'.css');
             }
             foreach ($js as $link) {
                 if (Director::isDev() === false) {
                     $link .= '.min';
                 }
-                Requirements::javascript('sunnysideup/table_filter_sort: client/javascript/'.$link.'.js', 'table_filter_sort');
+                Requirements::javascript('sunnysideup/table_filter_sort: client/javascript/'.$link.'.js');
             }
         } else {
 
