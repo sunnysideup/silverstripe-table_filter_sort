@@ -57,8 +57,8 @@ class TableFilterSortServerSaver extends DataObject
             'type' => 'unique',
             'columns' => [
                 'ParentPageID',
-                'Title'
-            ]
+                'Title',
+            ],
         ],
         'Title' => true,
         'ParentPageID' => true,

@@ -59,53 +59,53 @@ function create_test()
     $veg = RandomTestValues::get_sample_array_by_type('veg');
     $sizes = RandomTestValues::get_sample_array_by_type('sizes');
     for ($i = 0; $i < $limit; $i++) {
-        $id = 'tfs'.$i;
+        $id = 'tfs' . $i;
         $jsonArray[$id] = [
-            'SKU' => ($i+1),
+            'SKU' => ($i + 1),
             'Type' => $type,
             'OriginalProducer' => $producer,
-            'Colour' => $colours[rand(0, count($colours)-1)],
-            'Size' => $sizes[rand(0, count($sizes)-1)],
+            'Colour' => $colours[rand(0, count($colours) - 1)],
+            'Size' => $sizes[rand(0, count($sizes) - 1)],
             'Weight' => rand(1, 100),
-            'Price' => (rand(0, 99999)/100),
+            'Price' => (rand(0, 99999) / 100),
             'Rating' => rand(1, 5),
             'Tags' => [
-                $veg[rand(0, count($veg)-1)],
-                $veg[rand(0, count($veg)-1)],
-                $veg[rand(0, count($veg)-1)]
+                $veg[rand(0, count($veg) - 1)],
+                $veg[rand(0, count($veg) - 1)],
+                $veg[rand(0, count($veg) - 1)],
             ],
             'InputValue' => 'tba',
-            'SelectValue' => 'yes'
+            'SelectValue' => 'yes',
         ];
         $rowData = $jsonArray[$id];
         if ($useJSON) {
             $html = $templateRow;
         } else {
             $html .= '
-            <tr class="tfstr hide" id="'.$id.'">
+            <tr class="tfstr hide" id="' . $id . '">
                 <td><a href="#" class="more">+</a></td>
                 <td><a href="#" class="adf" title="Add to Favourites">♥</a></td>
                 <th scope="row">
-                    <span data-filter="SKU">'.$rowData['SKU'].'</span><br />
+                    <span data-filter="SKU">' . $rowData['SKU'] . '</span><br />
                     <p style="display: none;" class="hidden">
                         Some more content goes here.
                     </p>
                 </th>
-                <td><span data-filter="Type">'.$type.'</span></td>
-                <td><span data-filter="OriginalProducer">'.$producer.'</span></td>
-                <td><span data-filter="Colour" class="dl">'.$rowData['Colour'].'</span></td>
-                <td><span data-filter="Size">'.$rowData['Size'].'</span></td>
-                <td><span data-filter="Weight">'.$rowData['Weight'].'kg.</span></td>
-                <td><span data-filter="Price">$'.$rowData['Price'].'</span></td>
-                <td><span data-filter="Rating">'.$rowData['Rating'].' Stars</span></td>
+                <td><span data-filter="Type">' . $type . '</span></td>
+                <td><span data-filter="OriginalProducer">' . $producer . '</span></td>
+                <td><span data-filter="Colour" class="dl">' . $rowData['Colour'] . '</span></td>
+                <td><span data-filter="Size">' . $rowData['Size'] . '</span></td>
+                <td><span data-filter="Weight">' . $rowData['Weight'] . 'kg.</span></td>
+                <td><span data-filter="Price">$' . $rowData['Price'] . '</span></td>
+                <td><span data-filter="Rating">' . $rowData['Rating'] . ' Stars</span></td>
                 <td>
                     <ul>
-                        <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][0].'</span></li>
-                        <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][1].'</span></li>
-                        <li><span data-filter="Tags" class="dl">'.$rowData['Tags'][2].'</span></li>
+                        <li><span data-filter="Tags" class="dl">' . $rowData['Tags'][0] . '</span></li>
+                        <li><span data-filter="Tags" class="dl">' . $rowData['Tags'][1] . '</span></li>
+                        <li><span data-filter="Tags" class="dl">' . $rowData['Tags'][2] . '</span></li>
                     </ul>
                     <div style="display: none;" class="hidden">
-                    <p>'.$lipsum->sentence().'</p>
+                    <p>' . $lipsum->sentence() . '</p>
                     </div>
                 </td>
                 <td>
@@ -121,7 +121,7 @@ function create_test()
     return [
         'HTML' => $html,
         'Data' => ($useJSON ? $jsonArray : []),
-        'useJSON' => $useJSON
+        'useJSON' => $useJSON,
     ];
 }
 
@@ -157,8 +157,8 @@ $useJSON = $data['useJSON'];
         <header>
             <h1>Example of a Filter and Sort Table ... </h1>
             <form action="?submitted" method="get" class="update-page-form">
-                <div><input type="number" name="i" value="<?php echo(isset($_GET['i']) ? intval($_GET['i']) : 300);  ?>"/><label for="i">number of rows</label></div>
-                <div><input type="checkbox" name="nojson" value="1" <?php echo(isset($_GET['nojson']) && $_GET['nojson'] == 1 ? 'checked="checked"' : '');  ?> /><label for="nojson">without json data</label></div>
+                <div><input type="number" name="i" value="<?php echo isset($_GET['i']) ? intval($_GET['i']) : 300; ?>"/><label for="i">number of rows</label></div>
+                <div><input type="checkbox" name="nojson" value="1" <?php echo isset($_GET['nojson']) && $_GET['nojson'] === 1 ? 'checked="checked"' : ''; ?> /><label for="nojson">without json data</label></div>
                 <div><input type="submit" value="reload" /></div>
             </form>
             <p>Below the table is an examle of the <a href="#html">HTML</a> you need to use.</p>
@@ -358,7 +358,7 @@ $useJSON = $data['useJSON'];
                 {
                     debug: true,
                     mySelector: ".tfs-holder",
-                    rowRawData: <?php echo($useJSON ? json_encode($jsonArray) : 'null'); ?>,
+                    rowRawData: <?php echo $useJSON ? json_encode($jsonArray) : 'null'; ?>,
                     filtersParentPageID: 'Test Filter',
                     favouritesParentPageID: 'Test Favourites',
                     dataDictionary: {
@@ -396,14 +396,14 @@ class RandomTestValues
             'violet',
             'green',
             'yellow',
-            'Crazy Dots'
+            'Crazy Dots',
         ],
         'sizes' => [
             'Small',
             'Medium',
             'Large',
             'X-Large',
-            'XX-Large'
+            'XX-Large',
         ],
         'veg' => [
             'Artichoke',
@@ -541,8 +541,8 @@ class RandomTestValues
             'Turnip greens',
             'Water chestnut',
             'Watercress',
-            'Zucchini'
-        ]
+            'Zucchini',
+        ],
     ];
 
     public static function get_sample_array_by_type($type)
@@ -573,15 +573,6 @@ class RandomTestValues
 class LoremIpsum
 {
     /**
-     * First
-     *
-     * Whether or not we should be starting the string with "Lorem ipsum..."
-     *
-     * @access private
-     * @var    boolean
-     */
-    private $first = true;
-    /**
      * Words
      *
      * A lorem ipsum vocabulary of sorts. Not a complete list as I'm unsure if
@@ -590,7 +581,7 @@ class LoremIpsum
      * @access private
      * @var    array
      */
-    public $words = array(
+    public $words = [
         // Lorem ipsum...
         'lorem',        'ipsum',       'dolor',        'sit',
         'amet',         'consectetur', 'adipiscing',   'elit',
@@ -639,7 +630,18 @@ class LoremIpsum
         'ut',           'varius',      'vehicula',     'vel',
         'velit',        'venenatis',   'vestibulum',   'vitae',
         'vivamus',      'viverra',     'volutpat',     'vulputate',
-    );
+    ];
+
+    /**
+     * First
+     *
+     * Whether or not we should be starting the string with "Lorem ipsum..."
+     *
+     * @access private
+     * @var    boolean
+     */
+    private $first = true;
+
     /**
      * Word
      *
@@ -653,6 +655,7 @@ class LoremIpsum
     {
         return $this->words(1, $tags);
     }
+
     /**
      * Words Array
      *
@@ -667,6 +670,7 @@ class LoremIpsum
     {
         return $this->words($count, $tags, true);
     }
+
     /**
      * Words
      *
@@ -680,7 +684,7 @@ class LoremIpsum
      */
     public function words($count = 1, $tags = false, $array = false)
     {
-        $words      = array();
+        $words = [];
         $word_count = 0;
         // Shuffles and appends the word list to compensate for count
         // arguments that exceed the size of our vocabulary list
@@ -690,16 +694,17 @@ class LoremIpsum
                 $this->shuffle();
                 // Checks that the last word of the list and the first word of
                 // the list that's about to be appended are not the same
-                if (!$word_count || $words[$word_count - 1] != $this->words[0]) {
-                    $words      = array_merge($words, $this->words);
+                if (! $word_count || $words[$word_count - 1] !== $this->words[0]) {
+                    $words = array_merge($words, $this->words);
                     $word_count = count($words);
-                    $shuffle    = false;
+                    $shuffle = false;
                 }
             }
         }
         $words = array_slice($words, 0, $count);
         return $this->output($words, $tags, $array);
     }
+
     /**
      * Sentence
      *
@@ -713,6 +718,7 @@ class LoremIpsum
     {
         return $this->sentences(1, $tags);
     }
+
     /**
      * Sentences Array
      *
@@ -727,6 +733,7 @@ class LoremIpsum
     {
         return $this->sentences($count, $tags, true);
     }
+
     /**
      * Sentences
      *
@@ -740,13 +747,14 @@ class LoremIpsum
      */
     public function sentences($count = 1, $tags = false, $array = false)
     {
-        $sentences = array();
+        $sentences = [];
         for ($i = 0; $i < $count; $i++) {
             $sentences[] = $this->wordsArray($this->gauss(24.46, 5.08));
         }
         $this->punctuate($sentences);
         return $this->output($sentences, $tags, $array);
     }
+
     /**
      * Paragraph
      *
@@ -760,6 +768,7 @@ class LoremIpsum
     {
         return $this->paragraphs(1, $tags);
     }
+
     /**
      * Paragraph Array
      *
@@ -774,6 +783,7 @@ class LoremIpsum
     {
         return $this->paragraphs($count, $tags, true);
     }
+
     /**
      * Paragraphss
      *
@@ -787,12 +797,13 @@ class LoremIpsum
      */
     public function paragraphs($count = 1, $tags = false, $array = false)
     {
-        $paragraphs = array();
+        $paragraphs = [];
         for ($i = 0; $i < $count; $i++) {
             $paragraphs[] = $this->sentences($this->gauss(5.8, 1.93));
         }
         return $this->output($paragraphs, $tags, $array, "\n\n");
     }
+
     /**
      * Gaussian Distribution
      *
@@ -810,9 +821,10 @@ class LoremIpsum
     {
         $x = mt_rand() / mt_getrandmax();
         $y = mt_rand() / mt_getrandmax();
-        $z = sqrt(-2 * log($x)) * cos(2 * pi() * $y);
+        $z = sqrt(-2 * log($x)) * cos(2 * M_PI * $y);
         return $z * $std_dev + $mean;
     }
+
     /**
      * Shuffle
      *
@@ -833,6 +845,7 @@ class LoremIpsum
             shuffle($this->words);
         }
     }
+
     /**
      * Punctuate
      *
@@ -849,9 +862,9 @@ class LoremIpsum
             $words = count($sentence);
             // Only worry about commas on sentences longer than 4 words
             if ($words > 4) {
-                $mean    = log($words, 6);
+                $mean = log($words, 6);
                 $std_dev = $mean / 6;
-                $commas  = round($this->gauss($mean, $std_dev));
+                $commas = round($this->gauss($mean, $std_dev));
                 for ($i = 1; $i <= $commas; $i++) {
                     $word = round($i * $words / ($commas + 1));
                     if ($word < ($words - 1) && $word > 0) {
@@ -862,6 +875,7 @@ class LoremIpsum
             $sentences[$key] = ucfirst(implode(' ', $sentence) . '.');
         }
     }
+
     /**
      * Output
      *
@@ -880,8 +894,8 @@ class LoremIpsum
     private function output($strings, $tags, $array, $delimiter = ' ')
     {
         if ($tags) {
-            if (!is_array($tags)) {
-                $tags = array($tags);
+            if (! is_array($tags)) {
+                $tags = [$tags];
             } else {
                 // Flips the array so we can work from the inside out
                 $tags = array_reverse($tags);
@@ -889,7 +903,7 @@ class LoremIpsum
             foreach ($strings as $key => $string) {
                 foreach ($tags as $tag) {
                     // Detects / applies back reference
-                    if ($tag[0] == '<') {
+                    if ($tag[0] === '<') {
                         $string = str_replace('$1', $string, $tag);
                     } else {
                         $string = sprintf('<%1$s>%2$s</%1$s>', $tag, $string);
@@ -898,7 +912,7 @@ class LoremIpsum
                 }
             }
         }
-        if (!$array) {
+        if (! $array) {
             $strings = implode($delimiter, $strings);
         }
         return $strings;

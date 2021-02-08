@@ -7,10 +7,11 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\View\Requirements;
 use SilverStripe\View\SSViewer;
 use SilverStripe\View\ViewableData;
-use SilverStripe\View\ThemeResourceLoader;
 
 class TableFilterSortAPI extends ViewableData
 {
+    protected static $js_settings = [];
+
     private static $js = [
         'jsurl',
         'jquery.simplemodal-1.4.5',
@@ -26,8 +27,6 @@ class TableFilterSortAPI extends ViewableData
         'TableFilterSort',
         'TableFilterSort.theme',
     ];
-
-    protected static $js_settings = [];
 
     public static function add_setting($key, $value)
     {
@@ -90,7 +89,7 @@ class TableFilterSortAPI extends ViewableData
 
         //remove jQuery
         if ($jqueryLocation !== '') {
-            if($jqueryLocation) {
+            if ($jqueryLocation) {
                 Requirements::javascript($jqueryLocation);
             }
         } else {
@@ -104,25 +103,23 @@ class TableFilterSortAPI extends ViewableData
         }
 
         if (! $includeInPage) {
-
             //simple inclusion
             foreach ($css as $link) {
                 if (Director::isDev() === false) {
                     $link .= '.min';
                 }
-                Requirements::css('sunnysideup/table_filter_sort: client/css/'.$link.'.css');
+                Requirements::css('sunnysideup/table_filter_sort: client/css/' . $link . '.css');
             }
             foreach ($js as $link) {
                 if (Director::isDev() === false) {
                     $link .= '.min';
                 }
-                Requirements::javascript('sunnysideup/table_filter_sort: client/javascript/'.$link.'.js');
+                Requirements::javascript('sunnysideup/table_filter_sort: client/javascript/' . $link . '.js');
             }
         } else {
-
             //inline inclusion
             $base = Director::baseFolder() . '/';
-            $themes = SSViewer::get_themes();
+            // $themes = SSViewer::get_themes();
 
             //css
             $allCss = '';
@@ -131,14 +128,14 @@ class TableFilterSortAPI extends ViewableData
                     $link .= '.min';
                 }
                 $testFiles = [
-                    'vendor/sunnysideup/table_filter_sort/client/css/'.$link.'.css'
+                    'vendor/sunnysideup/table_filter_sort/client/css/' . $link . '.css',
                 ];
                 $hasBeenIncluded = false;
                 foreach ($testFiles as $testFile) {
-                    $testFile = $base . '/'. $testFile;
+                    $testFile = $base . '/' . $testFile;
                     if (file_exists($testFile)) {
                         $hasBeenIncluded = true;
-                        $allCss .= "\n\n".file_get_contents($testFile);
+                        $allCss .= "\n\n" . file_get_contents($testFile);
                         break;
                     }
                 }
@@ -147,10 +144,9 @@ class TableFilterSortAPI extends ViewableData
                     //Requirements::themedCSS($link, 'table_filter_sort');
                 }
             }
-            if($allCss) {
+            if ($allCss) {
                 Requirements::customCSS($allCss, 'table_filter_sort_css');
             }
-
 
             //js
             $allJS = '';
@@ -160,27 +156,26 @@ class TableFilterSortAPI extends ViewableData
                 }
                 $testFile = $base . $link;
                 $testFiles = [
-                    'vendor/sunnysideup/table_filter_sort/client/javascript/'.$link.'.js'
+                    'vendor/sunnysideup/table_filter_sort/client/javascript/' . $link . '.js',
                 ];
                 $hasBeenIncluded = false;
                 foreach ($testFiles as $testFile) {
-                    $testFile = $base . '/'. $testFile;
+                    $testFile = $base . '/' . $testFile;
                     if (file_exists($testFile)) {
                         $hasBeenIncluded = true;
-                        $allJS .= "\n\n".file_get_contents($testFile);
+                        $allJS .= "\n\n" . file_get_contents($testFile);
                         break;
                     }
                 }
                 if (! $hasBeenIncluded) {
-                    Requirements::themedJavascript('sunnysideup/table_filter_sort: client/javascript/'.$link.'.js');
+                    Requirements::themedJavascript('sunnysideup/table_filter_sort: client/javascript/' . $link . '.js');
                 }
             }
-            if($allJS) {
+            if ($allJS) {
                 Requirements::customScript($allJS, 'table_filter_sort_js');
             }
         }
     }
-
 
     protected static function workOutJSSettings($jsSettings)
     {
@@ -225,7 +220,6 @@ class TableFilterSortAPI extends ViewableData
         return $jsSettings;
     }
 
-
     protected static function num_2_alpha($n)
     {
         for ($r = ''; $n >= 0; $n = intval($n / 26) - 1) {
@@ -233,5 +227,4 @@ class TableFilterSortAPI extends ViewableData
         }
         return $r;
     }
-
 }
