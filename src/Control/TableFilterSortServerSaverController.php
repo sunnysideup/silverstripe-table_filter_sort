@@ -155,7 +155,6 @@ class TableFilterSortServerSaverController extends Controller
 
     /**
      * returns datalist of options for use in template
-     * @param  [type] $request [description]
      * @return [type]          [description]
      */
     public function MyList()
