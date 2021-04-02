@@ -13,6 +13,7 @@ use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\View\Requirements;
 use Sunnysideup\TableFilterSort\Api\TableFilterSortAPI;
@@ -155,7 +156,7 @@ class TableFilterSortServerSaverController extends Controller
 
     /**
      * returns datalist of options for use in template
-     * @return [type]          [description]
+     * @return DataList
      */
     public function MyList()
     {
@@ -164,8 +165,7 @@ class TableFilterSortServerSaverController extends Controller
 
     public function AddForm()
     {
-        if ($this->dataToSave()
-        ) {
+        if ($this->dataToSave()) {
             $singleton = Injector::inst()->get(TableFilterSortServerSaver::class);
             $fieldLabels = $singleton->FieldLabels();
             $fieldList = FieldList::create(
@@ -258,5 +258,6 @@ class TableFilterSortServerSaverController extends Controller
                 return $data;
             }
         }
+        return null;
     }
 }

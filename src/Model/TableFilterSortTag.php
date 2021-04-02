@@ -55,10 +55,10 @@ class TableFilterSortTag extends DataObject
      * see README.md for usage ...
      *
      * @param string $title
-     * @param bool $addToObject
+     * @param  int|DataObject $addToObjectOrId
      * @return DataObject
      */
-    public static function find_or_create($title, $addToObject)
+    public static function find_or_create(string $title, $addToObjectOrId)
     {
         $title = strtolower(trim($title));
         if (! $title) {
@@ -76,7 +76,8 @@ class TableFilterSortTag extends DataObject
         $obj->Title = $title;
         $obj->write();
 
-        $obj->TableFilterSortServerSavers()->add($addToObject->ID);
+        // add to many many relation
+        $obj->TableFilterSortServerSavers()->add($addToObjectOrId);
 
         return $obj;
     }

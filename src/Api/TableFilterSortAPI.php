@@ -191,6 +191,7 @@ class TableFilterSortAPI extends ViewableData
                 }
             }
             foreach ($categories as $category => $values) {
+                $shortKey = 'not-set';
                 if ($firstRow) {
                     $shortKey = self::num_2_alpha($categoryIndex);
                     $categoryIndex++;
