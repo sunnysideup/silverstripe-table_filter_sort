@@ -54,7 +54,8 @@ class TableFilterSortTag extends DataObject
     /**
      * see README.md for usage ...
      *
-     * @param  int|DataObject $addToObjectOrId
+     * @param DataObject|int $addToObjectOrId
+     *
      * @return DataObject
      */
     public static function find_or_create(string $title, $addToObjectOrId)

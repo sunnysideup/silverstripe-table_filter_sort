@@ -8,10 +8,7 @@ use Sunnysideup\TableFilterSort\Model\TableFilterSortServerSaver;
 if (defined('SS_TABLE_FILTER_SORT_SHOW_MOODEL_ADMIN')) {
     /**
      *@ author nicolaas[at] sunny side up .co .nz
-     *
-     *
-     *
-     **/
+     */
     class TableFilterSortModelAdmin extends ModelAdmin
     {
         private static $managed_models = [

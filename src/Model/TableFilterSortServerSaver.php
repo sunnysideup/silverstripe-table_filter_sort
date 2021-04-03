@@ -79,6 +79,7 @@ class TableFilterSortServerSaver extends DataObject
      *
      * @param string $title
      * @param string $parentPageID
+     *
      * @return DataObject
      */
     public static function find_or_create($title, $parentPageID)
@@ -119,7 +120,7 @@ class TableFilterSortServerSaver extends DataObject
         $originalName = $this->Title;
         while ($this->titleExists()) {
             $this->Title = $originalName . ' ' . $iteration;
-            $iteration++;
+            ++$iteration;
         }
         $this->URLSegment = urlencode(
             strtolower(

@@ -22,7 +22,7 @@ use Sunnysideup\TableFilterSort\Model\TableFilterSortTag;
 
 class TableFilterSortServerSaverController extends Controller
 {
-    protected $parentPageID = null;
+    protected $parentPageID;
 
     /**
      * Default URL handlers - (Action)/(ID)/(OtherID).
@@ -37,7 +37,8 @@ class TableFilterSortServerSaverController extends Controller
     ];
 
     /**
-     * Defines methods that can be called directly
+     * Defines methods that can be called directly.
+     *
      * @var array
      */
     private static $allowed_actions = [
@@ -65,6 +66,7 @@ class TableFilterSortServerSaverController extends Controller
         if ($this->myTitle) {
             return $this->myTitle;
         }
+
         return $this->request->param('Action');
     }
 
@@ -76,9 +78,11 @@ class TableFilterSortServerSaverController extends Controller
             $this->getRequest()->getSession()->clear('TableFilterSortPostData');
             if (isset($postData['ParentPageID'])) {
                 $this->parentPageID = $postData['ParentPageID'];
+
                 return Director::absoluteURL($this->Link('find/' . $this->parentPageID));
             }
         }
+
         return '404';
     }
 
@@ -94,8 +98,10 @@ class TableFilterSortServerSaverController extends Controller
         $postData = $request->postVars();
         if ($postData) {
             $this->getRequest()->getSession()->set('TableFilterSortPostData', $postData);
+
             return Director::absoluteURL($this->Link('save'));
         }
+
         return '404';
     }
 
@@ -103,8 +109,10 @@ class TableFilterSortServerSaverController extends Controller
     {
         if ($this->dataToSave()) {
             $this->myTitle = 'Save ' . $this->parentPageID . ' ... ';
+
             return $this->renderWith('TableFilterSortServerSaverController ');
         }
+
         return 'NO DATA TO BE SAVED ...';
     }
 
@@ -133,6 +141,7 @@ class TableFilterSortServerSaverController extends Controller
         } else {
             $form->setMessage('Please provide title', 'bad');
         }
+
         return $this->RenderWith('TableFilterSortServerSaverController ');
     }
 
@@ -151,11 +160,13 @@ class TableFilterSortServerSaverController extends Controller
                 ]
             );
         }
+
         return '{}';
     }
 
     /**
-     * returns datalist of options for use in template
+     * returns datalist of options for use in template.
+     *
      * @return DataList
      */
     public function MyList()
@@ -178,7 +189,7 @@ class TableFilterSortServerSaverController extends Controller
                 TextareaField::create('Description', $fieldLabels['Description'])
                     ->setAttribute('placeholder', $fieldLabels['Description'])
             );
-            for ($i = 1; $i < 8; $i++) {
+            for ($i = 1; $i < 8; ++$i) {
                 $title = $fieldLabels['Tags'] . ' #' . $i;
                 $fieldList->push(
                     TextField::create('TagsTempField[' . $i . ']', $title)
@@ -190,13 +201,16 @@ class TableFilterSortServerSaverController extends Controller
                 FormAction::create('dosave', $actionTitle)
             );
             $requireFields = RequiredFields::create(['Title']);
+
             return Form::create($this, 'AddForm', $fieldList, $actionList, $requireFields);
         }
     }
 
     /**
      * returns ABSOLUTE link to the shopping cart controller.
-     * @param array|string|null $actionAndOtherLinkVariables
+     *
+     * @param null|array|string $actionAndOtherLinkVariables
+     *
      * @return string
      */
     protected static function create_link($actionAndOtherLinkVariables = null)
@@ -245,9 +259,9 @@ class TableFilterSortServerSaverController extends Controller
     /**
      * returns an array with three values:
      * ParentPageID
-     * Data
+     * Data.
      *
-     * @return array|null
+     * @return null|array
      */
     protected function dataToSave()
     {
@@ -255,9 +269,11 @@ class TableFilterSortServerSaverController extends Controller
         if ($data) {
             if (isset($data['ParentPageID'])) {
                 $this->parentPageID = $data['ParentPageID'];
+
                 return $data;
             }
         }
+
         return null;
     }
 }

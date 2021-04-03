@@ -49,11 +49,11 @@ class TableFilterSortAPI extends ViewableData
     }
 
     /**
-     * @param  string $tableSelector              e.g. #MyTableHolder
-     * @param  array $blockArray                  files not to include (both CSS and JS)
-     * @param  string $jqueryLocation             if you like to include jQuery then add link here... or set to false to not include jQuery at all
-     * @param  boolean $includeInPage             would you like to include the css / js on the page itself?
-     * @param  string | array $jsSettings         add JS snippet for settings ...
+     * @param string         $tableSelector  e.g. #MyTableHolder
+     * @param array          $blockArray     files not to include (both CSS and JS)
+     * @param string         $jqueryLocation if you like to include jQuery then add link here... or set to false to not include jQuery at all
+     * @param bool           $includeInPage  would you like to include the css / js on the page itself?
+     * @param string | array $jsSettings     add JS snippet for settings ...
      */
     public static function include_requirements(
         $tableSelector = '.tfs-holder',
@@ -62,7 +62,7 @@ class TableFilterSortAPI extends ViewableData
         $includeInPage = false,
         $jsSettings = null
     ) {
-        if ($jsSettings === null) {
+        if (null === $jsSettings) {
             $jsSettings = self::$js_settings;
         }
         if (isset($jsSettings['rowRawData'])) {
@@ -88,7 +88,7 @@ class TableFilterSortAPI extends ViewableData
         $css = Config::inst()->get(self::class, 'css');
 
         //remove jQuery
-        if ($jqueryLocation !== '') {
+        if ('' !== $jqueryLocation) {
             if ($jqueryLocation) {
                 Requirements::javascript($jqueryLocation);
             }
@@ -105,13 +105,13 @@ class TableFilterSortAPI extends ViewableData
         if (! $includeInPage) {
             //simple inclusion
             foreach ($css as $link) {
-                if (Director::isDev() === false) {
+                if (false === Director::isDev()) {
                     $link .= '.min';
                 }
                 Requirements::css('sunnysideup/table_filter_sort: client/css/' . $link . '.css');
             }
             foreach ($js as $link) {
-                if (Director::isDev() === false) {
+                if (false === Director::isDev()) {
                     $link .= '.min';
                 }
                 Requirements::javascript('sunnysideup/table_filter_sort: client/javascript/' . $link . '.js');
@@ -124,7 +124,7 @@ class TableFilterSortAPI extends ViewableData
             //css
             $allCss = '';
             foreach ($css as $link) {
-                if (Director::isDev() === false) {
+                if (false === Director::isDev()) {
                     $link .= '.min';
                 }
                 $testFiles = [
@@ -136,6 +136,7 @@ class TableFilterSortAPI extends ViewableData
                     if (file_exists($testFile)) {
                         $hasBeenIncluded = true;
                         $allCss .= "\n\n" . file_get_contents($testFile);
+
                         break;
                     }
                 }
@@ -151,7 +152,7 @@ class TableFilterSortAPI extends ViewableData
             //js
             $allJS = '';
             foreach ($js as $link) {
-                if (Director::isDev() === false) {
+                if (false === Director::isDev()) {
                     $link .= '.min';
                 }
                 $testFile = $base . $link;
@@ -164,6 +165,7 @@ class TableFilterSortAPI extends ViewableData
                     if (file_exists($testFile)) {
                         $hasBeenIncluded = true;
                         $allJS .= "\n\n" . file_get_contents($testFile);
+
                         break;
                     }
                 }
@@ -194,7 +196,7 @@ class TableFilterSortAPI extends ViewableData
                 $shortKey = 'not-set';
                 if ($firstRow) {
                     $shortKey = self::num_2_alpha($categoryIndex);
-                    $categoryIndex++;
+                    ++$categoryIndex;
                     if (array_key_exists($shortKey, $jsSettings['rowRawData'][$rowID])) {
                         user_error('You are using an illegal key in the raw data, namely: ' . $shortKey);
                     }
@@ -226,6 +228,7 @@ class TableFilterSortAPI extends ViewableData
         for ($r = ''; $n >= 0; $n = intval($n / 26) - 1) {
             $r = chr($n % 26 + 0x41) . $r;
         }
+
         return $r;
     }
 }

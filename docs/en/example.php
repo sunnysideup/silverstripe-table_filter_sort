@@ -3,7 +3,7 @@
 function create_test()
 {
     $useJSON = true;
-    if (isset($_GET['nojson']) && $_GET['nojson'] === '1') {
+    if (isset($_GET['nojson']) && '1' === $_GET['nojson']) {
         $useJSON = false;
     }
     $templateRow = '';
@@ -58,7 +58,7 @@ function create_test()
     $colours = RandomTestValues::get_sample_array_by_type('colours');
     $veg = RandomTestValues::get_sample_array_by_type('veg');
     $sizes = RandomTestValues::get_sample_array_by_type('sizes');
-    for ($i = 0; $i < $limit; $i++) {
+    for ($i = 0; $i < $limit; ++$i) {
         $id = 'tfs' . $i;
         $jsonArray[$id] = [
             'SKU' => ($i + 1),
@@ -118,6 +118,7 @@ function create_test()
             </tr>';
         }
     }
+
     return [
         'HTML' => $html,
         'Data' => ($useJSON ? $jsonArray : []),
@@ -130,17 +131,15 @@ $html = $data['HTML'];
 $jsonArray = $data['Data'];
 $useJSON = $data['useJSON'];
 
-
-
 ?><!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
         <title>Example Filter Table</title>
-        <link rel="stylesheet" type="text/css" href="../../css/awesomplete.css?x=<?php echo rand(0, 9999999999) ?>">
-        <link rel="stylesheet" type="text/css" href="../../css/awesomplete.theme.css?x=<?php echo rand(0, 9999999999) ?>">
-        <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.css?x=<?php echo rand(0, 9999999999) ?>">
-        <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.theme.css?x=<?php echo rand(0, 9999999999) ?>">
+        <link rel="stylesheet" type="text/css" href="../../css/awesomplete.css?x=<?php echo rand(0, 9999999999); ?>">
+        <link rel="stylesheet" type="text/css" href="../../css/awesomplete.theme.css?x=<?php echo rand(0, 9999999999); ?>">
+        <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.css?x=<?php echo rand(0, 9999999999); ?>">
+        <link rel="stylesheet" type="text/css" href="../../css/TableFilterSort.theme.css?x=<?php echo rand(0, 9999999999); ?>">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
         <style>
             form.update-page-form {width: 400px; margin-left: auto; margin-right: auto; box-sizing: border-box; background-color: #ccc; border: 1px solid #999; border-radius: 5px;}
@@ -158,7 +157,7 @@ $useJSON = $data['useJSON'];
             <h1>Example of a Filter and Sort Table ... </h1>
             <form action="?submitted" method="get" class="update-page-form">
                 <div><input type="number" name="i" value="<?php echo isset($_GET['i']) ? intval($_GET['i']) : 300; ?>"/><label for="i">number of rows</label></div>
-                <div><input type="checkbox" name="nojson" value="1" <?php echo isset($_GET['nojson']) && $_GET['nojson'] === 1 ? 'checked="checked"' : ''; ?> /><label for="nojson">without json data</label></div>
+                <div><input type="checkbox" name="nojson" value="1" <?php echo isset($_GET['nojson']) && 1 === $_GET['nojson'] ? 'checked="checked"' : ''; ?> /><label for="nojson">without json data</label></div>
                 <div><input type="submit" value="reload" /></div>
             </form>
             <p>Below the table is an examle of the <a href="#html">HTML</a> you need to use.</p>
@@ -344,12 +343,12 @@ $useJSON = $data['useJSON'];
         </main>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script src="../../javascript/jsurl.js?x=<?php echo rand(0, 9999999999) ?>"></script>
-        <script src="../../javascript/jquery.simplemodal-1.4.5?x=<?php echo rand(0, 9999999999) ?>"></script>
-        <script src="../../javascript/js.cookies.js?x=<?php echo rand(0, 9999999999) ?>"></script>
-        <script src="../../javascript/awesomplete.js?x=<?php echo rand(0, 9999999999) ?>"></script>
-        <script src="../../javascript/doT.js?x=<?php echo rand(0, 9999999999) ?>"></script>
-        <script src="../../javascript/TableFilterSort.js?x=<?php echo rand(0, 9999999999) ?>"></script>
+        <script src="../../javascript/jsurl.js?x=<?php echo rand(0, 9999999999); ?>"></script>
+        <script src="../../javascript/jquery.simplemodal-1.4.5?x=<?php echo rand(0, 9999999999); ?>"></script>
+        <script src="../../javascript/js.cookies.js?x=<?php echo rand(0, 9999999999); ?>"></script>
+        <script src="../../javascript/awesomplete.js?x=<?php echo rand(0, 9999999999); ?>"></script>
+        <script src="../../javascript/doT.js?x=<?php echo rand(0, 9999999999); ?>"></script>
+        <script src="../../javascript/TableFilterSort.js?x=<?php echo rand(0, 9999999999); ?>"></script>
         <script type="text/javascript">
             if(! Array.isArray(TableFilterSortVars)) {
                 var TableFilterSortVars = [];
@@ -383,7 +382,6 @@ $useJSON = $data['useJSON'];
 </html>
 
 <?php
-
 
 class RandomTestValues
 {
@@ -548,6 +546,7 @@ class RandomTestValues
     public static function get_sample_array_by_type($type)
     {
         $obj = new RandomTestValues();
+
         return $obj->getData($type);
     }
 
@@ -558,7 +557,7 @@ class RandomTestValues
 }
 
 /**
- * Lorem Ipsum Generator
+ * Lorem Ipsum Generator.
  *
  * PHP version 5.3+
  *
@@ -568,17 +567,17 @@ class RandomTestValues
  * @author    Josh Sherman <josh@gravityblvd.com>
  * @copyright Copyright 2014, 2015, 2016 Josh Sherman
  * @license   http://www.opensource.org/licenses/mit-license.html
- * @link      https://github.com/joshtronic/php-loremipsum
+ *
+ * @see      https://github.com/joshtronic/php-loremipsum
  */
 class LoremIpsum
 {
     /**
-     * Words
+     * Words.
      *
      * A lorem ipsum vocabulary of sorts. Not a complete list as I'm unsure if
      * a complete list exists and if so, where to get it.
      *
-     * @access private
      * @var array
      */
     public $words = [
@@ -633,22 +632,21 @@ class LoremIpsum
     ];
 
     /**
-     * First
+     * First.
      *
      * Whether or not we should be starting the string with "Lorem ipsum..."
      *
-     * @access private
-     * @var boolean
+     * @var bool
      */
     private $first = true;
 
     /**
-     * Word
+     * Word.
      *
      * Generates a single word of lorem ipsum.
      *
-     * @access public
-     * @param  mixed  $tags string or array of HTML tags to wrap output with
+     * @param mixed $tags string or array of HTML tags to wrap output with
+     *
      * @return string generated lorem ipsum word
      */
     public function word($tags = false)
@@ -657,14 +655,14 @@ class LoremIpsum
     }
 
     /**
-     * Words Array
+     * Words Array.
      *
      * Generates an array of lorem ipsum words.
      *
-     * @access public
-     * @param  integer $count how many words to generate
-     * @param  mixed   $tags string or array of HTML tags to wrap output with
-     * @return array   generated lorem ipsum words
+     * @param int   $count how many words to generate
+     * @param mixed $tags  string or array of HTML tags to wrap output with
+     *
+     * @return array generated lorem ipsum words
      */
     public function wordsArray($count = 1, $tags = false)
     {
@@ -672,15 +670,15 @@ class LoremIpsum
     }
 
     /**
-     * Words
+     * Words.
      *
      * Generates words of lorem ipsum.
      *
-     * @access public
-     * @param  integer $count how many words to generate
-     * @param  mixed   $tags string or array of HTML tags to wrap output with
-     * @param  boolean $array whether an array or a string should be returned
-     * @return mixed   string or array of generated lorem ipsum words
+     * @param int   $count how many words to generate
+     * @param mixed $tags  string or array of HTML tags to wrap output with
+     * @param bool  $array whether an array or a string should be returned
+     *
+     * @return mixed string or array of generated lorem ipsum words
      */
     public function words($count = 1, $tags = false, $array = false)
     {
@@ -702,16 +700,17 @@ class LoremIpsum
             }
         }
         $words = array_slice($words, 0, $count);
+
         return $this->output($words, $tags, $array);
     }
 
     /**
-     * Sentence
+     * Sentence.
      *
      * Generates a full sentence of lorem ipsum.
      *
-     * @access public
-     * @param  mixed  $tags string or array of HTML tags to wrap output with
+     * @param mixed $tags string or array of HTML tags to wrap output with
+     *
      * @return string generated lorem ipsum sentence
      */
     public function sentence($tags = false)
@@ -720,14 +719,14 @@ class LoremIpsum
     }
 
     /**
-     * Sentences Array
+     * Sentences Array.
      *
      * Generates an array of lorem ipsum sentences.
      *
-     * @access public
-     * @param  integer $count how many sentences to generate
-     * @param  mixed   $tags string or array of HTML tags to wrap output with
-     * @return array   generated lorem ipsum sentences
+     * @param int   $count how many sentences to generate
+     * @param mixed $tags  string or array of HTML tags to wrap output with
+     *
+     * @return array generated lorem ipsum sentences
      */
     public function sentencesArray($count = 1, $tags = false)
     {
@@ -735,33 +734,34 @@ class LoremIpsum
     }
 
     /**
-     * Sentences
+     * Sentences.
      *
      * Generates sentences of lorem ipsum.
      *
-     * @access public
-     * @param  integer $count how many sentences to generate
-     * @param  mixed   $tags string or array of HTML tags to wrap output with
-     * @param  boolean $array whether an array or a string should be returned
-     * @return mixed   string or array of generated lorem ipsum sentences
+     * @param int   $count how many sentences to generate
+     * @param mixed $tags  string or array of HTML tags to wrap output with
+     * @param bool  $array whether an array or a string should be returned
+     *
+     * @return mixed string or array of generated lorem ipsum sentences
      */
     public function sentences($count = 1, $tags = false, $array = false)
     {
         $sentences = [];
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 0; $i < $count; ++$i) {
             $sentences[] = $this->wordsArray($this->gauss(24.46, 5.08));
         }
         $this->punctuate($sentences);
+
         return $this->output($sentences, $tags, $array);
     }
 
     /**
-     * Paragraph
+     * Paragraph.
      *
      * Generates a full paragraph of lorem ipsum.
      *
-     * @access public
-     * @param  mixed  $tags string or array of HTML tags to wrap output with
+     * @param mixed $tags string or array of HTML tags to wrap output with
+     *
      * @return string generated lorem ipsum paragraph
      */
     public function paragraph($tags = false)
@@ -770,14 +770,14 @@ class LoremIpsum
     }
 
     /**
-     * Paragraph Array
+     * Paragraph Array.
      *
      * Generates an array of lorem ipsum paragraphs.
      *
-     * @access public
-     * @param  integer $count how many paragraphs to generate
-     * @param  mixed   $tags string or array of HTML tags to wrap output with
-     * @return array   generated lorem ipsum paragraphs
+     * @param int   $count how many paragraphs to generate
+     * @param mixed $tags  string or array of HTML tags to wrap output with
+     *
+     * @return array generated lorem ipsum paragraphs
      */
     public function paragraphsArray($count = 1, $tags = false)
     {
@@ -785,53 +785,53 @@ class LoremIpsum
     }
 
     /**
-     * Paragraphss
+     * Paragraphss.
      *
      * Generates paragraphs of lorem ipsum.
      *
-     * @access public
-     * @param  integer $count how many paragraphs to generate
-     * @param  mixed   $tags string or array of HTML tags to wrap output with
-     * @param  boolean $array whether an array or a string should be returned
-     * @return mixed   string or array of generated lorem ipsum paragraphs
+     * @param int   $count how many paragraphs to generate
+     * @param mixed $tags  string or array of HTML tags to wrap output with
+     * @param bool  $array whether an array or a string should be returned
+     *
+     * @return mixed string or array of generated lorem ipsum paragraphs
      */
     public function paragraphs($count = 1, $tags = false, $array = false)
     {
         $paragraphs = [];
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 0; $i < $count; ++$i) {
             $paragraphs[] = $this->sentences($this->gauss(5.8, 1.93));
         }
+
         return $this->output($paragraphs, $tags, $array, "\n\n");
     }
 
     /**
-     * Gaussian Distribution
+     * Gaussian Distribution.
      *
      * This is some smart kid stuff. I went ahead and combined the N(0,1) logic
      * with the N(m,s) logic into this single function. Used to calculate the
      * number of words in a sentence, the number of sentences in a paragraph
      * and the distribution of commas in a sentence.
      *
-     * @access private
-     * @param  double  $mean average value
-     * @param  double  $std_dev stadnard deviation
-     * @return double  calculated distribution
+     * @param float $mean    average value
+     * @param float $std_dev stadnard deviation
+     *
+     * @return float calculated distribution
      */
     private function gauss($mean, $std_dev)
     {
         $x = mt_rand() / mt_getrandmax();
         $y = mt_rand() / mt_getrandmax();
         $z = sqrt(-2 * log($x)) * cos(2 * M_PI * $y);
+
         return $z * $std_dev + $mean;
     }
 
     /**
-     * Shuffle
+     * Shuffle.
      *
      * Shuffles the words, forcing "Lorem ipsum..." at the beginning if it is
      * the first time we are generating the text.
-     *
-     * @access private
      */
     private function shuffle()
     {
@@ -847,14 +847,13 @@ class LoremIpsum
     }
 
     /**
-     * Punctuate
+     * Punctuate.
      *
      * Applies punctuation to a sentence. This includes a period at the end,
      * the injection of commas as well as capitalizing the first letter of the
      * first word of the sentence.
      *
-     * @access private
-     * @param  array   $sentences the sentences we would like to punctuate
+     * @param array $sentences the sentences we would like to punctuate
      */
     private function punctuate(&$sentences)
     {
@@ -865,7 +864,7 @@ class LoremIpsum
                 $mean = log($words, 6);
                 $std_dev = $mean / 6;
                 $commas = round($this->gauss($mean, $std_dev));
-                for ($i = 1; $i <= $commas; $i++) {
+                for ($i = 1; $i <= $commas; ++$i) {
                     $word = round($i * $words / ($commas + 1));
                     if ($word < ($words - 1) && $word > 0) {
                         $sentence[$word] .= ',';
@@ -877,19 +876,19 @@ class LoremIpsum
     }
 
     /**
-     * Output
+     * Output.
      *
      * Does the rest of the processing of the strings. This includes wrapping
      * the strings in HTML tags, handling transformations with the ability of
      * back referencing and determining if the passed array should be converted
      * into a string or not.
      *
-     * @access private
-     * @param  array   $strings an array of generated strings
-     * @param  mixed   $tags string or array of HTML tags to wrap output with
-     * @param  boolean $array whether an array or a string should be returned
-     * @param  string  $delimiter the string to use when calling implode()
-     * @return mixed   string or array of generated lorem ipsum text
+     * @param array  $strings   an array of generated strings
+     * @param mixed  $tags      string or array of HTML tags to wrap output with
+     * @param bool   $array     whether an array or a string should be returned
+     * @param string $delimiter the string to use when calling implode()
+     *
+     * @return mixed string or array of generated lorem ipsum text
      */
     private function output($strings, $tags, $array, $delimiter = ' ')
     {
@@ -903,7 +902,7 @@ class LoremIpsum
             foreach ($strings as $key => $string) {
                 foreach ($tags as $tag) {
                     // Detects / applies back reference
-                    if ($tag[0] === '<') {
+                    if ('<' === $tag[0]) {
                         $string = str_replace('$1', $string, $tag);
                     } else {
                         $string = sprintf('<%1$s>%2$s</%1$s>', $tag, $string);
@@ -915,6 +914,7 @@ class LoremIpsum
         if (! $array) {
             $strings = implode($delimiter, $strings);
         }
+
         return $strings;
     }
 }
