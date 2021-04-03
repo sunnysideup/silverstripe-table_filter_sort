@@ -1188,7 +1188,7 @@ jQuery(document).ready(
 
             /**
              * retrieve raw data from HTML for JSON
-             * @return {[type]} [description]
+             * @return {[type]}
              */
             turnHTMLIntoJSON: function()
             {
@@ -1447,8 +1447,8 @@ jQuery(document).ready(
             /**
              * updates the dataDictionary for all rows
              * that are currently marked as matching!
-             * @param  {string} category [description]
-             * @param  {mixed} newValue [description]
+             * @param  {string} category
+             * @param  {mixed} newValue
              */
             updateMatchingRowsInDataDictionary: function(category, newValue)
             {
@@ -1677,8 +1677,8 @@ jQuery(document).ready(
 
             /**
              * is this an empty variable?
-             * @param  {mixed} value [description]
-             * @return {boolean}       [description]
+             * @param  {mixed} value
+             * @return {boolean}
              */
             isEmptyValue: function(value)
             {
@@ -1708,7 +1708,7 @@ jQuery(document).ready(
              * @param  {mixed}   value          value supplied
              * @param  {string}  forcedDataType specify the data type rather than relying on the category.
              *
-             * @return {mixed}                [description]
+             * @return {mixed}
              */
             validateValue: function(category, value, forcedDataType)
             {
@@ -2344,7 +2344,7 @@ jQuery(document).ready(
              * - favourites
              * - filter
              * data is sent as the data get parameter, separated by &
-             * @return {[type]} [description]
+             * @return {[type]}
              */
             openServerModalWindowListener: function()
             {
@@ -2564,10 +2564,10 @@ jQuery(document).ready(
 
             /**
              * creates the filter form
-             * @param  {string} type       [description]
-             * @param  {string} category   [description]
-             * @param  {int} tabIndex   [description]
-             * @param  {string} valueIndex [description]
+             * @param  {string} type
+             * @param  {string} category
+             * @param  {int} tabIndex
+             * @param  {string} valueIndex
              *
              * @return {string}            HTML
              */
@@ -2975,7 +2975,7 @@ jQuery(document).ready(
 
             /**
              * switch to a different page
-             * @param  {int} page [description]
+             * @param  {int} page
              */
             gotoPage: function(page, force)
             {
@@ -3000,7 +3000,7 @@ jQuery(document).ready(
 
             /**
              * switch to a different page
-             * @param  {int} page [description]
+             * @param  {int} page
              */
             reloadCurrentPage: function()
             {
@@ -3775,7 +3775,7 @@ jQuery(document).ready(
 
 
             /**
-             * * @param {string} type [description]
+             * @param {string} type
              */
             getSortComparator: function(type)
             {
