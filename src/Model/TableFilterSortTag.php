@@ -54,7 +54,6 @@ class TableFilterSortTag extends DataObject
     /**
      * see README.md for usage ...
      *
-     * @param string $title
      * @param  int|DataObject $addToObjectOrId
      * @return DataObject
      */
