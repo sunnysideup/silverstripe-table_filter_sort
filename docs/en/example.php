@@ -579,7 +579,7 @@ class LoremIpsum
      * a complete list exists and if so, where to get it.
      *
      * @access private
-     * @var    array
+     * @var array
      */
     public $words = [
         // Lorem ipsum...
@@ -638,7 +638,7 @@ class LoremIpsum
      * Whether or not we should be starting the string with "Lorem ipsum..."
      *
      * @access private
-     * @var    boolean
+     * @var boolean
      */
     private $first = true;
 
