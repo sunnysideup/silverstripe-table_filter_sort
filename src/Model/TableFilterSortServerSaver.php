@@ -134,6 +134,6 @@ class TableFilterSortServerSaver extends DataObject
         return self::get()
             ->filter(['Title' => $this->Title, 'ParentPageID' => $this->ParentPageID])
             ->exclude(['ID' => $this->ID])
-            ->count() ? true : false;
+            ->exists() ? true : false;
     }
 }
