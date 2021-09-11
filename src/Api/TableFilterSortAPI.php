@@ -49,11 +49,11 @@ class TableFilterSortAPI extends ViewableData
     }
 
     /**
-     * @param string         $tableSelector  e.g. #MyTableHolder
-     * @param array          $blockArray     files not to include (both CSS and JS)
-     * @param string         $jqueryLocation if you like to include jQuery then add link here... or set to false to not include jQuery at all
-     * @param bool           $includeInPage  would you like to include the css / js on the page itself?
-     * @param string | array $jsSettings     add JS snippet for settings ...
+     * @param string       $tableSelector  e.g. #MyTableHolder
+     * @param array        $blockArray     files not to include (both CSS and JS)
+     * @param string       $jqueryLocation if you like to include jQuery then add link here... or set to false to not include jQuery at all
+     * @param bool         $includeInPage  would you like to include the css / js on the page itself?
+     * @param array|string $jsSettings     add JS snippet for settings ...
      */
     public static function include_requirements(
         $tableSelector = '.tfs-holder',
