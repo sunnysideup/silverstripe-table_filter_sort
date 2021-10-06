@@ -113,9 +113,11 @@ class TableFilterSortServerSaver extends DataObject
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        if (! $this->Title) {
-            $this->Title = rand(0, 99999999999999999);
-        }
+        // if (! $this->Title){
+        //     /*this Title is in string, does throw an error */
+        //
+        //     $this->Title = (int)$this.rand(0, getrandmax());
+        // }
         $iteration = 2;
         $originalName = $this->Title;
         while ($this->titleExists()) {

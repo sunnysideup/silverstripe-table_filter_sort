@@ -89,9 +89,9 @@ class TableFilterSortAPI extends ViewableData
 
         //remove jQuery
         if ('' !== $jqueryLocation) {
-            if ($jqueryLocation) {
-                Requirements::javascript($jqueryLocation);
-            }
+            Requirements::javascript($jqueryLocation);
+            // if ($jqueryLocation) {
+            // }
         } else {
             Requirements::javascript('https://code.jquery.com/jquery-3.5.1.min.js');
         }
