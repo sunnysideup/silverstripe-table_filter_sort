@@ -28,7 +28,7 @@ class TableFilterSortServerSaver extends DataObject
     ];
 
     private static $default_sort = [
-        'Created' => 'DESC',
+        'ID' => 'DESC',
     ];
 
     private static $required_fields = [
