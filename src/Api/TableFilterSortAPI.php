@@ -187,10 +187,8 @@ class TableFilterSortAPI extends ViewableData
         foreach ($jsSettings['rowRawData'] as $rowID => $categories) {
             if ($firstRow) {
                 $rowCount = count($categories);
-            } else {
-                if ($rowCount !== count($categories)) {
-                    user_error('Bad number of entries in ' . $rowID);
-                }
+            } elseif ($rowCount !== count($categories)) {
+                user_error('Bad number of entries in ' . $rowID);
             }
             foreach ($categories as $category => $values) {
                 $shortKey = 'not-set';
@@ -201,15 +199,13 @@ class TableFilterSortAPI extends ViewableData
                         user_error('You are using an illegal key in the raw data, namely: ' . $shortKey);
                     }
                     $rawDataFieldKey[$category] = $shortKey;
+                } elseif (isset($category, $jsSettings['rowRawData'][$rowID])) {
+                    $shortKey = $rawDataFieldKey[$category];
                 } else {
-                    if (isset($category, $jsSettings['rowRawData'][$rowID])) {
-                        $shortKey = $rawDataFieldKey[$category];
-                    } else {
-                        user_error('Your rows are not identical: ' . $rowID . ' has an unknown category: ' . $category);
-                        print_r($rowID);
-                        print_r($values);
-                        print_r($jsSettings['rowRawData'][$rowID]);
-                    }
+                    user_error('Your rows are not identical: ' . $rowID . ' has an unknown category: ' . $category);
+                    print_r($rowID);
+                    print_r($values);
+                    print_r($jsSettings['rowRawData'][$rowID]);
                 }
                 $jsSettings['rowRawData'][$rowID][$shortKey] = $values;
                 unset($jsSettings['rowRawData'][$rowID][$category]);
@@ -225,7 +221,7 @@ class TableFilterSortAPI extends ViewableData
 
     protected static function num_2_alpha($n)
     {
-        for ($r = ''; $n >= 0; $n = intval($n / 26) - 1) {
+        for ($r = ''; $n >= 0; $n = (int) ($n / 26) - 1) {
             $r = chr($n % 26 + 0x41) . $r;
         }
 

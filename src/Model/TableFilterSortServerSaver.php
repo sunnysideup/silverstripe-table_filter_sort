@@ -93,7 +93,7 @@ class TableFilterSortServerSaver extends DataObject
         }
         $obj = DataObject::get_one(
             $className,
-            'LOWER("Title") =\'' . Convert::raw2sql($titleToLower) . '\' AND ParentPageID = \'' . Convert::raw2sql($parentPageID) . '\'',
+            'LOWER("Title") =\'' . Convert::raw2sql($titleToLower) . "' AND ParentPageID = '" . Convert::raw2sql($parentPageID) . "'",
             $cacheDataObjectGetOne = false
         );
         if (! $obj) {
@@ -110,7 +110,7 @@ class TableFilterSortServerSaver extends DataObject
     /**
      * Event handler called before writing to the database.
      */
-    public function onBeforeWrite()
+    protected function onBeforeWrite()
     {
         parent::onBeforeWrite();
         // if (! $this->Title){
@@ -136,6 +136,7 @@ class TableFilterSortServerSaver extends DataObject
         return self::get()
             ->filter(['Title' => $this->Title, 'ParentPageID' => $this->ParentPageID])
             ->exclude(['ID' => $this->ID])
-            ->exists() ? true : false;
+            ->exists()
+        ;
     }
 }

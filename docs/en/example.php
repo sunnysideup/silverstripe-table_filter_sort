@@ -156,7 +156,7 @@ $useJSON = $data['useJSON'];
         <header>
             <h1>Example of a Filter and Sort Table ... </h1>
             <form action="?submitted" method="get" class="update-page-form">
-                <div><input type="number" name="i" value="<?php echo isset($_GET['i']) ? intval($_GET['i']) : 300; ?>"/><label for="i">number of rows</label></div>
+                <div><input type="number" name="i" value="<?php echo isset($_GET['i']) ? (int) $_GET['i'] : 300; ?>"/><label for="i">number of rows</label></div>
                 <div><input type="checkbox" name="nojson" value="1" <?php echo isset($_GET['nojson']) && 1 === $_GET['nojson'] ? 'checked="checked"' : ''; ?> /><label for="nojson">without json data</label></div>
                 <div><input type="submit" value="reload" /></div>
             </form>
@@ -893,20 +893,10 @@ class LoremIpsum
     private function output($strings, $tags, $array, $delimiter = ' ')
     {
         if ($tags) {
-            if (! is_array($tags)) {
-                $tags = [$tags];
-            } else {
-                // Flips the array so we can work from the inside out
-                $tags = array_reverse($tags);
-            }
+            $tags = is_array($tags) ? array_reverse($tags) : [$tags];
             foreach ($strings as $key => $string) {
                 foreach ($tags as $tag) {
-                    // Detects / applies back reference
-                    if ('<' === $tag[0]) {
-                        $string = str_replace('$1', $string, $tag);
-                    } else {
-                        $string = sprintf('<%1$s>%2$s</%1$s>', $tag, $string);
-                    }
+                    $string = '<' === $tag[0] ? str_replace('$1', $string, $tag) : sprintf('<%1$s>%2$s</%1$s>', $tag, $string);
                     $strings[$key] = $string;
                 }
             }
