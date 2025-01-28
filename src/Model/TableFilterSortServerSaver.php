@@ -6,6 +6,17 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
 
+/**
+ * Class \Sunnysideup\TableFilterSort\Model\TableFilterSortServerSaver
+ *
+ * @property string $URLSegment
+ * @property string $Title
+ * @property string $Author
+ * @property string $Description
+ * @property string $ParentPageID
+ * @property string $Data
+ * @method ManyManyList|TableFilterSortTag[] Tags()
+ */
 class TableFilterSortServerSaver extends DataObject
 {
     private static $singular_name = 'Server Data';
