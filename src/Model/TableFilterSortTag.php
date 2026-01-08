@@ -5,6 +5,12 @@ namespace Sunnysideup\TableFilterSort\Model;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DataObject;
 
+/**
+ * Class \Sunnysideup\TableFilterSort\Model\TableFilterSortTag
+ *
+ * @property string $Title
+ * @method ManyManyList|TableFilterSortServerSaver[] TableFilterSortServerSavers()
+ */
 class TableFilterSortTag extends DataObject
 {
     private static $singular_name = 'Tag';

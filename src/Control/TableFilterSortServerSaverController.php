@@ -20,6 +20,10 @@ use Sunnysideup\TableFilterSort\Api\TableFilterSortAPI;
 use Sunnysideup\TableFilterSort\Model\TableFilterSortServerSaver;
 use Sunnysideup\TableFilterSort\Model\TableFilterSortTag;
 
+/**
+ * Class \Sunnysideup\TableFilterSort\Control\TableFilterSortServerSaverController
+ *
+ */
 class TableFilterSortServerSaverController extends Controller
 {
     protected $parentPageID;
