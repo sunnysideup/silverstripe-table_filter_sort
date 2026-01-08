@@ -61,7 +61,7 @@ class TableFilterSortTag extends DataObject
     public static function find_or_create(string $title, $addToObjectOrId)
     {
         $title = strtolower(trim($title));
-        if (! $title) {
+        if ($title === '' || $title === '0') {
             return self::create();
         }
         $filter = ['Title' => $title];

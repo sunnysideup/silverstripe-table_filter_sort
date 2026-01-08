@@ -126,7 +126,7 @@ class TableFilterSortServerSaver extends DataObject
         }
         $this->URLSegment = urlencode(
             strtolower(
-                str_replace(' ', '-', trim($this->Title))
+                str_replace(' ', '-', trim((string) $this->Title))
             )
         );
     }

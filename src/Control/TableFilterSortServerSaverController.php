@@ -129,7 +129,7 @@ class TableFilterSortServerSaverController extends Controller
                 $obj->write();
                 foreach ($data['TagsTempField'] as $tag) {
                     $tag = trim($tag);
-                    if ($tag) {
+                    if ($tag !== '' && $tag !== '0') {
                         TableFilterSortTag::find_or_create($tag, $obj);
                     }
                 }
@@ -204,6 +204,7 @@ class TableFilterSortServerSaverController extends Controller
 
             return Form::create($this, 'AddForm', $fieldList, $actionList, $requireFields);
         }
+        return null;
     }
 
     /**
@@ -266,12 +267,9 @@ class TableFilterSortServerSaverController extends Controller
     protected function dataToSave()
     {
         $data = $this->getRequest()->getSession()->get('TableFilterSortPostData');
-        if ($data) {
-            if (isset($data['ParentPageID'])) {
-                $this->parentPageID = $data['ParentPageID'];
-
-                return $data;
-            }
+        if ($data && isset($data['ParentPageID'])) {
+            $this->parentPageID = $data['ParentPageID'];
+            return $data;
         }
 
         return null;

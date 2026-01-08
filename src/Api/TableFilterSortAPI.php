@@ -90,7 +90,7 @@ class TableFilterSortAPI extends ViewableData
         //remove jQuery
         if ('' !== $jqueryLocation) {
             Requirements::javascript($jqueryLocation);
-        // if ($jqueryLocation) {
+            // if ($jqueryLocation) {
             // }
         } else {
             Requirements::javascript('https://code.jquery.com/jquery-3.5.1.min.js');
@@ -145,7 +145,7 @@ class TableFilterSortAPI extends ViewableData
                     //Requirements::themedCSS($link, 'table_filter_sort');
                 }
             }
-            if ($allCss) {
+            if ($allCss !== '' && $allCss !== '0') {
                 Requirements::customCSS($allCss, 'table_filter_sort_css');
             }
 
@@ -173,7 +173,7 @@ class TableFilterSortAPI extends ViewableData
                     Requirements::themedJavascript('sunnysideup/table_filter_sort: client/javascript/' . $link . '.js');
                 }
             }
-            if ($allJS) {
+            if ($allJS !== '' && $allJS !== '0') {
                 Requirements::customScript($allJS, 'table_filter_sort_js');
             }
         }
