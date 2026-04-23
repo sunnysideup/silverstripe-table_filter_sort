@@ -72,11 +72,7 @@ class TableFilterSortTag extends DataObject
         }
 
         $filter = ['Title' => $title];
-        $obj = DataObject::get_one(
-            self::class,
-            $filter,
-            $cacheDataObjectGetOne = false
-        );
+        $obj = self::get()->setUseCache($cacheDataObjectGetOne = false)->filter($filter)->first();
         if ($obj) {
             $obj = self::create($filter);
         }

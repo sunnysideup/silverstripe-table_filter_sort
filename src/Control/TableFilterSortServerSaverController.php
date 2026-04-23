@@ -14,7 +14,6 @@ use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\View\Requirements;
 use Sunnysideup\TableFilterSort\Api\TableFilterSortAPI;
 use Sunnysideup\TableFilterSort\Model\TableFilterSortServerSaver;
@@ -153,10 +152,7 @@ class TableFilterSortServerSaverController extends Controller
     {
         $this->getResponse()->addHeader('Content-Type', 'application/json');
         $urlSegment = Convert::raw2sql($request->param('ID'));
-        $obj = DataObject::get_one(
-            TableFilterSortServerSaver::class,
-            ['URLSegment' => $urlSegment]
-        );
+        $obj = TableFilterSortServerSaver::get()->setUseCache(true)->filter(['URLSegment' => $urlSegment])->first();
         if ($obj) {
             return json_encode(
                 [
