@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\TableFilterSort\Control;
 
+use Override;
+use SilverStripe\Forms\Validation\RequiredFieldsValidator;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
@@ -10,11 +12,9 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
-use SilverStripe\Forms\RequiredFields;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\View\Requirements;
 use Sunnysideup\TableFilterSort\Api\TableFilterSortAPI;
 use Sunnysideup\TableFilterSort\Model\TableFilterSortServerSaver;
@@ -60,6 +60,7 @@ class TableFilterSortServerSaverController extends Controller
      *
      * @return string (Link)
      */
+    #[Override]
     public function Link($action = null)
     {
         return self::create_link($action);
@@ -132,7 +133,7 @@ class TableFilterSortServerSaverController extends Controller
                 $obj->Author = Convert::raw2sql($data['Author']);
                 $obj->write();
                 foreach ($data['TagsTempField'] as $tag) {
-                    $tag = trim($tag);
+                    $tag = trim((string) $tag);
                     if ($tag !== '' && $tag !== '0') {
                         TableFilterSortTag::find_or_create($tag, $obj);
                     }
@@ -153,10 +154,7 @@ class TableFilterSortServerSaverController extends Controller
     {
         $this->getResponse()->addHeader('Content-Type', 'application/json');
         $urlSegment = Convert::raw2sql($request->param('ID'));
-        $obj = DataObject::get_one(
-            TableFilterSortServerSaver::class,
-            ['URLSegment' => $urlSegment]
-        );
+        $obj = TableFilterSortServerSaver::get()->setUseCache(true)->filter(['URLSegment' => $urlSegment])->first();
         if ($obj) {
             return json_encode(
                 [
@@ -200,14 +198,16 @@ class TableFilterSortServerSaverController extends Controller
                         ->setAttribute('placeholder', $title)
                 );
             }
+
             $actionTitle = _t('TableFilterSortServerSaverController.SAVE', 'Save');
             $actionList = FieldList::create(
                 FormAction::create('dosave', $actionTitle)
             );
-            $requireFields = RequiredFields::create(['Title']);
+            $requireFields = RequiredFieldsValidator::create(['Title']);
 
             return Form::create($this, 'AddForm', $fieldList, $actionList, $requireFields);
         }
+
         return null;
     }
 
@@ -227,6 +227,7 @@ class TableFilterSortServerSaverController extends Controller
         );
     }
 
+    #[Override]
     protected function init()
     {
         parent::init();

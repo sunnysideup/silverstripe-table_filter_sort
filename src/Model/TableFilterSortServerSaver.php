@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\TableFilterSort\Model;
 
+use Override;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
@@ -75,12 +76,14 @@ class TableFilterSortServerSaver extends DataObject
         'ParentPageID' => true,
     ];
 
+    #[Override]
     public function i18n_singular_name()
     {
         return Config::inst()->get(self::class, 'singular_name');
     }
 
-    public function i18n_plural_name()
+    #[Override]
+    public function plural_name()
     {
         return Config::inst()->get(self::class, 'plural_name');
     }
@@ -102,14 +105,12 @@ class TableFilterSortServerSaver extends DataObject
         if (! $title || ! $parentPageID) {
             return $className::create();
         }
-        $obj = DataObject::get_one(
-            $className,
-            'LOWER("Title") =\'' . Convert::raw2sql($titleToLower) . "' AND ParentPageID = '" . Convert::raw2sql($parentPageID) . "'",
-            $cacheDataObjectGetOne = false
-        );
+
+        $obj = $className::get()->setUseCache($cacheDataObjectGetOne = false)->filter('LOWER("Title") =\'' . Convert::raw2sql($titleToLower) . "' AND ParentPageID = '" . Convert::raw2sql($parentPageID) . "'")->first();
         if (! $obj) {
             $obj = $className::create();
         }
+
         $obj->Title = $title;
         $obj->ParentPageID = $parentPageID;
 
@@ -121,6 +122,7 @@ class TableFilterSortServerSaver extends DataObject
     /**
      * Event handler called before writing to the database.
      */
+    #[Override]
     protected function onBeforeWrite()
     {
         parent::onBeforeWrite();
@@ -135,6 +137,7 @@ class TableFilterSortServerSaver extends DataObject
             $this->Title = $originalName . ' ' . $iteration;
             ++$iteration;
         }
+
         $this->URLSegment = urlencode(
             strtolower(
                 str_replace(' ', '-', trim((string) $this->Title))

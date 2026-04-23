@@ -2,13 +2,12 @@
 
 namespace Sunnysideup\TableFilterSort\Api;
 
+use SilverStripe\Model\ModelData;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\View\Requirements;
-use SilverStripe\View\SSViewer;
-use SilverStripe\View\ViewableData;
 
-class TableFilterSortAPI extends ViewableData
+class TableFilterSortAPI extends ModelData
 {
     protected static $js_settings = [];
 
@@ -65,9 +64,11 @@ class TableFilterSortAPI extends ViewableData
         if (null === $jsSettings) {
             $jsSettings = self::$js_settings;
         }
+
         if (isset($jsSettings['rowRawData'])) {
             $jsSettings = self::workOutJSSettings($jsSettings);
         }
+
         $jsSettings = json_encode($jsSettings);
         //this must come first
         if ($tableSelector) {
@@ -84,6 +85,7 @@ class TableFilterSortAPI extends ViewableData
                 'table_filter_sort'
             );
         }
+
         $js = Config::inst()->get(self::class, 'js');
         $css = Config::inst()->get(self::class, 'css');
 
@@ -108,12 +110,15 @@ class TableFilterSortAPI extends ViewableData
                 if (false === Director::isDev()) {
                     $link .= '.min';
                 }
+
                 Requirements::css('sunnysideup/table_filter_sort: client/css/' . $link . '.css');
             }
+
             foreach ($js as $link) {
                 if (false === Director::isDev()) {
                     $link .= '.min';
                 }
+
                 Requirements::javascript('sunnysideup/table_filter_sort: client/javascript/' . $link . '.js');
             }
         } else {
@@ -127,6 +132,7 @@ class TableFilterSortAPI extends ViewableData
                 if (false === Director::isDev()) {
                     $link .= '.min';
                 }
+
                 $testFiles = [
                     'vendor/sunnysideup/table_filter_sort/client/css/' . $link . '.css',
                 ];
@@ -140,11 +146,13 @@ class TableFilterSortAPI extends ViewableData
                         break;
                     }
                 }
+
                 if (! $hasBeenIncluded) {
                     //upgrade to do fix this
                     //Requirements::themedCSS($link, 'table_filter_sort');
                 }
             }
+
             if ($allCss !== '' && $allCss !== '0') {
                 Requirements::customCSS($allCss, 'table_filter_sort_css');
             }
@@ -155,6 +163,7 @@ class TableFilterSortAPI extends ViewableData
                 if (false === Director::isDev()) {
                     $link .= '.min';
                 }
+
                 $testFile = $base . $link;
                 $testFiles = [
                     'vendor/sunnysideup/table_filter_sort/client/javascript/' . $link . '.js',
@@ -169,10 +178,12 @@ class TableFilterSortAPI extends ViewableData
                         break;
                     }
                 }
+
                 if (! $hasBeenIncluded) {
                     Requirements::themedJavascript('sunnysideup/table_filter_sort: client/javascript/' . $link . '.js');
                 }
             }
+
             if ($allJS !== '' && $allJS !== '0') {
                 Requirements::customScript($allJS, 'table_filter_sort_js');
             }
@@ -190,6 +201,7 @@ class TableFilterSortAPI extends ViewableData
             } elseif ($rowCount !== count($categories)) {
                 user_error('Bad number of entries in ' . $rowID);
             }
+
             foreach ($categories as $category => $values) {
                 $shortKey = 'not-set';
                 if ($firstRow) {
@@ -198,6 +210,7 @@ class TableFilterSortAPI extends ViewableData
                     if (array_key_exists($shortKey, $jsSettings['rowRawData'][$rowID])) {
                         user_error('You are using an illegal key in the raw data, namely: ' . $shortKey);
                     }
+
                     $rawDataFieldKey[$category] = $shortKey;
                 } elseif (isset($category, $jsSettings['rowRawData'][$rowID])) {
                     $shortKey = $rawDataFieldKey[$category];
@@ -207,9 +220,11 @@ class TableFilterSortAPI extends ViewableData
                     print_r($values);
                     print_r($jsSettings['rowRawData'][$rowID]);
                 }
+
                 $jsSettings['rowRawData'][$rowID][$shortKey] = $values;
                 unset($jsSettings['rowRawData'][$rowID][$category]);
             }
+
             //this needs to be here - after the category loop
             $firstRow = false;
         }
