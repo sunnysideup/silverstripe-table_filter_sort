@@ -132,7 +132,7 @@ class TableFilterSortServerSaverController extends Controller
                 $obj->Author = Convert::raw2sql($data['Author']);
                 $obj->write();
                 foreach ($data['TagsTempField'] as $tag) {
-                    $tag = trim($tag);
+                    $tag = trim((string) $tag);
                     if ($tag !== '' && $tag !== '0') {
                         TableFilterSortTag::find_or_create($tag, $obj);
                     }
@@ -200,6 +200,7 @@ class TableFilterSortServerSaverController extends Controller
                         ->setAttribute('placeholder', $title)
                 );
             }
+
             $actionTitle = _t('TableFilterSortServerSaverController.SAVE', 'Save');
             $actionList = FieldList::create(
                 FormAction::create('dosave', $actionTitle)
@@ -208,6 +209,7 @@ class TableFilterSortServerSaverController extends Controller
 
             return Form::create($this, 'AddForm', $fieldList, $actionList, $requireFields);
         }
+
         return null;
     }
 

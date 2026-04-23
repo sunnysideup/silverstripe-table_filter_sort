@@ -52,7 +52,7 @@ class TableFilterSortTag extends DataObject
         return Config::inst()->get(self::class, 'singular_name');
     }
 
-    public function i18n_plural_name()
+    public function plural_name()
     {
         return Config::inst()->get(self::class, 'plural_name');
     }
@@ -70,6 +70,7 @@ class TableFilterSortTag extends DataObject
         if ($title === '' || $title === '0') {
             return self::create();
         }
+
         $filter = ['Title' => $title];
         $obj = DataObject::get_one(
             self::class,
@@ -79,6 +80,7 @@ class TableFilterSortTag extends DataObject
         if ($obj) {
             $obj = self::create($filter);
         }
+
         $obj->Title = $title;
         $obj->write();
 
