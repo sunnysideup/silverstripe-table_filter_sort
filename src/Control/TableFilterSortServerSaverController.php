@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\TableFilterSort\Control;
 
+use Override;
 use SilverStripe\Forms\Validation\RequiredFieldsValidator;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
@@ -59,6 +60,7 @@ class TableFilterSortServerSaverController extends Controller
      *
      * @return string (Link)
      */
+    #[Override]
     public function Link($action = null)
     {
         return self::create_link($action);
@@ -225,6 +227,7 @@ class TableFilterSortServerSaverController extends Controller
         );
     }
 
+    #[Override]
     protected function init()
     {
         parent::init();

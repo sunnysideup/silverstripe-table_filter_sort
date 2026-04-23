@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\TableFilterSort\Model;
 
+use Override;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
@@ -75,11 +76,13 @@ class TableFilterSortServerSaver extends DataObject
         'ParentPageID' => true,
     ];
 
+    #[Override]
     public function i18n_singular_name()
     {
         return Config::inst()->get(self::class, 'singular_name');
     }
 
+    #[Override]
     public function plural_name()
     {
         return Config::inst()->get(self::class, 'plural_name');
@@ -119,6 +122,7 @@ class TableFilterSortServerSaver extends DataObject
     /**
      * Event handler called before writing to the database.
      */
+    #[Override]
     protected function onBeforeWrite()
     {
         parent::onBeforeWrite();
