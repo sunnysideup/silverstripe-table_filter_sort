@@ -2,12 +2,12 @@
 
 namespace Sunnysideup\TableFilterSort\Api;
 
+use SilverStripe\Model\ModelData;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\View\Requirements;
-use SilverStripe\View\ViewableData;
 
-class TableFilterSortAPI extends ViewableData
+class TableFilterSortAPI extends ModelData
 {
     protected static $js_settings = [];
 

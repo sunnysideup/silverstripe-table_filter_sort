@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\TableFilterSort\Control;
 
+use SilverStripe\Forms\Validation\RequiredFieldsValidator;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
@@ -10,7 +11,6 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
-use SilverStripe\Forms\RequiredFields;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataList;
@@ -205,7 +205,7 @@ class TableFilterSortServerSaverController extends Controller
             $actionList = FieldList::create(
                 FormAction::create('dosave', $actionTitle)
             );
-            $requireFields = RequiredFields::create(['Title']);
+            $requireFields = RequiredFieldsValidator::create(['Title']);
 
             return Form::create($this, 'AddForm', $fieldList, $actionList, $requireFields);
         }
